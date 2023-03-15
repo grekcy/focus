@@ -1,25 +1,46 @@
+import { Box } from "@mui/material";
+import { useState } from "react";
+import { CookiesProvider } from "react-cookie";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import logo from "./logo.svg";
+import { AppBar } from "./AppBar";
+import { BoardPage } from "./routes/board";
+import { CardPage } from "./routes/card";
+import { ErrorPage } from "./routes/ErrorPage";
+import { ForecastPage } from "./routes/forecast";
+import { InboxPage } from "./routes/Inbox";
+import { Root } from "./routes/Root";
+import { TodayPage } from "./routes/today";
+import { DrawerHeader, SideBar } from "./sidebar";
 
 function App() {
+  const [open, setOpen] = useState(false);
+
+  function toggleSideBar() {
+    setOpen((p) => !p);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <CookiesProvider>
+      <BrowserRouter>
+        <Box sx={{ display: "flex" }}>
+          <AppBar open={open} onMenuClick={() => toggleSideBar()} />
+          <SideBar open={open} onClose={() => toggleSideBar()} />
+          <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+            <DrawerHeader />
+            <Routes>
+              <Route index element={<Root />} errorElement={<ErrorPage />} />
+              <Route path="/inbox" element={<InboxPage />} />
+              <Route path="/today" element={<TodayPage />} />
+              <Route path="/forecast" element={<ForecastPage />} />
+              <Route path="/cards/:cardId" element={<CardPage />} />
+              <Route path="/boards/:boardId" element={<BoardPage />} />
+              <Route path="*" element={<ErrorPage />} />
+            </Routes>
+          </Box>
+        </Box>
+      </BrowserRouter>
+    </CookiesProvider>
   );
 }
-
 export default App;
