@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/grekcy/focus/proto";
+
+service v1alpha1 {
+  rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
+}

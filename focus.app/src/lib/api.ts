@@ -1,7 +1,11 @@
 export class Card {
-  id: string = "";
+  id: number = 0; // database id
+  no: number = 0; // card number to display
+  parent: number | null = null;
+  rank: number = 0;
   subject: string = "";
   dueDate: Date | null = null;
+  completedAt: Date | null = null;
 
   constructor(initializer: any) {
     if (!initializer) return;
@@ -14,17 +18,19 @@ export class Card {
 const MOCK_CARDS = [
   new Card({
     id: 1,
-    subject: "focus: setup dev site",
+    subject: "quickadd를 통해서 inbox에 card를 추가한다.",
     dueDate: new Date(),
   }),
   new Card({
     id: 2,
-    subject: "implement gRPC client and server",
+    parent: 1,
+    subject: "setup golang project",
     dueDate: new Date(),
   }),
   new Card({
     id: 3,
-    subject: "authentication with oAuth service(google)",
+    parent: 1,
+    subject: "setup gRPC server & client",
     dueDate: new Date(),
   }),
 ];
@@ -35,7 +41,8 @@ export const focusAPI = {
   },
 
   addCard(card: Card) {
-    card.id = `${MOCK_CARDS.length + 1}`;
+    card.id = MOCK_CARDS.length + 1;
+    card.no = card.id;
     MOCK_CARDS.push(card);
   },
 };
