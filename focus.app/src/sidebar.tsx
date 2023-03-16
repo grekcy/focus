@@ -158,22 +158,27 @@ export const SideBar = forwardRef(
       <Box>
         <Drawer variant="permanent" open={currentOpen} onClose={toggleDrawer}>
           <DrawerHeader>
-            <IconButton onClick={() => onClose && onClose()}>
+            <IconButton key="x" onClick={() => onClose && onClose()}>
               <ChevronLeftIcon />
             </IconButton>
           </DrawerHeader>
           <Divider />
           <List>
-            {pages.map((page) => {
+            {pages.map((page, i) => {
               if (page.title === "-") {
-                return <Divider />;
+                return <Divider key={`${page.title}${i}`} />;
               }
 
               const icon = createElement(page.icon!);
               return (
-                <ListItem disablePadding sx={{ display: "block" }}>
+                <ListItem
+                  disablePadding
+                  sx={{ display: "block" }}
+                  key={page.title}
+                >
                   <Tooltip title={page.tooltip!}>
-                    <ListItemButton dense
+                    <ListItemButton
+                      dense
                       component={Link}
                       to={page.href!}
                       sx={{
