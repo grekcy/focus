@@ -6,6 +6,7 @@ export class Card {
   subject: string = "";
   dueDate: Date | null = null;
   completedAt: Date | null = null;
+  content: string = "";
 
   constructor(initializer: any) {
     if (!initializer) return;

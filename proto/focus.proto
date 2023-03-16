@@ -5,6 +5,20 @@ import "google/protobuf/empty.proto";
 
 option go_package = "github.com/grekcy/focus/proto";
 
+service focus() {
+  rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
+}
+
 service v1alpha1 {
   rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
+}
+
+message Card {
+  int64 no = 1;
+  int64 parent = 2;
+  string subject = 3;
+  int64 rank = 4;
+  int64 dueDate = 5;
+  int64 completedAt = 6;
+  string content = 7;
 }
