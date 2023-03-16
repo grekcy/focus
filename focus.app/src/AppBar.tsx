@@ -11,7 +11,8 @@ import {
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
 import { SyntheticEvent, useState } from "react";
-import { Card, focusAPI } from "./lib/api";
+import { v1alpha1Client } from "./lib/proto/FocusServiceClientPb";
+import { Card } from "./lib/proto/focus_pb";
 
 const drawerWidth = 170;
 
@@ -45,9 +46,19 @@ interface AppBarProps {
 export function AppBar({ open, onMenuClick }: AppBarProps) {
   const [qucikAddSubject, setQucikAddSubject] = useState("");
 
-  const onQuickAddKeyDown = (e: SyntheticEvent) => {
+  const onQuickAddKeyDown = async (e: SyntheticEvent) => {
     if ((e.nativeEvent as KeyboardEvent).key === "Enter") {
-      focusAPI.addCard(new Card({ subject: qucikAddSubject }));
+      console.log(`quick add: ${qucikAddSubject}`);
+
+      const card = new Card();
+      card.setSubject(qucikAddSubject);
+
+      const svc = new v1alpha1Client("http://localhost:8080");
+      await svc
+        .quickAddCard(card, null)
+        .then((r) => r.toObject())
+        .catch((e) => console.log(e));
+
       setQucikAddSubject("");
     }
   };

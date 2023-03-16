@@ -4,9 +4,6 @@ SRC=$(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path "*_te
 LDFLAGS ?= "-s -w"
 BUILD_FLAGS ?= -v -ldflags ${LDFLAGS}
 
-PROTO_DEFS := $(shell find . -not -path "./vendor/*" -type f -name '*.proto' -print)
-PROTO_GOS := $(patsubst %.proto,%.pb.go,$(PROTO_DEFS))
-
 .PHONY: clean test dep tidy
 
 all: build
@@ -31,10 +28,3 @@ dep:
 
 tidy:
 	@go mod tidy -v
-
-%.pb.go: $(patsubst %.pb.go,%.proto,$@)
-	protoc -I=./$(@D) --go_out=./$(@D) --go_opt=paths=source_relative \
-		--go-grpc_out=./$(@D) --go-grpc_opt=paths=source_relative \
-		--js_out=import_style=commonjs:./focus.app/src/lib/proto \
-		--grpc-web_out=import_style=commonjs,mode=grpcwebtext:./focus.app/src/lib/proto \
-		./$(patsubst %.pb.go,%.proto,$@)

@@ -20,8 +20,61 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
+const ()
+
+// FocusClient is the client API for Focus service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type FocusClient interface {
+}
+
+type focusClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewFocusClient(cc grpc.ClientConnInterface) FocusClient {
+	return &focusClient{cc}
+}
+
+// FocusServer is the server API for Focus service.
+// All implementations must embed UnimplementedFocusServer
+// for forward compatibility
+type FocusServer interface {
+	mustEmbedUnimplementedFocusServer()
+}
+
+// UnimplementedFocusServer must be embedded to have forward compatible implementations.
+type UnimplementedFocusServer struct {
+}
+
+func (UnimplementedFocusServer) mustEmbedUnimplementedFocusServer() {}
+
+// UnsafeFocusServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to FocusServer will
+// result in compilation errors.
+type UnsafeFocusServer interface {
+	mustEmbedUnimplementedFocusServer()
+}
+
+func RegisterFocusServer(s grpc.ServiceRegistrar, srv FocusServer) {
+	s.RegisterService(&Focus_ServiceDesc, srv)
+}
+
+// Focus_ServiceDesc is the grpc.ServiceDesc for Focus service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Focus_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "focus",
+	HandlerType: (*FocusServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams:     []grpc.StreamDesc{},
+	Metadata:    "focus.proto",
+}
+
 const (
-	V1Alpha1_Version_FullMethodName = "/v1alpha1/version"
+	V1Alpha1_Version_FullMethodName      = "/v1alpha1/version"
+	V1Alpha1_QuickAddCard_FullMethodName = "/v1alpha1/quickAddCard"
+	V1Alpha1_ListCards_FullMethodName    = "/v1alpha1/listCards"
 )
 
 // V1Alpha1Client is the client API for V1Alpha1 service.
@@ -29,6 +82,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type V1Alpha1Client interface {
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
+	QuickAddCard(ctx context.Context, in *Card, opts ...grpc.CallOption) (*Card, error)
+	ListCards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CardListResp, error)
 }
 
 type v1Alpha1Client struct {
@@ -48,11 +103,31 @@ func (c *v1Alpha1Client) Version(ctx context.Context, in *emptypb.Empty, opts ..
 	return out, nil
 }
 
+func (c *v1Alpha1Client) QuickAddCard(ctx context.Context, in *Card, opts ...grpc.CallOption) (*Card, error) {
+	out := new(Card)
+	err := c.cc.Invoke(ctx, V1Alpha1_QuickAddCard_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *v1Alpha1Client) ListCards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CardListResp, error) {
+	out := new(CardListResp)
+	err := c.cc.Invoke(ctx, V1Alpha1_ListCards_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // V1Alpha1Server is the server API for V1Alpha1 service.
 // All implementations must embed UnimplementedV1Alpha1Server
 // for forward compatibility
 type V1Alpha1Server interface {
 	Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
+	QuickAddCard(context.Context, *Card) (*Card, error)
+	ListCards(context.Context, *emptypb.Empty) (*CardListResp, error)
 	mustEmbedUnimplementedV1Alpha1Server()
 }
 
@@ -62,6 +137,12 @@ type UnimplementedV1Alpha1Server struct {
 
 func (UnimplementedV1Alpha1Server) Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
+}
+func (UnimplementedV1Alpha1Server) QuickAddCard(context.Context, *Card) (*Card, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QuickAddCard not implemented")
+}
+func (UnimplementedV1Alpha1Server) ListCards(context.Context, *emptypb.Empty) (*CardListResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListCards not implemented")
 }
 func (UnimplementedV1Alpha1Server) mustEmbedUnimplementedV1Alpha1Server() {}
 
@@ -94,6 +175,42 @@ func _V1Alpha1_Version_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _V1Alpha1_QuickAddCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Card)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(V1Alpha1Server).QuickAddCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: V1Alpha1_QuickAddCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(V1Alpha1Server).QuickAddCard(ctx, req.(*Card))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _V1Alpha1_ListCards_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(V1Alpha1Server).ListCards(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: V1Alpha1_ListCards_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(V1Alpha1Server).ListCards(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // V1Alpha1_ServiceDesc is the grpc.ServiceDesc for V1Alpha1 service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -104,6 +221,14 @@ var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "version",
 			Handler:    _V1Alpha1_Version_Handler,
+		},
+		{
+			MethodName: "quickAddCard",
+			Handler:    _V1Alpha1_QuickAddCard_Handler,
+		},
+		{
+			MethodName: "listCards",
+			Handler:    _V1Alpha1_ListCards_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -5,6 +5,8 @@ import (
 	"net"
 	"time"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/whitekid/goxp/log"
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/encoding/gzip"
@@ -14,18 +16,27 @@ import (
 	"focus/proto"
 )
 
-func Serve(ctx context.Context) error {
-	log.Infof("listening %v...", config.ApiServerBindAddr())
+// Serve serve grpc service with block
+func Serve(ctx context.Context, ln net.Listener) error {
 
-	ln, err := net.Listen("tcp", config.ApiServerBindAddr())
-	if err != nil {
-		return err
+	ownListener := true
+	if ln == nil {
+		var err error
+
+		log.Infof("listening %v...", config.ApiServerBindAddr())
+		ln, err = net.Listen("tcp", config.ApiServerBindAddr())
+		if err != nil {
+			return err
+		}
+		ownListener = false
 	}
 
-	go func() {
-		<-ctx.Done()
-		ln.Close()
-	}()
+	if ownListener {
+		go func() {
+			<-ctx.Done()
+			ln.Close()
+		}()
+	}
 
 	var kaep = keepalive.EnforcementPolicy{
 		MinTime:             5 * time.Second, // If a client pings more than once every 5 seconds, terminate the connection
@@ -37,7 +48,12 @@ func Serve(ctx context.Context) error {
 		Timeout: time.Second,     // Wait 1 second for the ping ack before assuming the connection is dead
 	}
 
+	logger := log.Zap(log.New())
+
 	g := grpc.NewServer(
+		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
+			grpc_zap.StreamServerInterceptor(logger),
+		)),
 		grpc.KeepaliveEnforcementPolicy(kaep),
 		grpc.KeepaliveParams(kasp),
 	)

@@ -17,7 +17,7 @@ func init() {
 }
 
 var defaults = map[string]any{
-	"apiserver.bind_addr": "127.0.0.1:8080",
+	"apiserver.bind_addr": "127.0.0.1:9090",
 }
 
 func ApiServerBindAddr() string { return v.GetString("apiserver.bind_addr") }

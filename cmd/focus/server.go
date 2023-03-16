@@ -12,7 +12,7 @@ func init() {
 		Use:   "apiserver",
 		Short: "start focus api server",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return api.Serve(cmd.Context())
+			return api.Serve(cmd.Context(), nil)
 		},
 	}, nil, nil)
 }

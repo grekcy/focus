@@ -2,15 +2,18 @@ syntax = "proto3";
 
 import "google/protobuf/wrappers.proto";
 import "google/protobuf/empty.proto";
+// import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/grekcy/focus/proto";
 
-service focus() {
-  rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
-}
+service focus {}
 
 service v1alpha1 {
   rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
+
+  rpc quickAddCard(Card) returns (Card);
+  rpc listCards(google.protobuf.Empty) returns (CardListResp) {}
 }
 
 message Card {
@@ -18,7 +21,11 @@ message Card {
   int64 parent = 2;
   string subject = 3;
   int64 rank = 4;
-  int64 dueDate = 5;
-  int64 completedAt = 6;
-  string content = 7;
+  optional google.protobuf.Timestamp dueDate = 5;
+  optional google.protobuf.Timestamp completedAt = 6;
+  google.protobuf.Timestamp createdAt = 7;
+  string content = 8;
+  repeated string labels = 9;
 }
+
+message CardListResp { repeated Card items = 1; }

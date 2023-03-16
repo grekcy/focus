@@ -1,7 +1,8 @@
 import { Typography } from "@mui/material";
 import { DataGrid, GridColDef, GridRowsProp } from "@mui/x-data-grid";
+import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { useEffect, useState } from "react";
-import { focusAPI } from "../lib/api";
+import { v1alpha1Client } from "../lib/proto/FocusServiceClientPb";
 
 export function InboxPage() {
   const columns: GridColDef[] = [
@@ -14,15 +15,26 @@ export function InboxPage() {
 
   const [rows, setRows] = useState<GridRowsProp>([]);
   useEffect(() => {
-    const cards = focusAPI.getCards();
-    const updatedRows = cards.map((c) => {
-      return {
-        id: c.id,
-        subject: c.subject,
-        dueDate: c.dueDate?.toLocaleString(),
-      };
-    });
-    setRows(updatedRows);
+    (async () => {
+      const svc = new v1alpha1Client("http://localhost:8080");
+      const r = await svc
+        .listCards(new Empty(), null)
+        .then((r) => r.toObject());
+
+      setRows(
+        r.itemsList.map((c) => {
+          return {
+            id: c.no,
+            subject: c.subject,
+            createdAt: c.createdat,
+            rank: c.rank,
+            completedAt: c.completedat,
+            content: c.content,
+            labels: c.labelsList,
+          };
+        })
+      );
+    })();
   }, []);
 
   return (
