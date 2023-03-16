@@ -34,4 +34,7 @@ tidy:
 
 %.pb.go: $(patsubst %.pb.go,%.proto,$@)
 	protoc -I=./$(@D) --go_out=./$(@D) --go_opt=paths=source_relative \
-		--go-grpc_out=./$(@D) --go-grpc_opt=paths=source_relative ./$(patsubst %.pb.go,%.proto,$@)
+		--go-grpc_out=./$(@D) --go-grpc_opt=paths=source_relative \
+		--js_out=import_style=commonjs:./focus.app/src/lib/proto \
+		--grpc-web_out=import_style=commonjs,mode=grpcwebtext:./focus.app/src/lib/proto \
+		./$(patsubst %.pb.go,%.proto,$@)
