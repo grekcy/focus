@@ -45,21 +45,32 @@ interface AppBarProps {
 
 export function AppBar({ open, onMenuClick }: AppBarProps) {
   const [qucikAddSubject, setQucikAddSubject] = useState("");
+  const [adding, setAdding] = useState(false);
 
-  const onQuickAddKeyDown = async (e: SyntheticEvent) => {
+  const onQuickAddKeyUp = (e: SyntheticEvent) => {
     if ((e.nativeEvent as KeyboardEvent).key === "Enter") {
-      console.log(`quick add: ${qucikAddSubject}`);
+      if (adding) return; // NOTE 한글의 경우 글을 조합하는 도중에 Enter를 누르면 2번 호출됨
+      const subject = qucikAddSubject.trim();
+      if (subject === "") return;
+
+      setAdding(true);
 
       const card = new Card();
-      card.setSubject(qucikAddSubject);
+      card.setSubject(subject);
 
+      // TODO 주소를 이렇게 넣었는데, 이러면 안되지
       const svc = new v1alpha1Client("http://localhost:8080");
-      await svc
-        .quickAddCard(card, null)
-        .then((r) => r.toObject())
-        .catch((e) => console.log(e));
-
-      setQucikAddSubject("");
+      (async () => {
+        svc
+          .quickAddCard(card, null)
+          .then((r) => r.toObject())
+          .then((r) => {
+            setQucikAddSubject("");
+            return r;
+          })
+          .catch((e) => e)
+          .finally(() => setAdding(false));
+      })();
     }
   };
 
@@ -84,7 +95,7 @@ export function AppBar({ open, onMenuClick }: AppBarProps) {
             placeholder="add card to inbox..."
             value={qucikAddSubject}
             onChange={(e) => setQucikAddSubject(e.target.value)}
-            onKeyDown={onQuickAddKeyDown}
+            onKeyUp={onQuickAddKeyUp}
           />
         </Box>
         <Box sx={{ flexGrow: 0 }}>

@@ -1,8 +1,8 @@
 TARGET=bin/focus
 SRC=$(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path "*_test.go")
 
-LDFLAGS ?= "-s -w"
-BUILD_FLAGS ?= -v -ldflags ${LDFLAGS}
+LDFLAGS ?= -ldflags "-s -w"
+BUILD_FLAGS ?= -v ${LDFLAGS}
 
 .PHONY: clean test dep tidy
 

@@ -13,12 +13,12 @@ import (
 	"google.golang.org/grpc/keepalive"
 
 	"focus/config"
+	"focus/databases"
 	"focus/proto"
 )
 
 // Serve serve grpc service with block
 func Serve(ctx context.Context, ln net.Listener) error {
-
 	ownListener := true
 	if ln == nil {
 		var err error
@@ -58,7 +58,12 @@ func Serve(ctx context.Context, ln net.Listener) error {
 		grpc.KeepaliveParams(kasp),
 	)
 
-	proto.RegisterV1Alpha1Server(g, newV1Alpha1Service())
+	db, err := databases.Open("pgsql://focus:focus-pass@localhost/focus_dev")
+	if err != nil {
+		return err
+	}
+
+	proto.RegisterV1Alpha1Server(g, newV1Alpha1Service(db))
 
 	return g.Serve(ln)
 }

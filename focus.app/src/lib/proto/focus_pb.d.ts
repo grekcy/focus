@@ -9,37 +9,16 @@ export class Card extends jspb.Message {
   getNo(): number;
   setNo(value: number): Card;
 
-  getParent(): number;
-  setParent(value: number): Card;
-
   getSubject(): string;
   setSubject(value: string): Card;
 
   getRank(): number;
   setRank(value: number): Card;
 
-  getDuedate(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setDuedate(value?: google_protobuf_timestamp_pb.Timestamp): Card;
-  hasDuedate(): boolean;
-  clearDuedate(): Card;
-
-  getCompletedat(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setCompletedat(value?: google_protobuf_timestamp_pb.Timestamp): Card;
-  hasCompletedat(): boolean;
-  clearCompletedat(): Card;
-
   getCreatedat(): google_protobuf_timestamp_pb.Timestamp | undefined;
   setCreatedat(value?: google_protobuf_timestamp_pb.Timestamp): Card;
   hasCreatedat(): boolean;
   clearCreatedat(): Card;
-
-  getContent(): string;
-  setContent(value: string): Card;
-
-  getLabelsList(): Array<string>;
-  setLabelsList(value: Array<string>): Card;
-  clearLabelsList(): Card;
-  addLabels(value: string, index?: number): Card;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Card.AsObject;
@@ -52,24 +31,9 @@ export class Card extends jspb.Message {
 export namespace Card {
   export type AsObject = {
     no: number,
-    parent: number,
     subject: string,
     rank: number,
-    duedate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    completedat?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     createdat?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    content: string,
-    labelsList: Array<string>,
-  }
-
-  export enum DuedateCase { 
-    _DUEDATE_NOT_SET = 0,
-    DUEDATE = 5,
-  }
-
-  export enum CompletedatCase { 
-    _COMPLETEDAT_NOT_SET = 0,
-    COMPLETEDAT = 6,
   }
 }
 

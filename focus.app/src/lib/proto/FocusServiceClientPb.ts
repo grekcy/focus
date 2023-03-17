@@ -191,5 +191,48 @@ export class v1alpha1Client {
     this.methodDescriptorlistCards);
   }
 
+  methodDescriptordeleteCard = new grpcWeb.MethodDescriptor(
+    '/v1alpha1/deleteCard',
+    grpcWeb.MethodType.UNARY,
+    google_protobuf_wrappers_pb.UInt64Value,
+    google_protobuf_empty_pb.Empty,
+    (request: google_protobuf_wrappers_pb.UInt64Value) => {
+      return request.serializeBinary();
+    },
+    google_protobuf_empty_pb.Empty.deserializeBinary
+  );
+
+  deleteCard(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
+
+  deleteCard(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  deleteCard(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/v1alpha1/deleteCard',
+        request,
+        metadata || {},
+        this.methodDescriptordeleteCard,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/v1alpha1/deleteCard',
+    request,
+    metadata || {},
+    this.methodDescriptordeleteCard);
+  }
+
 }
 
