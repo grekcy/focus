@@ -49,12 +49,12 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *proto.Card) 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		// TODO workspace 별로 card_no를 계산해야 할 것임
 		cardNo := int64(0)
-		if tx := s.db.Model(&models.Card{}).Count(&cardNo); tx.Error != nil {
+		if tx := s.db.Model(&models.Card{}).Unscoped().Count(&cardNo); tx.Error != nil {
 			return status.Error(codes.Internal, "fail to get card count")
 		}
 
 		if cardNo != 0 {
-			if err := s.db.Model(&models.Card{}).Select("max(card_no)").Row().Scan(&cardNo); err != nil {
+			if err := s.db.Model(&models.Card{}).Unscoped().Select("max(card_no)").Row().Scan(&cardNo); err != nil {
 				log.Errorf("%v", err)
 				return status.Errorf(codes.Internal, "fail to get card_no")
 			}
