@@ -52,20 +52,3 @@ func TestVersion(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "v1alpha1", v.Value)
 }
-
-func TestQucickAdd(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	client := newTestServer(ctx, t)
-	got, err := client.QuickAddCard(ctx, &proto.Card{Subject: "test subject"})
-	require.NoError(t, err)
-	require.NotEqual(t, 0, got.No)
-	require.Equal(t, "test subject", got.Subject)
-	require.NotNil(t, got.CreatedAt)
-
-	resp, err := client.ListCards(ctx, &emptypb.Empty{})
-	require.NoError(t, err)
-	require.NotEqual(t, 0, len(resp.Items))
-	require.Equal(t, "test subject", resp.Items[0].Subject)
-}

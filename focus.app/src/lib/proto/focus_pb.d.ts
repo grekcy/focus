@@ -6,8 +6,8 @@ import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/t
 
 
 export class Card extends jspb.Message {
-  getNo(): number;
-  setNo(value: number): Card;
+  getCardno(): number;
+  setCardno(value: number): Card;
 
   getSubject(): string;
   setSubject(value: string): Card;
@@ -20,6 +20,11 @@ export class Card extends jspb.Message {
   hasCreatedat(): boolean;
   clearCreatedat(): Card;
 
+  getCompletedat(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCompletedat(value?: google_protobuf_timestamp_pb.Timestamp): Card;
+  hasCompletedat(): boolean;
+  clearCompletedat(): Card;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Card.AsObject;
   static toObject(includeInstance: boolean, msg: Card): Card.AsObject;
@@ -30,10 +35,38 @@ export class Card extends jspb.Message {
 
 export namespace Card {
   export type AsObject = {
-    no: number,
+    cardno: number,
     subject: string,
     rank: number,
     createdat?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    completedat?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+
+  export enum CompletedatCase { 
+    _COMPLETEDAT_NOT_SET = 0,
+    COMPLETEDAT = 5,
+  }
+}
+
+export class completeCardReq extends jspb.Message {
+  getCardno(): number;
+  setCardno(value: number): completeCardReq;
+
+  getComplted(): boolean;
+  setComplted(value: boolean): completeCardReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): completeCardReq.AsObject;
+  static toObject(includeInstance: boolean, msg: completeCardReq): completeCardReq.AsObject;
+  static serializeBinaryToWriter(message: completeCardReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): completeCardReq;
+  static deserializeBinaryFromReader(message: completeCardReq, reader: jspb.BinaryReader): completeCardReq;
+}
+
+export namespace completeCardReq {
+  export type AsObject = {
+    cardno: number,
+    complted: boolean,
   }
 }
 

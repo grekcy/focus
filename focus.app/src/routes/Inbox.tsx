@@ -1,18 +1,18 @@
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/Edit";
+import TaskAltIcon from "@mui/icons-material/TaskAlt";
+import TripOriginIcon from "@mui/icons-material/TripOrigin";
 import { Typography } from "@mui/material";
 import {
-  DataGrid,
   GridActionsCellItem,
   GridColDef,
   GridRowId,
   GridRowModel,
   GridRowsProp,
 } from "@mui/x-data-grid";
-import { Empty } from "google-protobuf/google/protobuf/empty_pb";
-import { UInt64Value } from "google-protobuf/google/protobuf/wrappers_pb";
 import { useContext, useEffect, useState } from "react";
 import { FocusContext, IFocusApp } from "../types";
+import { DataGridEx } from "./DataGridEx";
 
 export function InboxPage() {
   const app: IFocusApp = useContext(FocusContext);
@@ -22,7 +22,7 @@ export function InboxPage() {
       field: "id",
       headerName: "#",
       flex: 0,
-      width: 20,
+      width: 60,
     },
     {
       field: "subject",
@@ -31,39 +31,79 @@ export function InboxPage() {
       editable: true,
     },
     {
-      field: "actins",
+      field: "actions",
       type: "actions",
       headerName: "Actions",
-      width: 100,
+      width: 120,
       cellClassName: "actions",
       getActions: ({ id }) => {
-        return [
+        const row = rows.find((r) => r.id === id)!;
+
+        const acts = [
           <GridActionsCellItem icon={<EditIcon />} label="Edit" />,
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Delete"
-            onClick={(e) => {
-              onDeleteClick(id);
-            }}
+            onClick={() => onDeleteClick(id)}
           />,
         ];
+
+        if (row.card.completedat) {
+          acts.unshift(
+            <GridActionsCellItem
+              icon={<TaskAltIcon />}
+              label="clear completed"
+              onClick={() => setCompleted(row.card.cardno, false)}
+            />
+          );
+        } else {
+          acts.unshift(
+            <GridActionsCellItem
+              icon={<TripOriginIcon />}
+              label="mark completed"
+              onClick={() => setCompleted(row.card.cardno, true)}
+            />
+          );
+        }
+
+        return acts;
       },
     },
   ];
 
-  function onDeleteClick(id: GridRowId) {
-    console.log(`deleting ${id}`);
-
-    const service = app.client();
-    if (!service) {
+  function setCompleted(cardNo: number, complete: boolean) {
+    if (!cardNo) {
+      app.toast(`invalid cardNo: ${cardNo}`);
       return;
     }
 
-    const no = new UInt64Value();
-    no.setValue(parseInt(id.toString(), 10));
+    const service = app.client();
+    if (!service) return;
+
     (async () => {
-      await service
-        .deleteCard(no, null)
+      await service.completeCard(cardNo, complete);
+      setRows(
+        rows.map((r) => {
+          if (r.cardNo === cardNo) {
+            r.card.completedat = !r.card.completedat;
+          }
+          return r;
+        })
+      );
+    })();
+  }
+
+  function onDeleteClick(id: GridRowId) {
+    console.log(rows);
+    return;
+    console.log(`deleting ${id}`);
+
+    const service = app.client();
+    if (!service) return;
+
+    (async () => {
+      await service!
+        .deleteCard(parseInt(id.toString(), 10))
         .then((r) => setRows(rows.filter((row) => row.id !== id)))
         .catch((e) => app.toast(e, "error"));
     })();
@@ -73,26 +113,22 @@ export function InboxPage() {
   useEffect(() => {
     (async () => {
       const service = app.client();
-      if (!service) {
-        return;
-      }
+      if (!service) return;
 
-      await service
-        .listCards(new Empty(), null)
-        .then((r) => r.toObject())
-        .then((r) => {
-          setRows(
-            r.itemsList.map((c) => {
-              return {
-                id: c.no,
-                rank: c.rank,
-                subject: c.subject,
-                createdAt: c.createdat,
-              };
-            })
-          );
+      const r = await service.listCards();
+      setRows(
+        r.map((c) => {
+          return {
+            id: c.cardno,
+            cardNo: c.cardno,
+            rank: c.rank,
+            subject: c.subject,
+            createdAt: c.createdat,
+            completedAt: c.completedat,
+            card: c,
+          };
         })
-        .catch((e) => app.toast(e, "error"));
+      );
     })();
   }, []);
 
@@ -109,7 +145,7 @@ export function InboxPage() {
       <Typography variant="h5">Inbox</Typography>
 
       <div style={{ height: 300, width: "100%" }}>
-        <DataGrid
+        <DataGridEx
           columns={columns}
           rows={rows}
           autoHeight={true}
@@ -117,6 +153,9 @@ export function InboxPage() {
           columnHeaderHeight={0}
           editMode="row"
           processRowUpdate={processRowUpdate}
+          getRowClassName={(params) =>
+            `super-app-theme--${params.row.card.completedat ? "Filled" : ""}`
+          }
         />
       </div>
     </>

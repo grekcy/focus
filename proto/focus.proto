@@ -14,14 +14,21 @@ service v1alpha1 {
 
   rpc quickAddCard(Card) returns (Card);
   rpc listCards(google.protobuf.Empty) returns (CardListResp) {}
+  rpc completeCard(completeCardReq) returns (google.protobuf.Empty) {}
   rpc deleteCard(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {}
 }
 
 message Card {
-  uint64 no = 1;
+  uint64 cardNo = 1;
   string subject = 2;
   uint64 rank = 3;
   google.protobuf.Timestamp createdAt = 4;
+  optional google.protobuf.Timestamp completedAt = 5;
+}
+
+message completeCardReq {
+  uint64 cardNo = 1;
+  bool complted = 2;
 }
 
 message CardListResp { repeated Card items = 1; }

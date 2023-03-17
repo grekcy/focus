@@ -4,7 +4,7 @@ import { CookiesProvider } from "react-cookie";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { AppBar } from "./AppBar";
-import { v1alpha1Client } from "./lib/proto/FocusServiceClientPb";
+import { FocusAPI } from "./lib/api";
 import { BoardPage } from "./routes/board";
 import { CardPage } from "./routes/card";
 import { ErrorPage } from "./routes/ErrorPage";
@@ -23,7 +23,7 @@ function App() {
   const [toastSeverity, setToastSeverity] = useState<AlertColor>("success");
 
   // TODO authentication
-  const service = new v1alpha1Client("http://localhost:8080");
+  const service = new FocusAPI("http://localhost:8080");
 
   const impl: IFocusApp = {
     toggleSidebar() {
