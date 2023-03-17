@@ -11,10 +11,12 @@ import {
 } from "@mui/x-data-grid";
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { UInt64Value } from "google-protobuf/google/protobuf/wrappers_pb";
-import { useEffect, useState } from "react";
-import { v1alpha1Client } from "../lib/proto/FocusServiceClientPb";
+import { useContext, useEffect, useState } from "react";
+import { FocusContext, IFocusApp } from "../types";
 
 export function InboxPage() {
+  const app: IFocusApp = useContext(FocusContext);
+
   const columns: GridColDef[] = [
     {
       field: "id",
@@ -52,21 +54,29 @@ export function InboxPage() {
   function onDeleteClick(id: GridRowId) {
     console.log(`deleting ${id}`);
 
-    const service = new v1alpha1Client("http://localhost:8080");
+    const service = app.client();
+    if (!service) {
+      return;
+    }
+
     const no = new UInt64Value();
     no.setValue(parseInt(id.toString(), 10));
     (async () => {
       await service
         .deleteCard(no, null)
         .then((r) => setRows(rows.filter((row) => row.id !== id)))
-        .catch((e) => console.log(e));
+        .catch((e) => app.toast(e, "error"));
     })();
   }
 
   const [rows, setRows] = useState<GridRowsProp>([]);
   useEffect(() => {
     (async () => {
-      const service = new v1alpha1Client("http://localhost:8080");
+      const service = app.client();
+      if (!service) {
+        return;
+      }
+
       await service
         .listCards(new Empty(), null)
         .then((r) => r.toObject())
@@ -82,8 +92,7 @@ export function InboxPage() {
             })
           );
         })
-        .catch((e) => Error(e))
-        .finally(() => {});
+        .catch((e) => app.toast(e, "error"));
     })();
   }, []);
 

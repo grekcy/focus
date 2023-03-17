@@ -1,9 +1,10 @@
-import { Box } from "@mui/material";
+import { Alert, AlertColor, Box, Snackbar } from "@mui/material";
 import { useState } from "react";
 import { CookiesProvider } from "react-cookie";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { AppBar } from "./AppBar";
+import { v1alpha1Client } from "./lib/proto/FocusServiceClientPb";
 import { BoardPage } from "./routes/board";
 import { CardPage } from "./routes/card";
 import { ErrorPage } from "./routes/ErrorPage";
@@ -12,34 +13,67 @@ import { InboxPage } from "./routes/Inbox";
 import { Root } from "./routes/Root";
 import { TodayPage } from "./routes/today";
 import { DrawerHeader, SideBar } from "./sidebar";
+import { FocusContext, IFocusApp } from "./types";
 
 function App() {
-  const [open, setOpen] = useState(false);
+  const [openSideBar, setOpenSideBar] = useState(false);
 
-  function toggleSideBar() {
-    setOpen((p) => !p);
-  }
+  const [openToast, setOpenToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState<AlertColor>("success");
+
+  // TODO authentication
+  const service = new v1alpha1Client("http://localhost:8080");
+
+  const impl: IFocusApp = {
+    toggleSidebar() {
+      setOpenSideBar((p) => !p);
+    },
+    toast(message: string, severity?: AlertColor) {
+      setToastSeverity(severity ? severity : "info");
+      setToastMessage(message);
+      setOpenToast(true);
+    },
+    client() {
+      return service;
+    },
+  };
 
   return (
     <CookiesProvider>
-      <BrowserRouter>
-        <Box sx={{ display: "flex" }}>
-          <AppBar open={open} onMenuClick={() => toggleSideBar()} />
-          <SideBar open={open} onClose={() => toggleSideBar()} />
-          <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-            <DrawerHeader />
-            <Routes>
-              <Route index element={<Root />} errorElement={<ErrorPage />} />
-              <Route path="/inbox" element={<InboxPage />} />
-              <Route path="/today" element={<TodayPage />} />
-              <Route path="/forecast" element={<ForecastPage />} />
-              <Route path="/cards/:cardId" element={<CardPage />} />
-              <Route path="/boards/:boardId" element={<BoardPage />} />
-              <Route path="*" element={<ErrorPage />} />
-            </Routes>
+      <FocusContext.Provider value={impl}>
+        <BrowserRouter>
+          <Box sx={{ display: "flex" }}>
+            <AppBar open={openSideBar} />
+            <SideBar open={openSideBar} />
+            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+              <DrawerHeader />
+              <Routes>
+                <Route index element={<Root />} errorElement={<ErrorPage />} />
+                <Route path="/inbox" element={<InboxPage />} />
+                <Route path="/today" element={<TodayPage />} />
+                <Route path="/forecast" element={<ForecastPage />} />
+                <Route path="/cards/:cardId" element={<CardPage />} />
+                <Route path="/boards/:boardId" element={<BoardPage />} />
+                <Route path="*" element={<ErrorPage />} />
+              </Routes>
+            </Box>
           </Box>
-        </Box>
-      </BrowserRouter>
+        </BrowserRouter>
+        <Snackbar
+          open={openToast}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          autoHideDuration={6000}
+          onClose={(e, r) => {
+            if (r === "clickaway") return;
+            setOpenToast(false);
+          }}
+        >
+          <Alert severity={toastSeverity} onClose={() => setOpenToast(false)}>
+            {toastMessage}
+          </Alert>
+        </Snackbar>
+      </FocusContext.Provider>
     </CookiesProvider>
   );
 }

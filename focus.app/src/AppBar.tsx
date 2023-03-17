@@ -10,9 +10,10 @@ import {
 } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useContext, useState } from "react";
 import { v1alpha1Client } from "./lib/proto/FocusServiceClientPb";
 import { Card } from "./lib/proto/focus_pb";
+import { FocusContext, IFocusApp } from "./types";
 
 const drawerWidth = 170;
 
@@ -40,10 +41,9 @@ const MAppBar = styled(MuiAppBar, {
 
 interface AppBarProps {
   open: boolean;
-  onMenuClick?: () => void;
 }
 
-export function AppBar({ open, onMenuClick }: AppBarProps) {
+export function AppBar({ open }: AppBarProps) {
   const [qucikAddSubject, setQucikAddSubject] = useState("");
   const [adding, setAdding] = useState(false);
 
@@ -74,12 +74,14 @@ export function AppBar({ open, onMenuClick }: AppBarProps) {
     }
   };
 
+  const app: IFocusApp = useContext(FocusContext);
+
   return (
     <MAppBar position="fixed" open={open}>
       <Toolbar>
         <IconButton
           color="inherit"
-          onClick={() => onMenuClick && onMenuClick()}
+          onClick={() => app.toggleSidebar()}
           edge="start"
           sx={{ ...(open ? { display: "none" } : {}) }}
         >

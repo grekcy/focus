@@ -1,7 +1,7 @@
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
 import { UInt64Value } from "google-protobuf/google/protobuf/wrappers_pb";
-import { v1alpha1Client } from "./FocusServiceClientPb";
-import { Card } from "./focus_pb";
+import { v1alpha1Client } from "../FocusServiceClientPb";
+import { Card } from "../focus_pb";
 
 const endpoint = "http://127.0.0.1:8080";
 

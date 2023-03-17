@@ -24,11 +24,13 @@ import {
   forwardRef,
   Ref,
   SyntheticEvent,
+  useContext,
   useEffect,
   useImperativeHandle,
   useState,
 } from "react";
 import { Link } from "react-router-dom";
+import { FocusContext, IFocusApp } from "./types";
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -81,7 +83,6 @@ const Drawer = styled(MuiDrawer, {
 
 interface SideBarProps {
   open?: boolean;
-  onClose?: () => void;
 }
 
 export interface ISideBar {
@@ -142,7 +143,7 @@ const pages = [
 ];
 
 export const SideBar = forwardRef(
-  ({ open, onClose }: SideBarProps, ref: Ref<ISideBar>) => {
+  ({ open }: SideBarProps, ref: Ref<ISideBar>) => {
     useImperativeHandle(ref, () => ({
       toggle() {
         setCurrentOpen((p) => !p);
@@ -154,11 +155,13 @@ export const SideBar = forwardRef(
       setCurrentOpen(open);
     }, [open]);
 
+    const app: IFocusApp = useContext(FocusContext);
+
     return (
       <Box>
         <Drawer variant="permanent" open={currentOpen} onClose={toggleDrawer}>
           <DrawerHeader>
-            <IconButton key="x" onClick={() => onClose && onClose()}>
+            <IconButton key="x" onClick={() => app.toggleSidebar()}>
               <ChevronLeftIcon />
             </IconButton>
           </DrawerHeader>
