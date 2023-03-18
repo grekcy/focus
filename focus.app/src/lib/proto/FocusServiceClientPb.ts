@@ -33,7 +33,7 @@ export class FocusClient {
                options?: null | { [index: string]: any; }) {
     if (!options) options = {};
     if (!credentials) credentials = {};
-    options['format'] = 'text';
+    options['format'] = 'binary';
 
     this.client_ = new grpcWeb.GrpcWebClientBase(options);
     this.hostname_ = hostname.replace(/\/+$/, '');
@@ -54,7 +54,7 @@ export class V1Alpha1Client {
                options?: null | { [index: string]: any; }) {
     if (!options) options = {};
     if (!credentials) credentials = {};
-    options['format'] = 'text';
+    options['format'] = 'binary';
 
     this.client_ = new grpcWeb.GrpcWebClientBase(options);
     this.hostname_ = hostname.replace(/\/+$/, '');
