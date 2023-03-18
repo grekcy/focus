@@ -11,8 +11,6 @@ import {
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
 import { SyntheticEvent, useContext, useState } from "react";
-import { v1alpha1Client } from "./lib/proto/FocusServiceClientPb";
-import { Card } from "./lib/proto/focus_pb";
 import { FocusContext, IFocusApp } from "./types";
 
 const drawerWidth = 170;
@@ -47,6 +45,8 @@ export function AppBar({ open }: AppBarProps) {
   const [qucikAddSubject, setQucikAddSubject] = useState("");
   const [adding, setAdding] = useState(false);
 
+  const app: IFocusApp = useContext(FocusContext);
+
   const onQuickAddKeyUp = (e: SyntheticEvent) => {
     if ((e.nativeEvent as KeyboardEvent).key === "Enter") {
       if (adding) return; // NOTE 한글의 경우 글을 조합하는 도중에 Enter를 누르면 2번 호출됨
@@ -55,15 +55,12 @@ export function AppBar({ open }: AppBarProps) {
 
       setAdding(true);
 
-      const card = new Card();
-      card.setSubject(subject);
+      const service = app.client();
+      if (!service) return;
 
-      // TODO 주소를 이렇게 넣었는데, 이러면 안되지
-      const svc = new v1alpha1Client("http://localhost:8080");
       (async () => {
-        svc
-          .quickAddCard(card, null)
-          .then((r) => r.toObject())
+        service
+          .quickAddCard(subject)
           .then((r) => {
             setQucikAddSubject("");
             return r;
@@ -73,8 +70,6 @@ export function AppBar({ open }: AppBarProps) {
       })();
     }
   };
-
-  const app: IFocusApp = useContext(FocusContext);
 
   return (
     <MAppBar position="fixed" open={open}>

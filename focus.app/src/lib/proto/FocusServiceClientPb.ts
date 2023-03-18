@@ -22,7 +22,7 @@ import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty
 import * as google_protobuf_wrappers_pb from 'google-protobuf/google/protobuf/wrappers_pb';
 
 
-export class focusClient {
+export class FocusClient {
   client_: grpcWeb.AbstractClientBase;
   hostname_: string;
   credentials_: null | { [index: string]: string; };
@@ -43,7 +43,7 @@ export class focusClient {
 
 }
 
-export class v1alpha1Client {
+export class V1Alpha1Client {
   client_: grpcWeb.AbstractClientBase;
   hostname_: string;
   credentials_: null | { [index: string]: string; };
@@ -63,7 +63,7 @@ export class v1alpha1Client {
   }
 
   methodDescriptorversion = new grpcWeb.MethodDescriptor(
-    '/v1alpha1/version',
+    '/V1Alpha1/version',
     grpcWeb.MethodType.UNARY,
     google_protobuf_empty_pb.Empty,
     google_protobuf_wrappers_pb.StringValue,
@@ -91,7 +91,7 @@ export class v1alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/v1alpha1/version',
+          '/V1Alpha1/version',
         request,
         metadata || {},
         this.methodDescriptorversion,
@@ -99,14 +99,14 @@ export class v1alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/v1alpha1/version',
+      '/V1Alpha1/version',
     request,
     metadata || {},
     this.methodDescriptorversion);
   }
 
-  methodDescriptorquickAddCard = new grpcWeb.MethodDescriptor(
-    '/v1alpha1/quickAddCard',
+  methodDescriptorquickAadCard = new grpcWeb.MethodDescriptor(
+    '/V1Alpha1/quickAadCard',
     grpcWeb.MethodType.UNARY,
     focus_pb.Card,
     focus_pb.Card,
@@ -116,17 +116,17 @@ export class v1alpha1Client {
     focus_pb.Card.deserializeBinary
   );
 
-  quickAddCard(
+  quickAadCard(
     request: focus_pb.Card,
     metadata: grpcWeb.Metadata | null): Promise<focus_pb.Card>;
 
-  quickAddCard(
+  quickAadCard(
     request: focus_pb.Card,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
                response: focus_pb.Card) => void): grpcWeb.ClientReadableStream<focus_pb.Card>;
 
-  quickAddCard(
+  quickAadCard(
     request: focus_pb.Card,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
@@ -134,22 +134,22 @@ export class v1alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/v1alpha1/quickAddCard',
+          '/V1Alpha1/quickAadCard',
         request,
         metadata || {},
-        this.methodDescriptorquickAddCard,
+        this.methodDescriptorquickAadCard,
         callback);
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/v1alpha1/quickAddCard',
+      '/V1Alpha1/quickAadCard',
     request,
     metadata || {},
-    this.methodDescriptorquickAddCard);
+    this.methodDescriptorquickAadCard);
   }
 
   methodDescriptorlistCards = new grpcWeb.MethodDescriptor(
-    '/v1alpha1/listCards',
+    '/V1Alpha1/listCards',
     grpcWeb.MethodType.UNARY,
     google_protobuf_empty_pb.Empty,
     focus_pb.CardListResp,
@@ -177,7 +177,7 @@ export class v1alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/v1alpha1/listCards',
+          '/V1Alpha1/listCards',
         request,
         metadata || {},
         this.methodDescriptorlistCards,
@@ -185,42 +185,42 @@ export class v1alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/v1alpha1/listCards',
+      '/V1Alpha1/listCards',
     request,
     metadata || {},
     this.methodDescriptorlistCards);
   }
 
   methodDescriptorcompleteCard = new grpcWeb.MethodDescriptor(
-    '/v1alpha1/completeCard',
+    '/V1Alpha1/completeCard',
     grpcWeb.MethodType.UNARY,
-    focus_pb.completeCardReq,
+    focus_pb.CompleteCardReq,
     google_protobuf_empty_pb.Empty,
-    (request: focus_pb.completeCardReq) => {
+    (request: focus_pb.CompleteCardReq) => {
       return request.serializeBinary();
     },
     google_protobuf_empty_pb.Empty.deserializeBinary
   );
 
   completeCard(
-    request: focus_pb.completeCardReq,
+    request: focus_pb.CompleteCardReq,
     metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
 
   completeCard(
-    request: focus_pb.completeCardReq,
+    request: focus_pb.CompleteCardReq,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
                response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
   completeCard(
-    request: focus_pb.completeCardReq,
+    request: focus_pb.CompleteCardReq,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
                response: google_protobuf_empty_pb.Empty) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/v1alpha1/completeCard',
+          '/V1Alpha1/completeCard',
         request,
         metadata || {},
         this.methodDescriptorcompleteCard,
@@ -228,14 +228,14 @@ export class v1alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/v1alpha1/completeCard',
+      '/V1Alpha1/completeCard',
     request,
     metadata || {},
     this.methodDescriptorcompleteCard);
   }
 
   methodDescriptordeleteCard = new grpcWeb.MethodDescriptor(
-    '/v1alpha1/deleteCard',
+    '/V1Alpha1/deleteCard',
     grpcWeb.MethodType.UNARY,
     google_protobuf_wrappers_pb.UInt64Value,
     google_protobuf_empty_pb.Empty,
@@ -263,7 +263,7 @@ export class v1alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/v1alpha1/deleteCard',
+          '/V1Alpha1/deleteCard',
         request,
         metadata || {},
         this.methodDescriptordeleteCard,
@@ -271,7 +271,7 @@ export class v1alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/v1alpha1/deleteCard',
+      '/V1Alpha1/deleteCard',
     request,
     metadata || {},
     this.methodDescriptordeleteCard);

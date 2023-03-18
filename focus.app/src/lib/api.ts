@@ -1,13 +1,13 @@
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { UInt64Value } from "google-protobuf/google/protobuf/wrappers_pb";
-import { v1alpha1Client } from "./proto/FocusServiceClientPb";
-import { Card as pCard, completeCardReq } from "./proto/focus_pb";
+import { V1Alpha1Client } from "./proto/FocusServiceClientPb";
+import { Card as pCard, CompleteCardReq } from "./proto/focus_pb";
 
 export class FocusAPI {
-  s: v1alpha1Client;
+  s: V1Alpha1Client;
 
   constructor(endpoint: string) {
-    this.s = new v1alpha1Client(endpoint);
+    this.s = new V1Alpha1Client(endpoint);
   }
 
   version = async () => {
@@ -18,7 +18,7 @@ export class FocusAPI {
     const pcard = new pCard();
     pcard.setSubject(subject);
 
-    return await this.s.quickAddCard(pcard, null).then((r) => r.toObject());
+    return await this.s.quickAadCard(pcard, null).then((r) => r.toObject());
   };
 
   listCards = async () => {
@@ -29,8 +29,8 @@ export class FocusAPI {
   };
 
   completeCard = async (cardNo: number, complete: boolean) => {
-    const req = new completeCardReq();
-    req.setCardno(cardNo);
+    const req = new CompleteCardReq();
+    req.setCardNo(cardNo);
     req.setComplted(complete);
     await this.s.completeCard(req, null);
   };

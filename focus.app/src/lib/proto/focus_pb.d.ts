@@ -6,8 +6,8 @@ import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/t
 
 
 export class Card extends jspb.Message {
-  getCardno(): number;
-  setCardno(value: number): Card;
+  getCardNo(): number;
+  setCardNo(value: number): Card;
 
   getSubject(): string;
   setSubject(value: string): Card;
@@ -15,15 +15,15 @@ export class Card extends jspb.Message {
   getRank(): number;
   setRank(value: number): Card;
 
-  getCreatedat(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setCreatedat(value?: google_protobuf_timestamp_pb.Timestamp): Card;
-  hasCreatedat(): boolean;
-  clearCreatedat(): Card;
+  getCreatedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreatedAt(value?: google_protobuf_timestamp_pb.Timestamp): Card;
+  hasCreatedAt(): boolean;
+  clearCreatedAt(): Card;
 
-  getCompletedat(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setCompletedat(value?: google_protobuf_timestamp_pb.Timestamp): Card;
-  hasCompletedat(): boolean;
-  clearCompletedat(): Card;
+  getCompletedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCompletedAt(value?: google_protobuf_timestamp_pb.Timestamp): Card;
+  hasCompletedAt(): boolean;
+  clearCompletedAt(): Card;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Card.AsObject;
@@ -35,37 +35,37 @@ export class Card extends jspb.Message {
 
 export namespace Card {
   export type AsObject = {
-    cardno: number,
+    cardNo: number,
     subject: string,
     rank: number,
-    createdat?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    completedat?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
   }
 
-  export enum CompletedatCase { 
-    _COMPLETEDAT_NOT_SET = 0,
-    COMPLETEDAT = 5,
+  export enum CompletedAtCase { 
+    _COMPLETED_AT_NOT_SET = 0,
+    COMPLETED_AT = 5,
   }
 }
 
-export class completeCardReq extends jspb.Message {
-  getCardno(): number;
-  setCardno(value: number): completeCardReq;
+export class CompleteCardReq extends jspb.Message {
+  getCardNo(): number;
+  setCardNo(value: number): CompleteCardReq;
 
   getComplted(): boolean;
-  setComplted(value: boolean): completeCardReq;
+  setComplted(value: boolean): CompleteCardReq;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): completeCardReq.AsObject;
-  static toObject(includeInstance: boolean, msg: completeCardReq): completeCardReq.AsObject;
-  static serializeBinaryToWriter(message: completeCardReq, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): completeCardReq;
-  static deserializeBinaryFromReader(message: completeCardReq, reader: jspb.BinaryReader): completeCardReq;
+  toObject(includeInstance?: boolean): CompleteCardReq.AsObject;
+  static toObject(includeInstance: boolean, msg: CompleteCardReq): CompleteCardReq.AsObject;
+  static serializeBinaryToWriter(message: CompleteCardReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CompleteCardReq;
+  static deserializeBinaryFromReader(message: CompleteCardReq, reader: jspb.BinaryReader): CompleteCardReq;
 }
 
-export namespace completeCardReq {
+export namespace CompleteCardReq {
   export type AsObject = {
-    cardno: number,
+    cardNo: number,
     complted: boolean,
   }
 }

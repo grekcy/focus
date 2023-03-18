@@ -30,10 +30,10 @@ describe("focus API", () => {
 
   test("quick add", async () => {
     const got = await service.quickAddCard("test subject for quick add");
-    teardownCards.push(got.cardno);
-    expect(got.cardno).not.toEqual(0);
+    teardownCards.push(got.cardNo);
+    expect(got.cardNo).not.toEqual(0);
     expect(got.subject).toEqual("test subject for quick add");
-    expect(got.createdat?.seconds).not.toEqual(0);
+    expect(got.createdAt?.seconds).not.toEqual(0);
   });
 
   test("completed", async () => {
@@ -41,14 +41,14 @@ describe("focus API", () => {
     card.setSubject("test subject for completed");
 
     const got = await service.quickAddCard("test subject for completed");
-    teardownCards.push(got.cardno);
+    teardownCards.push(got.cardNo);
 
     // set completed
-    await service.completeCard(got.cardno, true);
+    await service.completeCard(got.cardNo, true);
 
     // again
     await service
-      .completeCard(got.cardno, true)
+      .completeCard(got.cardNo, true)
       .then((r) => {
         throw Error("should not called");
       })

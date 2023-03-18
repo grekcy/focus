@@ -53,7 +53,7 @@ export function InboxPage() {
             <GridActionsCellItem
               icon={<TaskAltIcon />}
               label="clear completed"
-              onClick={() => setCompleted(row.card.cardno, false)}
+              onClick={() => setCompleted(row.card.cardNo, false)}
             />
           );
         } else {
@@ -61,7 +61,7 @@ export function InboxPage() {
             <GridActionsCellItem
               icon={<TripOriginIcon />}
               label="mark completed"
-              onClick={() => setCompleted(row.card.cardno, true)}
+              onClick={() => setCompleted(row.card.cardNo, true)}
             />
           );
         }
@@ -119,12 +119,12 @@ export function InboxPage() {
       setRows(
         r.map((c) => {
           return {
-            id: c.cardno,
-            cardNo: c.cardno,
+            id: c.cardNo,
+            cardNo: c.cardNo,
             rank: c.rank,
             subject: c.subject,
-            createdAt: c.createdat,
-            completedAt: c.completedat,
+            createdAt: c.createdAt,
+            completedAt: c.completedAt,
             card: c,
           };
         })

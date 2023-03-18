@@ -64,7 +64,7 @@ func RegisterFocusServer(s grpc.ServiceRegistrar, srv FocusServer) {
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Focus_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "focus",
+	ServiceName: "Focus",
 	HandlerType: (*FocusServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams:     []grpc.StreamDesc{},
@@ -72,11 +72,11 @@ var Focus_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	V1Alpha1_Version_FullMethodName      = "/v1alpha1/version"
-	V1Alpha1_QuickAddCard_FullMethodName = "/v1alpha1/quickAddCard"
-	V1Alpha1_ListCards_FullMethodName    = "/v1alpha1/listCards"
-	V1Alpha1_CompleteCard_FullMethodName = "/v1alpha1/completeCard"
-	V1Alpha1_DeleteCard_FullMethodName   = "/v1alpha1/deleteCard"
+	V1Alpha1_Version_FullMethodName      = "/V1Alpha1/version"
+	V1Alpha1_QuickAadCard_FullMethodName = "/V1Alpha1/quickAadCard"
+	V1Alpha1_ListCards_FullMethodName    = "/V1Alpha1/listCards"
+	V1Alpha1_CompleteCard_FullMethodName = "/V1Alpha1/completeCard"
+	V1Alpha1_DeleteCard_FullMethodName   = "/V1Alpha1/deleteCard"
 )
 
 // V1Alpha1Client is the client API for V1Alpha1 service.
@@ -84,7 +84,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type V1Alpha1Client interface {
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
-	QuickAddCard(ctx context.Context, in *Card, opts ...grpc.CallOption) (*Card, error)
+	QuickAadCard(ctx context.Context, in *Card, opts ...grpc.CallOption) (*Card, error)
 	ListCards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CardListResp, error)
 	CompleteCard(ctx context.Context, in *CompleteCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -107,9 +107,9 @@ func (c *v1Alpha1Client) Version(ctx context.Context, in *emptypb.Empty, opts ..
 	return out, nil
 }
 
-func (c *v1Alpha1Client) QuickAddCard(ctx context.Context, in *Card, opts ...grpc.CallOption) (*Card, error) {
+func (c *v1Alpha1Client) QuickAadCard(ctx context.Context, in *Card, opts ...grpc.CallOption) (*Card, error) {
 	out := new(Card)
-	err := c.cc.Invoke(ctx, V1Alpha1_QuickAddCard_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, V1Alpha1_QuickAadCard_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (c *v1Alpha1Client) DeleteCard(ctx context.Context, in *wrapperspb.UInt64Va
 // for forward compatibility
 type V1Alpha1Server interface {
 	Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
-	QuickAddCard(context.Context, *Card) (*Card, error)
+	QuickAadCard(context.Context, *Card) (*Card, error)
 	ListCards(context.Context, *emptypb.Empty) (*CardListResp, error)
 	CompleteCard(context.Context, *CompleteCardReq) (*emptypb.Empty, error)
 	DeleteCard(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error)
@@ -162,8 +162,8 @@ type UnimplementedV1Alpha1Server struct {
 func (UnimplementedV1Alpha1Server) Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
-func (UnimplementedV1Alpha1Server) QuickAddCard(context.Context, *Card) (*Card, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method QuickAddCard not implemented")
+func (UnimplementedV1Alpha1Server) QuickAadCard(context.Context, *Card) (*Card, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QuickAadCard not implemented")
 }
 func (UnimplementedV1Alpha1Server) ListCards(context.Context, *emptypb.Empty) (*CardListResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCards not implemented")
@@ -205,20 +205,20 @@ func _V1Alpha1_Version_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _V1Alpha1_QuickAddCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _V1Alpha1_QuickAadCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Card)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(V1Alpha1Server).QuickAddCard(ctx, in)
+		return srv.(V1Alpha1Server).QuickAadCard(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: V1Alpha1_QuickAddCard_FullMethodName,
+		FullMethod: V1Alpha1_QuickAadCard_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(V1Alpha1Server).QuickAddCard(ctx, req.(*Card))
+		return srv.(V1Alpha1Server).QuickAadCard(ctx, req.(*Card))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -281,7 +281,7 @@ func _V1Alpha1_DeleteCard_Handler(srv interface{}, ctx context.Context, dec func
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "v1alpha1",
+	ServiceName: "V1Alpha1",
 	HandlerType: (*V1Alpha1Server)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -289,8 +289,8 @@ var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _V1Alpha1_Version_Handler,
 		},
 		{
-			MethodName: "quickAddCard",
-			Handler:    _V1Alpha1_QuickAddCard_Handler,
+			MethodName: "quickAadCard",
+			Handler:    _V1Alpha1_QuickAadCard_Handler,
 		},
 		{
 			MethodName: "listCards",
