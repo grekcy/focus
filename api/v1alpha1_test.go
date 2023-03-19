@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"focus/databases"
 	"focus/helper"
@@ -21,14 +23,14 @@ func newTestClient(ctx context.Context, t *testing.T) *v1alpha1ServiceImpl {
 
 func TestQuickAdd(t *testing.T) {
 	type args struct {
-		card *proto.Card
+		subject string
 	}
 	tests := [...]struct {
 		name    string
 		args    args
 		wantErr bool
 	}{
-		{"default", args{&proto.Card{Subject: "test subject"}}, false},
+		{"default", args{subject: "test subject"}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -39,13 +41,13 @@ func TestQuickAdd(t *testing.T) {
 			require.NoError(t, err)
 
 			service := newV1Alpha1Service(db).(*v1alpha1ServiceImpl)
-			got, err := service.QuickAddCard(ctx, tt.args.card)
+			got, err := service.QuickAddCard(ctx, wrapperspb.String(tt.args.subject))
 			require.Truef(t, (err != nil) == tt.wantErr, `Entries.List() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
 			if tt.wantErr {
 				return
 			}
 			require.NotEqual(t, uint64(0), got.CardNo)
-			require.Equal(t, tt.args.card.Subject, got.Subject)
+			require.Equal(t, tt.args.subject, got.Subject)
 
 			_, err = service.DeleteCard(ctx, helper.UInt64(got.CardNo))
 			require.NoError(t, err)
@@ -58,7 +60,7 @@ func TestCompleteCard(t *testing.T) {
 	defer cancel()
 
 	service := newTestClient(ctx, t)
-	card, err := service.QuickAddCard(ctx, &proto.Card{Subject: "test subject"})
+	card, err := service.QuickAddCard(ctx, wrapperspb.String("test subject"))
 	require.NoError(t, err)
 	defer func() {
 		_, err = service.DeleteCard(ctx, helper.UInt64(card.CardNo))
@@ -69,9 +71,12 @@ func TestCompleteCard(t *testing.T) {
 
 	// set completed
 	{
-		_, err = service.CompleteCard(ctx, &proto.CompleteCardReq{
-			CardNo:   card.CardNo,
-			Complted: true,
+		_, err = service.PatchCard(ctx, &proto.PatchCardReq{
+			Fields: []string{"completed_at"},
+			Card: &proto.Card{
+				CardNo:      card.CardNo,
+				CompletedAt: timestamppb.Now(),
+			},
 		})
 		require.NoError(t, err)
 
@@ -83,9 +88,12 @@ func TestCompleteCard(t *testing.T) {
 
 	// undo completed
 	{
-		_, err = service.CompleteCard(ctx, &proto.CompleteCardReq{
-			CardNo:   card.CardNo,
-			Complted: false,
+		_, err = service.PatchCard(ctx, &proto.PatchCardReq{
+			Fields: []string{"completed_at"},
+			Card: &proto.Card{
+				CardNo:      card.CardNo,
+				CompletedAt: nil,
+			},
 		})
 		require.NoError(t, err)
 

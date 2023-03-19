@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"time"
 
 	"github.com/whitekid/goxp"
 	"github.com/whitekid/goxp/fx"
@@ -187,7 +186,8 @@ func modelToProto(in *models.Card) *proto.Card {
 			func() *timestamppb.Timestamp { return nil },
 			func() *timestamppb.Timestamp { return timestamppb.New(*in.CompletedAt) },
 		),
-		Rank: uint64(in.Rank),
+		Rank:  uint64(in.Rank),
+		Depth: uint32(in.Depth),
 	}
 }
 
@@ -255,41 +255,37 @@ func (s *v1alpha1ServiceImpl) getCard(ctx context.Context, cardNo uint) (*models
 	}
 }
 
-func (s *v1alpha1ServiceImpl) CompleteCard(ctx context.Context, req *proto.CompleteCardReq) (*emptypb.Empty, error) {
-	if err := validate.Struct(&struct {
-		CardNo uint64 `validate:"required"`
-	}{
-		CardNo: req.CardNo,
-	}); err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	card, err := s.getCard(ctx, uint(req.CardNo))
+func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCardReq) (*emptypb.Empty, error) {
+	card, err := s.getCard(ctx, uint(req.Card.CardNo))
 	if err != nil {
 		return nil, err
 	}
 
-	if req.Complted {
-		if card.CompletedAt != nil {
-			return nil, status.Errorf(codes.AlreadyExists, "already completed at %v", card.CreatedAt.String())
-		}
-	} else {
-		if card.CompletedAt == nil {
-			return nil, status.Errorf(codes.AlreadyExists, "already not completed")
+	updates := map[string]any{}
+	for _, field := range req.Fields {
+		switch field {
+		case "subject":
+			updates["subject"] = req.Card.Subject
+		case "completed_at":
+			if req.Card.CompletedAt == nil {
+				updates["completed_at"] = gorm.Expr("NULL")
+			} else {
+				updates["completed_at"] = req.Card.CompletedAt.AsTime()
+			}
+		default:
+			log.Warnf("unknown field: %v", field)
 		}
 	}
 
+	if len(updates) == 0 {
+		return nil, status.Error(codes.InvalidArgument, "no columns to update")
+	}
+
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		if req.Complted {
-			tx = tx.Model(card).Update("completed_at", time.Now())
-		} else {
-			tx = tx.Model(card).Update("completed_at", gorm.Expr("NULL"))
+		if tx := s.db.Model(card).UpdateColumns(updates); tx.Error != nil {
+			return tx.Error
 		}
 
-		if tx.RowsAffected != 1 {
-
-			return status.Error(codes.Internal, "updates but multiple record affected.")
-		}
 		return nil
 	}); err != nil {
 		return nil, err

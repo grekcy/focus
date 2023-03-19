@@ -25,6 +25,9 @@ export class Card extends jspb.Message {
   hasCompletedAt(): boolean;
   clearCompletedAt(): Card;
 
+  getDepth(): number;
+  setDepth(value: number): Card;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Card.AsObject;
   static toObject(includeInstance: boolean, msg: Card): Card.AsObject;
@@ -40,6 +43,7 @@ export namespace Card {
     rank: number,
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    depth: number,
   }
 
   export enum CompletedAtCase { 
@@ -109,6 +113,32 @@ export namespace RankCardReq {
   export type AsObject = {
     cardNo: number,
     targetCardNo: number,
+  }
+}
+
+export class PatchCardReq extends jspb.Message {
+  getFieldsList(): Array<string>;
+  setFieldsList(value: Array<string>): PatchCardReq;
+  clearFieldsList(): PatchCardReq;
+  addFields(value: string, index?: number): PatchCardReq;
+
+  getCard(): Card | undefined;
+  setCard(value?: Card): PatchCardReq;
+  hasCard(): boolean;
+  clearCard(): PatchCardReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PatchCardReq.AsObject;
+  static toObject(includeInstance: boolean, msg: PatchCardReq): PatchCardReq.AsObject;
+  static serializeBinaryToWriter(message: PatchCardReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PatchCardReq;
+  static deserializeBinaryFromReader(message: PatchCardReq, reader: jspb.BinaryReader): PatchCardReq;
+}
+
+export namespace PatchCardReq {
+  export type AsObject = {
+    fieldsList: Array<string>,
+    card?: Card.AsObject,
   }
 }
 

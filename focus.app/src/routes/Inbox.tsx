@@ -181,6 +181,7 @@ export function InboxPage() {
             subject: c.subject,
             createdAt: c.createdAt,
             completedAt: c.completedAt,
+            depth: c.depth,
             card: c,
           };
         })
@@ -188,12 +189,22 @@ export function InboxPage() {
     })();
   }
 
-  // TODO updated to server
+  const [updating, setUpdating] = useState(false);
   function processRowUpdate(newRow: GridRowModel) {
-    const updatedRow = { ...newRow };
-    setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    console.log(newRow);
-    return updatedRow;
+    newRow.subject = newRow.subject.trim();
+    newRow.card.subject = newRow.subject.trim();
+
+    setUpdating(true);
+    return app
+      .client()!
+      .updateCardSubject(newRow.card.cardNo, newRow.subject)
+      .then((r) => {
+        const updatedRow = { ...newRow };
+        setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+        return updatedRow;
+      })
+      .catch((e: any) => app.toast(e.message, "error"))
+      .finally(() => setUpdating(false));
   }
 
   return (

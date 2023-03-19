@@ -191,47 +191,47 @@ export class V1Alpha1Client {
     this.methodDescriptorlistCards);
   }
 
-  methodDescriptorcompleteCard = new grpcWeb.MethodDescriptor(
-    '/V1Alpha1/completeCard',
+  methodDescriptorpatchCard = new grpcWeb.MethodDescriptor(
+    '/V1Alpha1/patchCard',
     grpcWeb.MethodType.UNARY,
-    focus_pb.CompleteCardReq,
+    focus_pb.PatchCardReq,
     google_protobuf_empty_pb.Empty,
-    (request: focus_pb.CompleteCardReq) => {
+    (request: focus_pb.PatchCardReq) => {
       return request.serializeBinary();
     },
     google_protobuf_empty_pb.Empty.deserializeBinary
   );
 
-  completeCard(
-    request: focus_pb.CompleteCardReq,
+  patchCard(
+    request: focus_pb.PatchCardReq,
     metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
 
-  completeCard(
-    request: focus_pb.CompleteCardReq,
+  patchCard(
+    request: focus_pb.PatchCardReq,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
                response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
-  completeCard(
-    request: focus_pb.CompleteCardReq,
+  patchCard(
+    request: focus_pb.PatchCardReq,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
                response: google_protobuf_empty_pb.Empty) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/V1Alpha1/completeCard',
+          '/V1Alpha1/patchCard',
         request,
         metadata || {},
-        this.methodDescriptorcompleteCard,
+        this.methodDescriptorpatchCard,
         callback);
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/V1Alpha1/completeCard',
+      '/V1Alpha1/patchCard',
     request,
     metadata || {},
-    this.methodDescriptorcompleteCard);
+    this.methodDescriptorpatchCard);
   }
 
   methodDescriptorrankUpCard = new grpcWeb.MethodDescriptor(
