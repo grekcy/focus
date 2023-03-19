@@ -73,9 +73,11 @@ var Focus_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	V1Alpha1_Version_FullMethodName      = "/V1Alpha1/version"
-	V1Alpha1_QuickAadCard_FullMethodName = "/V1Alpha1/quickAadCard"
+	V1Alpha1_QuickAddCard_FullMethodName = "/V1Alpha1/quickAddCard"
 	V1Alpha1_ListCards_FullMethodName    = "/V1Alpha1/listCards"
 	V1Alpha1_CompleteCard_FullMethodName = "/V1Alpha1/completeCard"
+	V1Alpha1_RankUpCard_FullMethodName   = "/V1Alpha1/rankUpCard"
+	V1Alpha1_RankDownCard_FullMethodName = "/V1Alpha1/rankDownCard"
 	V1Alpha1_DeleteCard_FullMethodName   = "/V1Alpha1/deleteCard"
 )
 
@@ -84,9 +86,11 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type V1Alpha1Client interface {
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
-	QuickAadCard(ctx context.Context, in *Card, opts ...grpc.CallOption) (*Card, error)
+	QuickAddCard(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*Card, error)
 	ListCards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CardListResp, error)
 	CompleteCard(ctx context.Context, in *CompleteCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RankUpCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RankDownCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -107,9 +111,9 @@ func (c *v1Alpha1Client) Version(ctx context.Context, in *emptypb.Empty, opts ..
 	return out, nil
 }
 
-func (c *v1Alpha1Client) QuickAadCard(ctx context.Context, in *Card, opts ...grpc.CallOption) (*Card, error) {
+func (c *v1Alpha1Client) QuickAddCard(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*Card, error) {
 	out := new(Card)
-	err := c.cc.Invoke(ctx, V1Alpha1_QuickAadCard_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, V1Alpha1_QuickAddCard_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,6 +138,24 @@ func (c *v1Alpha1Client) CompleteCard(ctx context.Context, in *CompleteCardReq, 
 	return out, nil
 }
 
+func (c *v1Alpha1Client) RankUpCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, V1Alpha1_RankUpCard_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *v1Alpha1Client) RankDownCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, V1Alpha1_RankDownCard_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *v1Alpha1Client) DeleteCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, V1Alpha1_DeleteCard_FullMethodName, in, out, opts...)
@@ -148,9 +170,11 @@ func (c *v1Alpha1Client) DeleteCard(ctx context.Context, in *wrapperspb.UInt64Va
 // for forward compatibility
 type V1Alpha1Server interface {
 	Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
-	QuickAadCard(context.Context, *Card) (*Card, error)
+	QuickAddCard(context.Context, *wrapperspb.StringValue) (*Card, error)
 	ListCards(context.Context, *emptypb.Empty) (*CardListResp, error)
 	CompleteCard(context.Context, *CompleteCardReq) (*emptypb.Empty, error)
+	RankUpCard(context.Context, *RankCardReq) (*emptypb.Empty, error)
+	RankDownCard(context.Context, *RankCardReq) (*emptypb.Empty, error)
 	DeleteCard(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error)
 	mustEmbedUnimplementedV1Alpha1Server()
 }
@@ -162,14 +186,20 @@ type UnimplementedV1Alpha1Server struct {
 func (UnimplementedV1Alpha1Server) Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
 }
-func (UnimplementedV1Alpha1Server) QuickAadCard(context.Context, *Card) (*Card, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method QuickAadCard not implemented")
+func (UnimplementedV1Alpha1Server) QuickAddCard(context.Context, *wrapperspb.StringValue) (*Card, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method QuickAddCard not implemented")
 }
 func (UnimplementedV1Alpha1Server) ListCards(context.Context, *emptypb.Empty) (*CardListResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCards not implemented")
 }
 func (UnimplementedV1Alpha1Server) CompleteCard(context.Context, *CompleteCardReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CompleteCard not implemented")
+}
+func (UnimplementedV1Alpha1Server) RankUpCard(context.Context, *RankCardReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RankUpCard not implemented")
+}
+func (UnimplementedV1Alpha1Server) RankDownCard(context.Context, *RankCardReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RankDownCard not implemented")
 }
 func (UnimplementedV1Alpha1Server) DeleteCard(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCard not implemented")
@@ -205,20 +235,20 @@ func _V1Alpha1_Version_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _V1Alpha1_QuickAadCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Card)
+func _V1Alpha1_QuickAddCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(wrapperspb.StringValue)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(V1Alpha1Server).QuickAadCard(ctx, in)
+		return srv.(V1Alpha1Server).QuickAddCard(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: V1Alpha1_QuickAadCard_FullMethodName,
+		FullMethod: V1Alpha1_QuickAddCard_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(V1Alpha1Server).QuickAadCard(ctx, req.(*Card))
+		return srv.(V1Alpha1Server).QuickAddCard(ctx, req.(*wrapperspb.StringValue))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -259,6 +289,42 @@ func _V1Alpha1_CompleteCard_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _V1Alpha1_RankUpCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RankCardReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(V1Alpha1Server).RankUpCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: V1Alpha1_RankUpCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(V1Alpha1Server).RankUpCard(ctx, req.(*RankCardReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _V1Alpha1_RankDownCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RankCardReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(V1Alpha1Server).RankDownCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: V1Alpha1_RankDownCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(V1Alpha1Server).RankDownCard(ctx, req.(*RankCardReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _V1Alpha1_DeleteCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(wrapperspb.UInt64Value)
 	if err := dec(in); err != nil {
@@ -289,8 +355,8 @@ var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _V1Alpha1_Version_Handler,
 		},
 		{
-			MethodName: "quickAadCard",
-			Handler:    _V1Alpha1_QuickAadCard_Handler,
+			MethodName: "quickAddCard",
+			Handler:    _V1Alpha1_QuickAddCard_Handler,
 		},
 		{
 			MethodName: "listCards",
@@ -299,6 +365,14 @@ var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "completeCard",
 			Handler:    _V1Alpha1_CompleteCard_Handler,
+		},
+		{
+			MethodName: "rankUpCard",
+			Handler:    _V1Alpha1_RankUpCard_Handler,
+		},
+		{
+			MethodName: "rankDownCard",
+			Handler:    _V1Alpha1_RankDownCard_Handler,
 		},
 		{
 			MethodName: "deleteCard",

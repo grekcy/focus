@@ -36,7 +36,6 @@ func newTestServer(ctx context.Context, t *testing.T) proto.V1Alpha1Client {
 	conn, err := grpc.Dial(ln.Addr().String(),
 		grpc.WithKeepaliveParams(kacp),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithCompressor(grpc.NewGZIPCompressor()), // TODO
 	)
 	require.NoError(t, err)
 

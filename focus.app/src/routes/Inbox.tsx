@@ -1,3 +1,5 @@
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/Edit";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
@@ -34,15 +36,28 @@ export function InboxPage() {
       field: "actions",
       type: "actions",
       headerName: "Actions",
-      width: 120,
+      width: 180,
       cellClassName: "actions",
       getActions: ({ id }) => {
         const row = rows.find((r) => r.id === id)!;
 
         const acts = [
+          <GridActionsCellItem
+            icon={<ArrowUpwardIcon />}
+            label="Move up"
+            disabled={ranking}
+            onClick={() => rankUp(row.card.cardNo)}
+          />,
+          <GridActionsCellItem
+            icon={<ArrowDownwardIcon />}
+            label="Move down"
+            disabled={ranking}
+            onClick={() => rankDown(row.card.cardNo)}
+          />,
           <GridActionsCellItem icon={<EditIcon />} label="Edit" />,
           <GridActionsCellItem
             icon={<DeleteIcon />}
+            disabled={deletingCard}
             label="Delete"
             onClick={() => onDeleteClick(id)}
           />,
@@ -93,9 +108,45 @@ export function InboxPage() {
     })();
   }
 
+  const [ranking, setRanking] = useState(false);
+  async function rankUp(cardNo: number) {
+    const index = rows.findIndex((r) => r.card.cardNo === cardNo);
+    if (index === 0) {
+      app.toast("can't not move up top card", "info");
+      return;
+    }
+
+    setRanking(true);
+    await app
+      .client()!
+      .rankUpCard(cardNo, rows[index - 1].card.cardNo)
+      .then(() => refreshRows())
+      .catch((e: any) => app.toast(e.message, "error"))
+      .finally(() => setRanking(false));
+  }
+
+  async function rankDown(cardNo: number) {
+    const index = rows.findIndex((r) => r.card.cardNo === cardNo);
+    if (index === rows.length - 1) {
+      app.toast("can't not move down last card", "info");
+      return;
+    }
+
+    setRanking(true);
+    await app
+      .client()!
+      .rankUpCard(cardNo, rows[index + 1].card.cardNo)
+      .then(() => refreshRows())
+      .catch((e: any) => app.toast(e.message, "error"))
+      .finally(() => setRanking(false));
+  }
+
+  const [deletingCard, setDeletingCard] = useState(false);
+
   function onDeleteClick(id: GridRowId) {
-    console.log(rows);
-    return;
+    if (deletingCard) return;
+
+    setDeletingCard(true);
     console.log(`deleting ${id}`);
 
     const service = app.client();
@@ -105,12 +156,17 @@ export function InboxPage() {
       await service!
         .deleteCard(parseInt(id.toString(), 10))
         .then((r) => setRows(rows.filter((row) => row.id !== id)))
-        .catch((e) => app.toast(e, "error"));
+        .catch((e) => app.toast(e, "error"))
+        .finally(() => setDeletingCard(false));
     })();
   }
 
   const [rows, setRows] = useState<GridRowsProp>([]);
   useEffect(() => {
+    refreshRows();
+  }, []);
+
+  function refreshRows() {
     (async () => {
       const service = app.client();
       if (!service) return;
@@ -130,7 +186,7 @@ export function InboxPage() {
         })
       );
     })();
-  }, []);
+  }
 
   // TODO updated to server
   function processRowUpdate(newRow: GridRowModel) {

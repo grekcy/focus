@@ -90,3 +90,25 @@ export namespace CardListResp {
   }
 }
 
+export class RankCardReq extends jspb.Message {
+  getCardNo(): number;
+  setCardNo(value: number): RankCardReq;
+
+  getTargetCardNo(): number;
+  setTargetCardNo(value: number): RankCardReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RankCardReq.AsObject;
+  static toObject(includeInstance: boolean, msg: RankCardReq): RankCardReq.AsObject;
+  static serializeBinaryToWriter(message: RankCardReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RankCardReq;
+  static deserializeBinaryFromReader(message: RankCardReq, reader: jspb.BinaryReader): RankCardReq;
+}
+
+export namespace RankCardReq {
+  export type AsObject = {
+    cardNo: number,
+    targetCardNo: number,
+  }
+}
+

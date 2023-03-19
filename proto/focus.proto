@@ -12,9 +12,11 @@ service Focus {}
 service V1Alpha1 {
   rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
 
-  rpc quickAadCard(Card) returns (Card);
+  rpc quickAddCard(google.protobuf.StringValue) returns (Card);
   rpc listCards(google.protobuf.Empty) returns (CardListResp) {}
   rpc completeCard(CompleteCardReq) returns (google.protobuf.Empty) {}
+  rpc rankUpCard(RankCardReq) returns (google.protobuf.Empty) {}
+  rpc rankDownCard(RankCardReq) returns (google.protobuf.Empty) {}
   rpc deleteCard(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {}
 }
 
@@ -32,3 +34,8 @@ message CompleteCardReq {
 }
 
 message CardListResp { repeated Card items = 1; }
+
+message RankCardReq {
+  uint64 card_no = 1;
+  uint64 target_card_no = 2;
+}

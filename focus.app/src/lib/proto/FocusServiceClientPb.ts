@@ -105,47 +105,47 @@ export class V1Alpha1Client {
     this.methodDescriptorversion);
   }
 
-  methodDescriptorquickAadCard = new grpcWeb.MethodDescriptor(
-    '/V1Alpha1/quickAadCard',
+  methodDescriptorquickAddCard = new grpcWeb.MethodDescriptor(
+    '/V1Alpha1/quickAddCard',
     grpcWeb.MethodType.UNARY,
+    google_protobuf_wrappers_pb.StringValue,
     focus_pb.Card,
-    focus_pb.Card,
-    (request: focus_pb.Card) => {
+    (request: google_protobuf_wrappers_pb.StringValue) => {
       return request.serializeBinary();
     },
     focus_pb.Card.deserializeBinary
   );
 
-  quickAadCard(
-    request: focus_pb.Card,
+  quickAddCard(
+    request: google_protobuf_wrappers_pb.StringValue,
     metadata: grpcWeb.Metadata | null): Promise<focus_pb.Card>;
 
-  quickAadCard(
-    request: focus_pb.Card,
+  quickAddCard(
+    request: google_protobuf_wrappers_pb.StringValue,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
                response: focus_pb.Card) => void): grpcWeb.ClientReadableStream<focus_pb.Card>;
 
-  quickAadCard(
-    request: focus_pb.Card,
+  quickAddCard(
+    request: google_protobuf_wrappers_pb.StringValue,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
                response: focus_pb.Card) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/V1Alpha1/quickAadCard',
+          '/V1Alpha1/quickAddCard',
         request,
         metadata || {},
-        this.methodDescriptorquickAadCard,
+        this.methodDescriptorquickAddCard,
         callback);
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/V1Alpha1/quickAadCard',
+      '/V1Alpha1/quickAddCard',
     request,
     metadata || {},
-    this.methodDescriptorquickAadCard);
+    this.methodDescriptorquickAddCard);
   }
 
   methodDescriptorlistCards = new grpcWeb.MethodDescriptor(
@@ -232,6 +232,92 @@ export class V1Alpha1Client {
     request,
     metadata || {},
     this.methodDescriptorcompleteCard);
+  }
+
+  methodDescriptorrankUpCard = new grpcWeb.MethodDescriptor(
+    '/V1Alpha1/rankUpCard',
+    grpcWeb.MethodType.UNARY,
+    focus_pb.RankCardReq,
+    google_protobuf_empty_pb.Empty,
+    (request: focus_pb.RankCardReq) => {
+      return request.serializeBinary();
+    },
+    google_protobuf_empty_pb.Empty.deserializeBinary
+  );
+
+  rankUpCard(
+    request: focus_pb.RankCardReq,
+    metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
+
+  rankUpCard(
+    request: focus_pb.RankCardReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  rankUpCard(
+    request: focus_pb.RankCardReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/V1Alpha1/rankUpCard',
+        request,
+        metadata || {},
+        this.methodDescriptorrankUpCard,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/V1Alpha1/rankUpCard',
+    request,
+    metadata || {},
+    this.methodDescriptorrankUpCard);
+  }
+
+  methodDescriptorrankDownCard = new grpcWeb.MethodDescriptor(
+    '/V1Alpha1/rankDownCard',
+    grpcWeb.MethodType.UNARY,
+    focus_pb.RankCardReq,
+    google_protobuf_empty_pb.Empty,
+    (request: focus_pb.RankCardReq) => {
+      return request.serializeBinary();
+    },
+    google_protobuf_empty_pb.Empty.deserializeBinary
+  );
+
+  rankDownCard(
+    request: focus_pb.RankCardReq,
+    metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
+
+  rankDownCard(
+    request: focus_pb.RankCardReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  rankDownCard(
+    request: focus_pb.RankCardReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/V1Alpha1/rankDownCard',
+        request,
+        metadata || {},
+        this.methodDescriptorrankDownCard,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/V1Alpha1/rankDownCard',
+    request,
+    metadata || {},
+    this.methodDescriptorrankDownCard);
   }
 
   methodDescriptordeleteCard = new grpcWeb.MethodDescriptor(

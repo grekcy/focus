@@ -36,19 +36,19 @@ func (s *v1alpha1ServiceImpl) Version(context.Context, *emptypb.Empty) (*wrapper
 	return &wrapperspb.StringValue{Value: "v1alpha1"}, nil
 }
 
-func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, req *proto.Card) (*proto.Card, error) {
-	log.Debugf("quickAdd: subject=%v", req)
+func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.StringValue) (*proto.Card, error) {
+	log.Debugf("quickAdd: subject=%v", in)
 
 	if err := validate.Struct(&struct {
 		Subject string `validate:"required"`
 	}{
-		Subject: req.Subject,
+		Subject: in.Value,
 	}); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	newCard := &models.Card{
-		Subject: req.Subject,
+		Subject: in.Value,
 	}
 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
@@ -67,6 +67,21 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, req *proto.Card)
 
 		newCard.CardNo = uint(cardNo) + 1
 
+		// TODO workspace 별로 card_no를 계산해야 할 것임
+		rank := int64(0)
+		if tx := s.db.Model(&models.Card{}).Unscoped().Count(&rank); tx.Error != nil {
+			return status.Error(codes.Internal, "fail to get rank")
+		}
+
+		if rank != 0 {
+			if err := s.db.Model(&models.Card{}).Unscoped().Select("max(rank)").Row().Scan(&rank); err != nil {
+				log.Errorf("%v", err)
+				return status.Errorf(codes.Internal, "fail to get rank")
+			}
+		}
+
+		newCard.Rank = uint(rank) + 1
+
 		if tx := s.db.Save(newCard); tx.Error != nil {
 			return status.Errorf(codes.Internal, "fail to save card")
 		}
@@ -77,6 +92,69 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, req *proto.Card)
 	}
 
 	return modelToProto(newCard), nil
+}
+
+func (s *v1alpha1ServiceImpl) RankUpCard(ctx context.Context, req *proto.RankCardReq) (*emptypb.Empty, error) {
+	log.Debugf("rank up: card=%v, target_card=%v", req.CardNo, req.TargetCardNo)
+
+	card, err := s.getCard(ctx, uint(req.CardNo))
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "card not found: %v", req.CardNo)
+	}
+
+	targetCard, err := s.getCard(ctx, uint(req.TargetCardNo))
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "target card not found: %v", req.TargetCardNo)
+	}
+
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		if tx := s.db.Model(&models.Card{}).
+			Where("rank BETWEEN ? AND ?", targetCard.Rank, card.Rank).
+			Update("rank", gorm.Expr("rank + 1")); tx.Error != nil {
+			return tx.Error
+		}
+
+		if tx := s.db.Model(card).Update("rank", targetCard.Rank); tx.Error != nil {
+			return tx.Error
+		}
+
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	return helper.Empty(), nil
+}
+func (s *v1alpha1ServiceImpl) RankDownCard(ctx context.Context, req *proto.RankCardReq) (*emptypb.Empty, error) {
+	log.Debugf("rank down: card=%v, target_card=%v", req.CardNo, req.TargetCardNo)
+
+	card, err := s.getCard(ctx, uint(req.CardNo))
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "card not found: %v", req.CardNo)
+	}
+
+	targetCard, err := s.getCard(ctx, uint(req.TargetCardNo))
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "target card not found: %v", req.TargetCardNo)
+	}
+
+	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		if tx := s.db.Model(&models.Card{}).
+			Where("rank BETWEEN ? AND ?", card.Rank, targetCard.Rank).
+			Update("rank", gorm.Expr("rank - 1")); tx.Error != nil {
+			return tx.Error
+		}
+
+		if tx := s.db.Model(card).Update("rank", targetCard.Rank); tx.Error != nil {
+			return tx.Error
+		}
+
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	return helper.Empty(), nil
 }
 
 func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UInt64Value) (*emptypb.Empty, error) {
@@ -109,6 +187,7 @@ func modelToProto(in *models.Card) *proto.Card {
 			func() *timestamppb.Timestamp { return nil },
 			func() *timestamppb.Timestamp { return timestamppb.New(*in.CompletedAt) },
 		),
+		Rank: uint64(in.Rank),
 	}
 }
 
@@ -136,7 +215,7 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card,
 	}
 
 	r := make([]*models.Card, 0)
-	if tx := tx.Order("rank DESC, created_at").Where(where).Find(&r); tx.Error != nil {
+	if tx := tx.Order("rank, created_at").Where(where).Find(&r); tx.Error != nil {
 		return nil, status.Errorf(codes.Internal, "fail to find cards: %+v", tx.Error)
 	}
 
@@ -192,12 +271,10 @@ func (s *v1alpha1ServiceImpl) CompleteCard(ctx context.Context, req *proto.Compl
 
 	if req.Complted {
 		if card.CompletedAt != nil {
-
 			return nil, status.Errorf(codes.AlreadyExists, "already completed at %v", card.CreatedAt.String())
 		}
 	} else {
 		if card.CompletedAt == nil {
-
 			return nil, status.Errorf(codes.AlreadyExists, "already not completed")
 		}
 	}

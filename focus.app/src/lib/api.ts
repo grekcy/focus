@@ -1,7 +1,10 @@
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
-import { UInt64Value } from "google-protobuf/google/protobuf/wrappers_pb";
+import {
+  StringValue,
+  UInt64Value,
+} from "google-protobuf/google/protobuf/wrappers_pb";
 import { V1Alpha1Client } from "./proto/FocusServiceClientPb";
-import { Card as pCard, CompleteCardReq } from "./proto/focus_pb";
+import { CompleteCardReq, RankCardReq } from "./proto/focus_pb";
 
 export class FocusAPI {
   s: V1Alpha1Client;
@@ -15,10 +18,10 @@ export class FocusAPI {
   };
 
   quickAddCard = async (subject: string) => {
-    const pcard = new pCard();
-    pcard.setSubject(subject);
+    const s = new StringValue();
+    s.setValue(subject);
 
-    return await this.s.quickAadCard(pcard, null).then((r) => r.toObject());
+    return await this.s.quickAddCard(s, null).then((r) => r.toObject());
   };
 
   listCards = async () => {
@@ -32,7 +35,21 @@ export class FocusAPI {
     const req = new CompleteCardReq();
     req.setCardNo(cardNo);
     req.setComplted(complete);
-    await this.s.completeCard(req, null);
+    return await this.s.completeCard(req, null);
+  };
+
+  rankUpCard = async (cardNo: number, targetCardNo: number) => {
+    const req = new RankCardReq();
+    req.setCardNo(cardNo);
+    req.setTargetCardNo(targetCardNo);
+    return await this.s.rankUpCard(req, null);
+  };
+
+  rankDownCard = async (cardNo: number, targetCardNo: number) => {
+    const req = new RankCardReq();
+    req.setCardNo(cardNo);
+    req.setTargetCardNo(targetCardNo);
+    return await this.s.rankDownCard(req, null);
   };
 
   deleteCard = async (cardNo: number) => {
