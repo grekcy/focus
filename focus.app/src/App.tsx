@@ -5,7 +5,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { AppBar } from "./AppBar";
 import { FocusAPI } from "./lib/api";
-import { BoardPage } from "./routes/board";
+import { ChallengePage } from "./routes/challenge";
 import { CardPage } from "./routes/card";
 import { ErrorPage } from "./routes/ErrorPage";
 import { ForecastPage } from "./routes/forecast";
@@ -54,7 +54,7 @@ function App() {
                 <Route path="/today" element={<TodayPage />} />
                 <Route path="/forecast" element={<ForecastPage />} />
                 <Route path="/cards/:cardId" element={<CardPage />} />
-                <Route path="/boards/:boardId" element={<BoardPage />} />
+                <Route path="/challenges/:challengeId" element={<ChallengePage />} />
                 <Route path="*" element={<ErrorPage />} />
               </Routes>
             </Box>

@@ -1,9 +1,9 @@
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CalendarViewWeekIcon from "@mui/icons-material/CalendarViewWeek";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import FactCheckIcon from "@mui/icons-material/FactCheck";
 import FlagIcon from "@mui/icons-material/Flag";
 import InboxIcon from "@mui/icons-material/Inbox";
+import InsightsIcon from "@mui/icons-material/Insights";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import {
@@ -112,33 +112,33 @@ const pages = [
     href: "/cards/1",
     title: "Cards",
     icon: LibraryBooksIcon,
-    tooltip: "cards",
+    tooltip: "card #1",
   },
   { title: "-" },
   {
-    href: "/boards/1",
-    title: "Board #1",
+    href: "/challenges/1",
+    title: "challenge #1",
     icon: ViewColumnIcon,
-    tooltip: "boards",
+    tooltip: "challenge #1",
   },
   {
-    href: "/boards/2",
-    title: "Board #2",
+    href: "/challenges/2",
+    title: "challenge #2",
     icon: ViewColumnIcon,
-    tooltip: "board #2",
+    tooltip: "challenge #2",
   },
   { title: "-" },
   {
     href: "/planning",
     title: "Planning",
     icon: FlagIcon,
-    tooltip: "boards",
+    tooltip: "planning",
   },
   {
-    href: "/observation",
-    title: "Observation",
-    icon: FactCheckIcon,
-    tooltip: "boards",
+    href: "/performance",
+    title: "Performance",
+    icon: InsightsIcon,
+    tooltip: "performance",
   },
 ];
 

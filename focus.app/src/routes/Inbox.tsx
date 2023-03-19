@@ -209,9 +209,9 @@ export function InboxPage() {
 
   return (
     <>
-      <Typography variant="h5">Inbox</Typography>
+      <Typography variant="h5">Inbox cards</Typography>
 
-      <div style={{ height: 300, width: "100%" }}>
+      <div style={{  width: "100%" }}>
         <DataGridEx
           columns={columns}
           rows={rows}
