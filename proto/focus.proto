@@ -14,6 +14,7 @@ service V1Alpha1 {
 
   rpc quickAddCard(google.protobuf.StringValue) returns (Card);
   rpc listCards(google.protobuf.Empty) returns (CardListResp) {}
+  rpc getCard(google.protobuf.UInt64Value) returns (Card) {}
   rpc patchCard(PatchCardReq) returns (google.protobuf.Empty) {}
   rpc rankUpCard(RankCardReq) returns (google.protobuf.Empty) {}
   rpc rankDownCard(RankCardReq) returns (google.protobuf.Empty) {}
@@ -22,11 +23,13 @@ service V1Alpha1 {
 
 message Card {
   uint64 card_no = 1;
-  string subject = 2;
-  uint64 rank = 3;
-  google.protobuf.Timestamp created_at = 4;
-  optional google.protobuf.Timestamp completed_at = 5;
-  uint32 depth = 6;
+  uint64 rank = 2;
+  optional uint64 parent = 3;
+  uint32 depth = 4;
+  google.protobuf.Timestamp created_at = 5;
+  optional google.protobuf.Timestamp completed_at = 6;
+  string subject = 7;
+  string content = 8;
 }
 
 message CompleteCardReq {
@@ -41,7 +44,12 @@ message RankCardReq {
   uint64 target_card_no = 2;
 }
 
+enum CardField {
+  SUBJECT = 0;
+  COMPLETED_AT = 1;
+}
+
 message PatchCardReq {
-  repeated string fields = 1;
+  repeated CardField fields = 1;
   Card card = 2;
 }

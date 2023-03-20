@@ -5,7 +5,7 @@ import {
   UInt64Value,
 } from "google-protobuf/google/protobuf/wrappers_pb";
 import { V1Alpha1Client } from "./proto/FocusServiceClientPb";
-import { Card, PatchCardReq, RankCardReq } from "./proto/focus_pb";
+import { Card, CardField, PatchCardReq, RankCardReq } from "./proto/focus_pb";
 
 export class FocusAPI {
   s: V1Alpha1Client;
@@ -39,7 +39,7 @@ export class FocusAPI {
     else card.clearCreatedAt();
 
     const req = new PatchCardReq();
-    req.addFields("completed_at");
+    req.addFields(CardField.COMPLETED_AT);
     req.setCard(card);
 
     return await this.s.patchCard(req, null);
@@ -51,7 +51,7 @@ export class FocusAPI {
     card.setSubject(subject);
 
     const req = new PatchCardReq();
-    req.addFields("subject");
+    req.addFields(CardField.SUBJECT);
     req.setCard(card);
 
     return await this.s.patchCard(req, null);

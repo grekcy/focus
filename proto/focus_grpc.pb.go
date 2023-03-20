@@ -75,6 +75,7 @@ const (
 	V1Alpha1_Version_FullMethodName      = "/V1Alpha1/version"
 	V1Alpha1_QuickAddCard_FullMethodName = "/V1Alpha1/quickAddCard"
 	V1Alpha1_ListCards_FullMethodName    = "/V1Alpha1/listCards"
+	V1Alpha1_GetCard_FullMethodName      = "/V1Alpha1/getCard"
 	V1Alpha1_PatchCard_FullMethodName    = "/V1Alpha1/patchCard"
 	V1Alpha1_RankUpCard_FullMethodName   = "/V1Alpha1/rankUpCard"
 	V1Alpha1_RankDownCard_FullMethodName = "/V1Alpha1/rankDownCard"
@@ -88,6 +89,7 @@ type V1Alpha1Client interface {
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
 	QuickAddCard(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*Card, error)
 	ListCards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CardListResp, error)
+	GetCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*Card, error)
 	PatchCard(ctx context.Context, in *PatchCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RankUpCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RankDownCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -123,6 +125,15 @@ func (c *v1Alpha1Client) QuickAddCard(ctx context.Context, in *wrapperspb.String
 func (c *v1Alpha1Client) ListCards(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CardListResp, error) {
 	out := new(CardListResp)
 	err := c.cc.Invoke(ctx, V1Alpha1_ListCards_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *v1Alpha1Client) GetCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*Card, error) {
+	out := new(Card)
+	err := c.cc.Invoke(ctx, V1Alpha1_GetCard_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -172,6 +183,7 @@ type V1Alpha1Server interface {
 	Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
 	QuickAddCard(context.Context, *wrapperspb.StringValue) (*Card, error)
 	ListCards(context.Context, *emptypb.Empty) (*CardListResp, error)
+	GetCard(context.Context, *wrapperspb.UInt64Value) (*Card, error)
 	PatchCard(context.Context, *PatchCardReq) (*emptypb.Empty, error)
 	RankUpCard(context.Context, *RankCardReq) (*emptypb.Empty, error)
 	RankDownCard(context.Context, *RankCardReq) (*emptypb.Empty, error)
@@ -191,6 +203,9 @@ func (UnimplementedV1Alpha1Server) QuickAddCard(context.Context, *wrapperspb.Str
 }
 func (UnimplementedV1Alpha1Server) ListCards(context.Context, *emptypb.Empty) (*CardListResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCards not implemented")
+}
+func (UnimplementedV1Alpha1Server) GetCard(context.Context, *wrapperspb.UInt64Value) (*Card, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCard not implemented")
 }
 func (UnimplementedV1Alpha1Server) PatchCard(context.Context, *PatchCardReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PatchCard not implemented")
@@ -267,6 +282,24 @@ func _V1Alpha1_ListCards_Handler(srv interface{}, ctx context.Context, dec func(
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(V1Alpha1Server).ListCards(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _V1Alpha1_GetCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(wrapperspb.UInt64Value)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(V1Alpha1Server).GetCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: V1Alpha1_GetCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(V1Alpha1Server).GetCard(ctx, req.(*wrapperspb.UInt64Value))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -361,6 +394,10 @@ var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "listCards",
 			Handler:    _V1Alpha1_ListCards_Handler,
+		},
+		{
+			MethodName: "getCard",
+			Handler:    _V1Alpha1_GetCard_Handler,
 		},
 		{
 			MethodName: "patchCard",

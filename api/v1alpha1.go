@@ -31,8 +31,20 @@ func newV1Alpha1Service(db *gorm.DB) proto.V1Alpha1Server {
 	}
 }
 
-func (s *v1alpha1ServiceImpl) Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error) {
+func (s *v1alpha1ServiceImpl) Version(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.StringValue, error) {
 	return &wrapperspb.StringValue{Value: "v1alpha1"}, nil
+}
+
+// user return current user
+func (s *v1alpha1ServiceImpl) user(ctx context.Context) *models.User {
+	user, _ := ctx.Value(keyUser).(*models.User)
+	return user
+}
+
+// defaultWorkspace returns current user's default workspace
+func (s *v1alpha1ServiceImpl) defaultWorkspace(ctx context.Context) *models.Workspace {
+	ws, _ := ctx.Value(keyUserWorkspace).(*models.Workspace)
+	return ws
 }
 
 func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.StringValue) (*proto.Card, error) {
@@ -47,18 +59,24 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 	}
 
 	newCard := &models.Card{
-		Subject: in.Value,
+		Subject:     in.Value,
+		CreatorID:   s.user(ctx).ID,
+		WorkspaceID: s.defaultWorkspace(ctx).ID,
 	}
 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		// TODO workspace 별로 card_no를 계산해야 할 것임
 		cardNo := int64(0)
-		if tx := s.db.Model(&models.Card{}).Unscoped().Count(&cardNo); tx.Error != nil {
+		if tx := s.db.Model(&models.Card{}).Unscoped().
+			Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
+			Count(&cardNo); tx.Error != nil {
 			return status.Error(codes.Internal, "fail to get card count")
 		}
 
 		if cardNo != 0 {
-			if err := s.db.Model(&models.Card{}).Unscoped().Select("max(card_no)").Row().Scan(&cardNo); err != nil {
+			if err := s.db.Model(&models.Card{}).Unscoped().
+				Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
+				Select("max(card_no)").Row().Scan(&cardNo); err != nil {
 				log.Errorf("%v", err)
 				return status.Errorf(codes.Internal, "fail to get card_no")
 			}
@@ -66,14 +84,17 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 
 		newCard.CardNo = uint(cardNo) + 1
 
-		// TODO workspace 별로 card_no를 계산해야 할 것임
 		rank := int64(0)
-		if tx := s.db.Model(&models.Card{}).Unscoped().Count(&rank); tx.Error != nil {
+		if tx := s.db.Model(&models.Card{}).Unscoped().
+			Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
+			Count(&rank); tx.Error != nil {
 			return status.Error(codes.Internal, "fail to get rank")
 		}
 
 		if rank != 0 {
-			if err := s.db.Model(&models.Card{}).Unscoped().Select("max(rank)").Row().Scan(&rank); err != nil {
+			if err := s.db.Model(&models.Card{}).Unscoped().
+				Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
+				Select("max(rank)").Row().Scan(&rank); err != nil {
 				log.Errorf("%v", err)
 				return status.Errorf(codes.Internal, "fail to get rank")
 			}
@@ -108,6 +129,7 @@ func (s *v1alpha1ServiceImpl) RankUpCard(ctx context.Context, req *proto.RankCar
 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		if tx := s.db.Model(&models.Card{}).
+			Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
 			Where("rank BETWEEN ? AND ?", targetCard.Rank, card.Rank).
 			Update("rank", gorm.Expr("rank + 1")); tx.Error != nil {
 			return tx.Error
@@ -139,6 +161,7 @@ func (s *v1alpha1ServiceImpl) RankDownCard(ctx context.Context, req *proto.RankC
 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		if tx := s.db.Model(&models.Card{}).
+			Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
 			Where("rank BETWEEN ? AND ?", card.Rank, targetCard.Rank).
 			Update("rank", gorm.Expr("rank - 1")); tx.Error != nil {
 			return tx.Error
@@ -157,7 +180,7 @@ func (s *v1alpha1ServiceImpl) RankDownCard(ctx context.Context, req *proto.RankC
 }
 
 func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UInt64Value) (*emptypb.Empty, error) {
-	log.Debugf("deleteCard(): no=%+v", req.Value)
+	log.Debugf("deleteCard(): card_no=%+v", req.Value)
 
 	if err := validate.Struct(&struct {
 		CardNo uint64 `validate:"required"`
@@ -167,9 +190,10 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	// TODO cardNo는 key가 아님... 따라서 workspace 정보와 같이 지워야하겠음.
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		return s.db.Delete(&models.Card{}, &models.Card{CardNo: uint(req.Value)}).Error
+		return s.db.Delete(&models.Card{}, &models.Card{
+			WorkspaceID: s.defaultWorkspace(ctx).ID,
+			CardNo:      uint(req.Value)}).Error
 	}); err != nil {
 		return helper.Empty(), status.Errorf(codes.Internal, "delete failed: %v", err.Error())
 	}
@@ -180,14 +204,16 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 func modelToProto(in *models.Card) *proto.Card {
 	return &proto.Card{
 		CardNo:    uint64(in.CardNo),
-		Subject:   in.Subject,
+		Rank:      uint64(in.Rank),
+		Parent:    helper.P(in.ParentID),
+		Depth:     uint32(in.Depth),
 		CreatedAt: timestamppb.New(in.CreatedAt),
 		CompletedAt: goxp.TernaryCF(in.CompletedAt == nil,
 			func() *timestamppb.Timestamp { return nil },
 			func() *timestamppb.Timestamp { return timestamppb.New(*in.CompletedAt) },
 		),
-		Rank:  uint64(in.Rank),
-		Depth: uint32(in.Depth),
+		Subject: in.Subject,
+		Content: in.Content,
 	}
 }
 
@@ -215,7 +241,9 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card,
 	}
 
 	r := make([]*models.Card, 0)
-	if tx := tx.Order("rank, created_at").Where(where).Find(&r); tx.Error != nil {
+	if tx := tx.Order("rank, created_at").
+		Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
+		Where(where).Find(&r); tx.Error != nil {
 		return nil, status.Errorf(codes.Internal, "fail to find cards: %+v", tx.Error)
 	}
 
@@ -264,12 +292,18 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 	updates := map[string]any{}
 	for _, field := range req.Fields {
 		switch field {
-		case "subject":
+		case proto.CardField_SUBJECT:
 			updates["subject"] = req.Card.Subject
-		case "completed_at":
+		case proto.CardField_COMPLETED_AT:
 			if req.Card.CompletedAt == nil {
+				if card.CompletedAt == nil {
+					return nil, status.Errorf(codes.AlreadyExists, "already in progress status")
+				}
 				updates["completed_at"] = gorm.Expr("NULL")
 			} else {
+				if card.CompletedAt != nil {
+					return nil, status.Errorf(codes.AlreadyExists, "already completed")
+				}
 				updates["completed_at"] = req.Card.CompletedAt.AsTime()
 			}
 		default:

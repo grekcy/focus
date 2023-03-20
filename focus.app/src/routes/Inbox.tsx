@@ -171,21 +171,25 @@ export function InboxPage() {
       const service = app.client();
       if (!service) return;
 
-      const r = await service.listCards();
-      setRows(
-        r.map((c) => {
-          return {
-            id: c.cardNo,
-            cardNo: c.cardNo,
-            rank: c.rank,
-            subject: c.subject,
-            createdAt: c.createdAt,
-            completedAt: c.completedAt,
-            depth: c.depth,
-            card: c,
-          };
+      await service
+        .listCards()
+        .then((r) => {
+          setRows(
+            r.map((c) => {
+              return {
+                id: c.cardNo,
+                cardNo: c.cardNo,
+                rank: c.rank,
+                subject: c.subject,
+                createdAt: c.createdAt,
+                completedAt: c.completedAt,
+                depth: c.depth,
+                card: c,
+              };
+            })
+          );
         })
-      );
+        .catch((e) => app.toast(e.message));
     })();
   }
 
@@ -211,7 +215,7 @@ export function InboxPage() {
     <>
       <Typography variant="h5">Inbox cards</Typography>
 
-      <div style={{  width: "100%" }}>
+      <div style={{ width: "100%" }}>
         <DataGridEx
           columns={columns}
           rows={rows}
@@ -220,6 +224,7 @@ export function InboxPage() {
           columnHeaderHeight={0}
           editMode="row"
           processRowUpdate={processRowUpdate}
+          onProcessRowUpdateError={(e) => app.toast(e.message, "error")}
           getRowClassName={(params) =>
             `super-app-theme--${params.row.card.completedat ? "Filled" : ""}`
           }

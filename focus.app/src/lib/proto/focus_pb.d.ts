@@ -9,11 +9,16 @@ export class Card extends jspb.Message {
   getCardNo(): number;
   setCardNo(value: number): Card;
 
-  getSubject(): string;
-  setSubject(value: string): Card;
-
   getRank(): number;
   setRank(value: number): Card;
+
+  getParent(): number;
+  setParent(value: number): Card;
+  hasParent(): boolean;
+  clearParent(): Card;
+
+  getDepth(): number;
+  setDepth(value: number): Card;
 
   getCreatedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
   setCreatedAt(value?: google_protobuf_timestamp_pb.Timestamp): Card;
@@ -25,8 +30,11 @@ export class Card extends jspb.Message {
   hasCompletedAt(): boolean;
   clearCompletedAt(): Card;
 
-  getDepth(): number;
-  setDepth(value: number): Card;
+  getSubject(): string;
+  setSubject(value: string): Card;
+
+  getContent(): string;
+  setContent(value: string): Card;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Card.AsObject;
@@ -39,16 +47,23 @@ export class Card extends jspb.Message {
 export namespace Card {
   export type AsObject = {
     cardNo: number,
-    subject: string,
     rank: number,
+    parent?: number,
+    depth: number,
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    depth: number,
+    subject: string,
+    content: string,
+  }
+
+  export enum ParentCase { 
+    _PARENT_NOT_SET = 0,
+    PARENT = 3,
   }
 
   export enum CompletedAtCase { 
     _COMPLETED_AT_NOT_SET = 0,
-    COMPLETED_AT = 5,
+    COMPLETED_AT = 6,
   }
 }
 
@@ -117,10 +132,10 @@ export namespace RankCardReq {
 }
 
 export class PatchCardReq extends jspb.Message {
-  getFieldsList(): Array<string>;
-  setFieldsList(value: Array<string>): PatchCardReq;
+  getFieldsList(): Array<CardField>;
+  setFieldsList(value: Array<CardField>): PatchCardReq;
   clearFieldsList(): PatchCardReq;
-  addFields(value: string, index?: number): PatchCardReq;
+  addFields(value: CardField, index?: number): PatchCardReq;
 
   getCard(): Card | undefined;
   setCard(value?: Card): PatchCardReq;
@@ -137,8 +152,12 @@ export class PatchCardReq extends jspb.Message {
 
 export namespace PatchCardReq {
   export type AsObject = {
-    fieldsList: Array<string>,
+    fieldsList: Array<CardField>,
     card?: Card.AsObject,
   }
 }
 
+export enum CardField { 
+  SUBJECT = 0,
+  COMPLETED_AT = 1,
+}
