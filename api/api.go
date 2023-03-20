@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"time"
 
@@ -54,7 +55,7 @@ func Serve(ctx context.Context, ln net.Listener) error {
 
 	logger := log.Zap(log.New())
 
-	db, err := databases.Open("pgsql://focus:focus-pass@localhost/focus_dev")
+	db, err := databases.Open(fmt.Sprintf("pgsql://%s:%s@%s/%s", config.DBUser(), config.DBPassword(), config.DBHostname(), config.DBName()))
 	if err != nil {
 		return err
 	}

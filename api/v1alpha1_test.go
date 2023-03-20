@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -9,13 +10,14 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
+	"focus/config"
 	"focus/databases"
 	"focus/helper"
 	"focus/proto"
 )
 
 func newTestClient(ctx context.Context, t *testing.T) (context.Context, *v1alpha1ServiceImpl) {
-	db, err := databases.Open("pgsql://focus:focus-pass@localhost/focus_dev")
+	db, err := databases.Open(fmt.Sprintf("pgsql://%s:%s@%s/%s", config.DBUser(), config.DBPassword(), config.DBHostname(), config.DBName()))
 	require.NoError(t, err)
 
 	ctx = context.WithValue(ctx, keyDB, db)
