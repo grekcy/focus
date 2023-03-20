@@ -4,7 +4,6 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import FlagIcon from "@mui/icons-material/Flag";
 import InboxIcon from "@mui/icons-material/Inbox";
 import InsightsIcon from "@mui/icons-material/Insights";
-import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import {
   Box,
@@ -18,12 +17,12 @@ import {
   Tooltip,
 } from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
-import { CSSObject, styled, Theme } from "@mui/material/styles";
+import { CSSObject, Theme, styled } from "@mui/material/styles";
 import {
-  createElement,
-  forwardRef,
   Ref,
   SyntheticEvent,
+  createElement,
+  forwardRef,
   useContext,
   useEffect,
   useImperativeHandle,
@@ -106,26 +105,20 @@ const pages = [
     href: "/forecast",
     title: "Forecast",
     icon: CalendarViewWeekIcon,
-    tooltip: "forecat",
-  },
-  {
-    href: "/cards/1",
-    title: "Cards",
-    icon: LibraryBooksIcon,
-    tooltip: "card #1",
+    tooltip: "forecast",
   },
   { title: "-" },
   {
     href: "/challenges/1",
-    title: "challenge #1",
+    title: "Challenge #1",
     icon: ViewColumnIcon,
-    tooltip: "challenge #1",
+    tooltip: "Challenge #1",
   },
   {
     href: "/challenges/2",
-    title: "challenge #2",
+    title: "Challenge #2",
     icon: ViewColumnIcon,
-    tooltip: "challenge #2",
+    tooltip: "Challenge #2",
   },
   { title: "-" },
   {

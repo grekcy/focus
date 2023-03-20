@@ -4,7 +4,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import EditIcon from "@mui/icons-material/Edit";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import TripOriginIcon from "@mui/icons-material/TripOrigin";
-import { Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import {
   GridActionsCellItem,
   GridColDef,
@@ -12,7 +12,8 @@ import {
   GridRowModel,
   GridRowsProp,
 } from "@mui/x-data-grid";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { CardBar, ICardBar } from "../lib/components/cardbar";
 import { FocusContext, IFocusApp } from "../types";
 import { DataGridEx } from "./DataGridEx";
 
@@ -211,11 +212,23 @@ export function InboxPage() {
       .finally(() => setUpdating(false));
   }
 
+  const cardBarRef = useRef<ICardBar>(null);
+  function cardBarToggle() {
+    cardBarRef.current && cardBarRef.current.toggle();
+  }
+
   return (
     <>
-      <Typography variant="h5">Inbox cards</Typography>
+      <Box display="flex">
+        <Typography variant="h5" flexGrow={1}>
+          Inbox cards
+        </Typography>
+        <Box flexGrow={0}>
+          <Button onClick={() => cardBarToggle()}>Show Card</Button>
+        </Box>
+      </Box>
 
-      <div style={{ width: "100%" }}>
+      <Box sx={{ width: 1 }}>
         <DataGridEx
           columns={columns}
           rows={rows}
@@ -229,7 +242,8 @@ export function InboxPage() {
             `super-app-theme--${params.row.card.completedat ? "Filled" : ""}`
           }
         />
-      </div>
+      </Box>
+      <CardBar ref={cardBarRef} />
     </>
   );
 }

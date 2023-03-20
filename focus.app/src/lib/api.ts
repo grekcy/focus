@@ -9,27 +9,39 @@ import { Card, CardField, PatchCardReq, RankCardReq } from "./proto/focus_pb";
 
 export class FocusAPI {
   s: V1Alpha1Client;
+  metadata: { [s: string]: string };
 
   constructor(endpoint: string) {
     this.s = new V1Alpha1Client(endpoint);
+    this.metadata = {};
   }
 
   version = async () => {
-    return await this.s.version(new Empty(), null).then((r) => r.toObject());
+    return await this.s
+      .version(new Empty(), this.metadata)
+      .then((r) => r.toObject());
   };
 
   quickAddCard = async (subject: string) => {
     const s = new StringValue();
     s.setValue(subject);
 
-    return await this.s.quickAddCard(s, null).then((r) => r.toObject());
+    return await this.s
+      .quickAddCard(s, this.metadata)
+      .then((r) => r.toObject());
   };
 
   listCards = async () => {
     return await this.s
-      .listCards(new Empty(), null)
+      .listCards(new Empty(), this.metadata)
       .then((r) => r.toObject())
       .then((r) => r.itemsList);
+  };
+
+  getCard = async (cardNo: number) => {
+    const no = new UInt64Value();
+    no.setValue(cardNo);
+    return await this.s.getCard(no, this.metadata).then((r) => r.toObject());
   };
 
   completeCard = async (cardNo: number, complete: boolean) => {
@@ -42,7 +54,7 @@ export class FocusAPI {
     req.addFields(CardField.COMPLETED_AT);
     req.setCard(card);
 
-    return await this.s.patchCard(req, null);
+    return await this.s.patchCard(req, this.metadata);
   };
 
   updateCardSubject = async (cardNo: number, subject: string) => {
@@ -54,26 +66,26 @@ export class FocusAPI {
     req.addFields(CardField.SUBJECT);
     req.setCard(card);
 
-    return await this.s.patchCard(req, null);
+    return await this.s.patchCard(req, this.metadata);
   };
 
   rankUpCard = async (cardNo: number, targetCardNo: number) => {
     const req = new RankCardReq();
     req.setCardNo(cardNo);
     req.setTargetCardNo(targetCardNo);
-    return await this.s.rankUpCard(req, null);
+    return await this.s.rankUpCard(req, this.metadata);
   };
 
   rankDownCard = async (cardNo: number, targetCardNo: number) => {
     const req = new RankCardReq();
     req.setCardNo(cardNo);
     req.setTargetCardNo(targetCardNo);
-    return await this.s.rankDownCard(req, null);
+    return await this.s.rankDownCard(req, this.metadata);
   };
 
   deleteCard = async (cardNo: number) => {
     const no = new UInt64Value();
     no.setValue(cardNo);
-    await this.s.deleteCard(no, null);
+    await this.s.deleteCard(no, this.metadata);
   };
 }

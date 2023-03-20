@@ -4,6 +4,7 @@ import {
   Box,
   IconButton,
   Input,
+  ListItemButton,
   SvgIcon,
   SvgIconProps,
   Toolbar,
@@ -11,6 +12,7 @@ import {
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
 import { SyntheticEvent, useContext, useState } from "react";
+import { Link } from "react-router-dom";
 import { FocusContext, IFocusApp } from "./types";
 
 const drawerWidth = 170;
@@ -82,9 +84,12 @@ export function AppBar({ open }: AppBarProps) {
         >
           <MenuIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
         </IconButton>
-        <Box sx={{ flexGrow: 1, display: { xs: "flex" } }}>
-          <HomeIcon />
+        <Box sx={{ flexGrow: 0, display: { xs: "flex" } }}>
+          <ListItemButton component={Link} to="/">
+            <HomeIcon />
+          </ListItemButton>
         </Box>
+        <Box sx={{ flexGrow: 1, display: { xs: "flex" } }} />
         <Box sx={{ flexGrow: 0, display: { xs: "flex" } }}>
           <Input
             sx={{ color: "inherit" }}

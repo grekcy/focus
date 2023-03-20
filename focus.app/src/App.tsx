@@ -5,12 +5,14 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { AppBar } from "./AppBar";
 import { FocusAPI } from "./lib/api";
-import { ChallengePage } from "./routes/challenge";
-import { CardPage } from "./routes/card";
 import { ErrorPage } from "./routes/ErrorPage";
-import { ForecastPage } from "./routes/forecast";
 import { InboxPage } from "./routes/Inbox";
 import { Root } from "./routes/Root";
+import { CardPage } from "./routes/card";
+import { ChallengePage } from "./routes/challenge";
+import { ForecastPage } from "./routes/forecast";
+import { PerformancePage } from "./routes/performance";
+import { PlanningPage } from "./routes/planning";
 import { TodayPage } from "./routes/today";
 import { DrawerHeader, SideBar } from "./sidebar";
 import { FocusContext, IFocusApp } from "./types";
@@ -54,7 +56,12 @@ function App() {
                 <Route path="/today" element={<TodayPage />} />
                 <Route path="/forecast" element={<ForecastPage />} />
                 <Route path="/cards/:cardId" element={<CardPage />} />
-                <Route path="/challenges/:challengeId" element={<ChallengePage />} />
+                <Route
+                  path="/challenges/:challengeId"
+                  element={<ChallengePage />}
+                />
+                <Route path="/planning" element={<PlanningPage />} />
+                <Route path="/performance" element={<PerformancePage />} />
                 <Route path="*" element={<ErrorPage />} />
               </Routes>
             </Box>
