@@ -9,16 +9,20 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
+	"focus/config"
 	"focus/models"
 )
 
 func Open(dburl string) (*gorm.DB, error) {
-	sqlLogger := logger.New(&gormLogger{},
-		logger.Config{
-			SlowThreshold:             200 * time.Millisecond,
-			LogLevel:                  logger.Info,
-			IgnoreRecordNotFoundError: true,
-		})
+	var sqlLogger logger.Interface
+	if config.DBLogSQL() {
+		sqlLogger = logger.New(&gormLogger{},
+			logger.Config{
+				SlowThreshold:             200 * time.Millisecond,
+				LogLevel:                  logger.Info,
+				IgnoreRecordNotFoundError: true,
+			})
+	}
 
 	db, err := gormx.Open(dburl, &gorm.Config{
 		SkipDefaultTransaction: true,
@@ -28,6 +32,14 @@ func Open(dburl string) (*gorm.DB, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "fail to open dataase")
 	}
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		return nil, errors.Wrapf(err, "fail to get sqlDB")
+	}
+	sqlDB.SetMaxIdleConns(config.DBMaxIdleConns())
+	sqlDB.SetMaxOpenConns(config.DBMaxOpenConns())
+	sqlDB.SetConnMaxLifetime(config.DBConnMaxLifeTime())
 
 	return db, nil
 }
