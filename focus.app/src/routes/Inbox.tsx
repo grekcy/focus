@@ -14,7 +14,7 @@ import {
 } from "@mui/x-data-grid";
 import { useContext, useEffect, useRef, useState } from "react";
 import { FocusContext, IFocusApp } from "../FocusProvider";
-import { CardBar, ICardBar } from "../lib/components/cardbar";
+import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { DataGridEx } from "./DataGridEx";
 
 export function InboxPage() {
@@ -136,7 +136,7 @@ export function InboxPage() {
     setRanking(true);
     await app
       .client()!
-      .rankUpCard(cardNo, rows[index + 1].card.cardNo)
+      .rankDownCard(cardNo, rows[index + 1].card.cardNo)
       .then(() => refreshRows())
       .catch((e: any) => app.toast(e.message, "error"))
       .finally(() => setRanking(false));

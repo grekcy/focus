@@ -24,17 +24,12 @@ service V1Alpha1 {
 message Card {
   uint64 card_no = 1;
   uint64 rank = 2;
-  optional uint64 parent = 3;
+  optional uint64 parent_card_no = 3;
   uint32 depth = 4;
   google.protobuf.Timestamp created_at = 5;
   optional google.protobuf.Timestamp completed_at = 6;
   string subject = 7;
   string content = 8;
-}
-
-message CompleteCardReq {
-  uint64 card_no = 1;
-  bool complted = 2;
 }
 
 message CardListResp { repeated Card items = 1; }

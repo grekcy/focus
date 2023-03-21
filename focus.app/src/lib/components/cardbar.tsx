@@ -12,6 +12,7 @@ import {
 import { FocusContext, IFocusApp } from "../../FocusProvider";
 import { DrawerHeader } from "../../sidebar";
 import { Card } from "../proto/focus_pb";
+import { InlineEdit } from "./InlineEdit";
 
 export interface ICardBar {
   toggle: () => void;
@@ -75,8 +76,10 @@ export const CardBar = forwardRef(
           </DrawerHeader>
           <Divider />
           <Box sx={{ p: 1, width: 300 }}>
-            <Typography>Subject: {card?.subject}</Typography>
-            <Typography></Typography>
+            <Typography variant="overline">Subject:</Typography>
+            <InlineEdit value={card?.subject} />
+            <Typography variant="overline">Description:</Typography>
+            <InlineEdit multiline value={card?.content} />
           </Box>
         </Drawer>
       </>

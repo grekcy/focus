@@ -203,11 +203,11 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 
 func modelToProto(in *models.Card) *proto.Card {
 	return &proto.Card{
-		CardNo:    uint64(in.CardNo),
-		Rank:      uint64(in.Rank),
-		Parent:    helper.P(in.ParentID),
-		Depth:     uint32(in.Depth),
-		CreatedAt: timestamppb.New(in.CreatedAt),
+		CardNo:       uint64(in.CardNo),
+		Rank:         uint64(in.Rank),
+		ParentCardNo: helper.P(in.ParentCardNo),
+		Depth:        uint32(in.Depth),
+		CreatedAt:    timestamppb.New(in.CreatedAt),
 		CompletedAt: goxp.TernaryCF(in.CompletedAt == nil,
 			func() *timestamppb.Timestamp { return nil },
 			func() *timestamppb.Timestamp { return timestamppb.New(*in.CompletedAt) },

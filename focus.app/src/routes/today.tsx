@@ -3,9 +3,8 @@ import update from "immutability-helper";
 import { Box, Button, Typography } from "@mui/material";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { FocusContext, IFocusApp } from "../FocusProvider";
+import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView } from "../lib/components/CardList";
-import { InlineEdit } from "../lib/components/InlineEdit";
-import { CardBar, ICardBar } from "../lib/components/cardbar";
 import { Card } from "../lib/proto/focus_pb";
 
 export function TodayPage() {

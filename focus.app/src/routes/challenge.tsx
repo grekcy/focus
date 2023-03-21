@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import { useContext, useRef } from "react";
 import { FocusContext, IFocusApp } from "../FocusProvider";
-import { CardBar, ICardBar } from "../lib/components/cardbar";
+import { CardBar, ICardBar } from "../lib/components/CardBar";
 
 export function ChallengePage() {
   const app: IFocusApp = useContext(FocusContext);

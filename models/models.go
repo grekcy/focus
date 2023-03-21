@@ -44,17 +44,16 @@ type UserWorkspace struct {
 type Card struct {
 	*gorm.Model
 
-	WorkspaceID uint `gorm:"not null"`
-	CreatorID   uint `gorm:"not null"`
-	CardNo      uint `gorm:"not null;index"`
-	Rank        uint `gorm:"not null;index;default:0"`
-	ParentID    *uint
-	Depth       uint `gorm:"not null;default:0"`
-	CompletedAt *time.Time
-	Subject     string `gorm:"type:varchar(500);not null;default:''"`
-	Content     string `gorm:"type:text;not null;default:''"`
+	WorkspaceID  uint `gorm:"not null"`
+	CreatorID    uint `gorm:"not null"`
+	CardNo       uint `gorm:"not null;index"`
+	Rank         uint `gorm:"not null;index;default:0"`
+	ParentCardNo *uint
+	Depth        uint `gorm:"not null;default:0"`
+	CompletedAt  *time.Time
+	Subject      string `gorm:"type:varchar(500);not null;default:''"`
+	Content      string `gorm:"type:text;not null;default:''"`
 
-	Cards     []*Card    `gorm:"foreignkey:ParentID"`
 	Creator   *User      `gorm:"foreignKey:CreatorID"`
 	Workspace *Workspace `gorm:"foreignKey:WorkspaceID"`
 }

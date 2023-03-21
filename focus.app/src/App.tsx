@@ -11,11 +11,11 @@ import { ErrorPage } from "./routes/ErrorPage";
 import { InboxPage } from "./routes/Inbox";
 import { Root } from "./routes/Root";
 import { TodayPage } from "./routes/Today";
-import { CardPage } from "./routes/card";
-import { ChallengePage } from "./routes/challenge";
-import { ForecastPage } from "./routes/forecast";
-import { PerformancePage } from "./routes/performance";
-import { PlanningPage } from "./routes/planning";
+import { CardPage } from "./routes/Cards";
+import { ChallengePage } from "./routes/Challenge";
+import { ForecastPage } from "./routes/Forecast";
+import { PerformancePage } from "./routes/Performance";
+import { PlanningPage } from "./routes/Planning";
 import { DrawerHeader, SideBar } from "./sidebar";
 
 function App() {

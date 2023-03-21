@@ -12,10 +12,10 @@ export class Card extends jspb.Message {
   getRank(): number;
   setRank(value: number): Card;
 
-  getParent(): number;
-  setParent(value: number): Card;
-  hasParent(): boolean;
-  clearParent(): Card;
+  getParentCardNo(): number;
+  setParentCardNo(value: number): Card;
+  hasParentCardNo(): boolean;
+  clearParentCardNo(): Card;
 
   getDepth(): number;
   setDepth(value: number): Card;
@@ -48,7 +48,7 @@ export namespace Card {
   export type AsObject = {
     cardNo: number,
     rank: number,
-    parent?: number,
+    parentCardNo?: number,
     depth: number,
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
@@ -56,36 +56,14 @@ export namespace Card {
     content: string,
   }
 
-  export enum ParentCase { 
-    _PARENT_NOT_SET = 0,
-    PARENT = 3,
+  export enum ParentCardNoCase { 
+    _PARENT_CARD_NO_NOT_SET = 0,
+    PARENT_CARD_NO = 3,
   }
 
   export enum CompletedAtCase { 
     _COMPLETED_AT_NOT_SET = 0,
     COMPLETED_AT = 6,
-  }
-}
-
-export class CompleteCardReq extends jspb.Message {
-  getCardNo(): number;
-  setCardNo(value: number): CompleteCardReq;
-
-  getComplted(): boolean;
-  setComplted(value: boolean): CompleteCardReq;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): CompleteCardReq.AsObject;
-  static toObject(includeInstance: boolean, msg: CompleteCardReq): CompleteCardReq.AsObject;
-  static serializeBinaryToWriter(message: CompleteCardReq, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): CompleteCardReq;
-  static deserializeBinaryFromReader(message: CompleteCardReq, reader: jspb.BinaryReader): CompleteCardReq;
-}
-
-export namespace CompleteCardReq {
-  export type AsObject = {
-    cardNo: number,
-    complted: boolean,
   }
 }
 
