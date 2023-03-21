@@ -8,6 +8,7 @@ import { V1Alpha1Client } from "./proto/FocusServiceClientPb";
 import {
   Card,
   CardField,
+  GetCardReq,
   ListCardReq,
   PatchCardReq,
   RankCardReq,
@@ -55,9 +56,16 @@ export class FocusAPI {
   };
 
   getCard = async (cardNo: number) => {
-    const no = new UInt64Value();
-    no.setValue(cardNo);
-    return await this.s.getCard(no, this.metadata).then((r) => r.toObject());
+    const resp = await this.getCards(cardNo);
+    return resp[cardNo];
+  };
+
+  getCards = async (...cardNo: number[]) => {
+    const req = new GetCardReq();
+    req.setCardNosList(cardNo);
+    return await this.s
+      .getCards(req, this.metadata)
+      .then((r) => Object.fromEntries(r.toObject().itemsMap));
   };
 
   completeCard = async (cardNo: number, complete: boolean) => {

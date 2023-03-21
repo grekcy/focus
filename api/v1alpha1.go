@@ -229,6 +229,7 @@ func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCard
 }
 
 type ListOpt struct {
+	CardNo           []uint
 	excludeCompleted bool
 }
 
@@ -238,6 +239,10 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card,
 	tx := s.db
 	if opt.excludeCompleted {
 		tx = tx.Where("completed_at IS NULL")
+	}
+
+	if len(opt.CardNo) > 0 {
+		tx = tx.Where("card_no IN ?", opt.CardNo)
 	}
 
 	r := make([]*models.Card, 0)
@@ -265,6 +270,36 @@ func (s *v1alpha1ServiceImpl) GetCard(ctx context.Context, cardNo *wrapperspb.UI
 	}
 
 	return modelToProto(card), nil
+}
+
+func (s *v1alpha1ServiceImpl) GetCards(ctx context.Context, req *proto.GetCardReq) (*proto.GetCardResp, error) {
+	if err := validate.Struct(&struct {
+		IDs []uint64 `validate:"required"`
+	}{
+		IDs: req.CardNos,
+	}); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	r, err := s.listCards(ctx, nil, ListOpt{
+		CardNo: fx.Map(req.CardNos, func(n uint64) uint { return uint(n) }),
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(r) != len(req.CardNos) {
+		return nil, status.Errorf(codes.NotFound, "expected %d but got %d", len(req.CardNos), len(r))
+	}
+
+	resp := &proto.GetCardResp{
+		Items: make(map[uint64]*proto.Card),
+	}
+
+	fx.Each(r, func(_ int, c *models.Card) {
+		resp.Items[uint64(c.CardNo)] = modelToProto(c)
+	})
+
+	return resp, nil
 }
 
 func (s *v1alpha1ServiceImpl) getCard(ctx context.Context, cardNo uint) (*models.Card, error) {

@@ -109,6 +109,44 @@ export namespace ListCardResp {
   }
 }
 
+export class GetCardReq extends jspb.Message {
+  getCardNosList(): Array<number>;
+  setCardNosList(value: Array<number>): GetCardReq;
+  clearCardNosList(): GetCardReq;
+  addCardNos(value: number, index?: number): GetCardReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetCardReq.AsObject;
+  static toObject(includeInstance: boolean, msg: GetCardReq): GetCardReq.AsObject;
+  static serializeBinaryToWriter(message: GetCardReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetCardReq;
+  static deserializeBinaryFromReader(message: GetCardReq, reader: jspb.BinaryReader): GetCardReq;
+}
+
+export namespace GetCardReq {
+  export type AsObject = {
+    cardNosList: Array<number>,
+  }
+}
+
+export class GetCardResp extends jspb.Message {
+  getItemsMap(): jspb.Map<number, Card>;
+  clearItemsMap(): GetCardResp;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetCardResp.AsObject;
+  static toObject(includeInstance: boolean, msg: GetCardResp): GetCardResp.AsObject;
+  static serializeBinaryToWriter(message: GetCardResp, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetCardResp;
+  static deserializeBinaryFromReader(message: GetCardResp, reader: jspb.BinaryReader): GetCardResp;
+}
+
+export namespace GetCardResp {
+  export type AsObject = {
+    itemsMap: Array<[number, Card.AsObject]>,
+  }
+}
+
 export class RankCardReq extends jspb.Message {
   getCardNo(): number;
   setCardNo(value: number): RankCardReq;

@@ -15,6 +15,7 @@ service V1Alpha1 {
   rpc quickAddCard(google.protobuf.StringValue) returns (Card);
   rpc listCards(ListCardReq) returns (ListCardResp) {}
   rpc getCard(google.protobuf.UInt64Value) returns (Card) {}
+  rpc getCards(GetCardReq) returns (GetCardResp) {}
   rpc patchCard(PatchCardReq) returns (Card) {}
   rpc rankUpCard(RankCardReq) returns (google.protobuf.Empty) {}
   rpc rankDownCard(RankCardReq) returns (google.protobuf.Empty) {}
@@ -38,6 +39,10 @@ message ListCardReq {
 }
 
 message ListCardResp { repeated Card items = 1; }
+
+message GetCardReq { repeated uint64 card_nos = 1; }
+
+message GetCardResp { map<uint64, Card> items = 1; }
 
 message RankCardReq {
   uint64 card_no = 1;

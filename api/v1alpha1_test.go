@@ -80,6 +80,28 @@ func TestListCards(t *testing.T) {
 	require.NotEmpty(t, items)
 }
 
+func TestGetCard(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	ctx, service := newTestClient(ctx, t)
+
+	_, err := service.GetCards(ctx, &proto.GetCardReq{})
+	require.Error(t, err, "empty request")
+
+	_, err = service.GetCards(ctx, &proto.GetCardReq{CardNos: []uint64{1, 9999999999999999999}})
+	require.Error(t, err, "not exists")
+
+	items, err := service.listCards(ctx, nil, ListOpt{excludeCompleted: true})
+	require.NoError(t, err)
+	require.NotEmpty(t, items)
+	cardNo := fx.Map(items, func(x *models.Card) uint64 { return uint64(x.CardNo) })
+
+	got, err := service.GetCards(ctx, &proto.GetCardReq{CardNos: cardNo})
+	require.NoError(t, err)
+	require.Equal(t, len(items), len(got.Items))
+}
+
 func TestCompleteCard(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
