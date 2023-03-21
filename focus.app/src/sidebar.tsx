@@ -1,6 +1,7 @@
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CalendarViewWeekIcon from "@mui/icons-material/CalendarViewWeek";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import FlagIcon from "@mui/icons-material/Flag";
 import InboxIcon from "@mui/icons-material/Inbox";
 import InsightsIcon from "@mui/icons-material/Insights";
@@ -132,6 +133,13 @@ const pages = [
     title: "Performance",
     icon: InsightsIcon,
     tooltip: "performance",
+  },
+  { title: "-" },
+  {
+    href: "/demo/dnd",
+    title: "DnD",
+    icon: DragIndicatorIcon,
+    tooltip: "DnD Demo",
   },
 ];
 

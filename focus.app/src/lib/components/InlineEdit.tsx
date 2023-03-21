@@ -9,11 +9,16 @@ import {
 
 interface InlineEditProp {
   value?: string;
+  multiline?: boolean;
   onSubmit?: (target: Element, value: string) => void;
 }
 
 // Ref: https://www.emgoto.com/react-inline-edit/
-export function InlineEdit({ value = "", onSubmit }: InlineEditProp) {
+export function InlineEdit({
+  value = "",
+  multiline = false,
+  onSubmit,
+}: InlineEditProp) {
   const [prevValue, setPrevValue] = useState(value);
   const [editingValue, setEditingValue] = useState(value);
   const [editing, setEditing] = useState(false);
@@ -38,9 +43,13 @@ export function InlineEdit({ value = "", onSubmit }: InlineEditProp) {
   }
 
   function handleKeyDownM(e: SyntheticEvent<HTMLDivElement, KeyboardEvent>) {
-    if (e.nativeEvent.key === "Enter" || e.nativeEvent.key === "Escape") {
-      if (e.nativeEvent.key === "Escape") setEditingValue(prevValue);
-      (e.nativeEvent.target! as HTMLInputElement).blur();
+    switch (e.nativeEvent.key) {
+      case "Enter":
+        if (multiline) return;
+        (e.nativeEvent.target! as HTMLInputElement).blur();
+        break;
+      case "Escape":
+        (e.nativeEvent.target! as HTMLInputElement).blur();
     }
   }
 
@@ -55,6 +64,7 @@ export function InlineEdit({ value = "", onSubmit }: InlineEditProp) {
       onKeyDown={handleKeyDownM}
       InputProps={{ disableUnderline: !editing, readOnly: !editing }}
       fullWidth
+      multiline={multiline}
     />
   );
 }

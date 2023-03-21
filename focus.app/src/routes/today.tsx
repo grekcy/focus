@@ -1,14 +1,12 @@
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import TaskAltIcon from "@mui/icons-material/TaskAlt";
-import TripOriginIcon from "@mui/icons-material/TripOrigin";
+import update from "immutability-helper";
 
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { Box, Button, Container, IconButton, Typography } from "@mui/material";
-import { useContext, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Box, Button, Typography } from "@mui/material";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { FocusContext, IFocusApp } from "../FocusProvider";
+import { CardListView } from "../lib/components/CardList";
 import { InlineEdit } from "../lib/components/InlineEdit";
 import { CardBar, ICardBar } from "../lib/components/cardbar";
+import { Card } from "../lib/proto/focus_pb";
 
 export function TodayPage() {
   const app: IFocusApp = useContext(FocusContext);
@@ -17,6 +15,29 @@ export function TodayPage() {
   function cardBarToggle() {
     cardBarRef.current && cardBarRef.current.toggle();
   }
+
+  const [items, setItems] = useState<Card.AsObject[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      app
+        .client()!
+        .listCards()
+        .then((r) => setItems(r))
+        .catch((e) => app.toast(e.message, "error"));
+    })();
+  }, []);
+
+  const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
+    setItems((prevItems: Card.AsObject[]) =>
+      update(prevItems, {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, prevItems[dragIndex] as Card.AsObject],
+        ],
+      })
+    );
+  }, []);
 
   return (
     <>
@@ -29,59 +50,12 @@ export function TodayPage() {
         </Box>
       </Box>
 
-      <Container disableGutters>
-        <Item cardNo={12346} onChange={(v) => app.toast(v)} />
-        <Item cardNo={567} selected onChange={(v) => app.toast(v)} />
-        <Item cardNo={123} onChange={(v) => app.toast(v)} />
-        <Item cardNo={3495} onChange={(v) => app.toast(v)} />
-        <Item cardNo={9834} onChange={(v) => app.toast(v)} />
-      </Container>
+      <CardListView
+        items={items}
+        onChange={(v) => app.toast(v)}
+        moveCard={moveCard}
+      />
       <CardBar ref={cardBarRef} />
     </>
-  );
-}
-
-interface ItemProp {
-  cardNo: number;
-  selected?: boolean;
-  onChange?: (value: string) => void;
-}
-
-function Item({ cardNo, selected = false, onChange }: ItemProp) {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        border: "1px solid gray",
-        padding: "0.5rem 1rem",
-        cursor: "move",
-        backgroundColor: selected ? "action.selected" : "",
-      }}
-      width={1}
-    >
-      <Box sx={{ flexGrow: 0, color: "GrayText", height: 0 }}>
-        <DragIndicatorIcon />
-      </Box>
-      <Box sx={{ flexGrow: 0, pr: 1 }}>
-        <Link to={`/cards/` + cardNo}>{cardNo}</Link>
-      </Box>
-      <Box sx={{ flexGrow: 1 }}>
-        <InlineEdit
-          value="hello"
-          onSubmit={(e, value) => onChange && onChange(value)}
-        />
-      </Box>
-      <Box sx={{ flexGrow: 0, color: "GrayText", height: 0 }}>
-        <IconButton>
-          <TaskAltIcon fontSize="small" />
-        </IconButton>
-        <IconButton>
-          <TripOriginIcon fontSize="small" />
-        </IconButton>
-        <IconButton>
-          <DeleteIcon fontSize="small" />
-        </IconButton>
-      </Box>
-    </Box>
   );
 }

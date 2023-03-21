@@ -190,7 +190,7 @@ export function InboxPage() {
             })
           );
         })
-        .catch((e) => app.toast(e.message));
+        .catch((e) => app.toast(e.message, "error"));
     })();
   }
 
