@@ -9,12 +9,13 @@ import {
   useRef,
   useState,
 } from "react";
+import { FocusContext, IFocusApp } from "../../FocusProvider";
 import { DrawerHeader } from "../../sidebar";
-import { FocusContext, IFocusApp } from "../../types";
 import { Card } from "../proto/focus_pb";
 
 export interface ICardBar {
   toggle: () => void;
+  setCardNo: (cardNo: number) => void;
 }
 
 interface CardBarProp {
@@ -33,6 +34,10 @@ export const CardBar = forwardRef(
     useImperativeHandle(ref, () => ({
       toggle() {
         setOpen((p) => !p);
+      },
+      setCardNo(cardNo: number) {
+        setOpen(true);
+        setCardNo(cardNo);
       },
     }));
 

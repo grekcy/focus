@@ -4,18 +4,19 @@ import { CookiesProvider } from "react-cookie";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { AppBar } from "./AppBar";
+import { FocusContext, IFocusApp } from "./FocusProvider";
+import { DnDDemo } from "./demo/dnd";
 import { FocusAPI } from "./lib/api";
 import { ErrorPage } from "./routes/ErrorPage";
 import { InboxPage } from "./routes/Inbox";
 import { Root } from "./routes/Root";
+import { TodayPage } from "./routes/Today";
 import { CardPage } from "./routes/card";
 import { ChallengePage } from "./routes/challenge";
 import { ForecastPage } from "./routes/forecast";
 import { PerformancePage } from "./routes/performance";
 import { PlanningPage } from "./routes/planning";
-import { TodayPage } from "./routes/today";
 import { DrawerHeader, SideBar } from "./sidebar";
-import { FocusContext, IFocusApp } from "./types";
 
 function App() {
   const [openSideBar, setOpenSideBar] = useState(false);

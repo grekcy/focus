@@ -13,7 +13,7 @@ import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
 import { SyntheticEvent, useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import { FocusContext, IFocusApp } from "./types";
+import { FocusContext, IFocusApp } from "./FocusProvider";
 
 const drawerWidth = 170;
 

@@ -62,11 +62,23 @@ type Card struct {
 type Challenge struct {
 	*gorm.Model
 
-	CreatorID uint   `gorm:"not null"`
-	OwnerID   uint   `gorm:"not null"`
-	Name      string `gorm:"type:varchar(100);not null;check:name<>''"`
+	WorkspaceID uint   `gorm:"not null"`
+	CreatorID   uint   `gorm:"not null"`
+	OwnerID     uint   `gorm:"not null"`
+	Name        string `gorm:"type:varchar(100);not null;check:name<>''"`
 
-	Creator *User   `gorm:"foreignkey:CreatorID"`
-	Owner   *User   `gorm:"foreignkey:OwnerID"`
-	Cards   []*Card `gorm:"many2many:challenge_cards"`
+	Creator   *User      `gorm:"foreignkey:CreatorID"`
+	Owner     *User      `gorm:"foreignkey:OwnerID"`
+	Cards     []*Card    `gorm:"many2many:challenge_cards"`
+	Workspace *Workspace `gorm:"foreignKey:WorkspaceID"`
+}
+
+type Labels struct {
+	*gorm.Model
+
+	WorkspaceID uint   `gorm:"not null"`
+	Label       string `gorm:"varchar(50);index;not null;lable<>''"`
+	Name        string `gorm:"varchar(50);not null;check:name<>''"`
+
+	Workspace *Workspace `gorm:"foreignKey:WorkspaceID"`
 }

@@ -13,8 +13,8 @@ import {
   GridRowsProp,
 } from "@mui/x-data-grid";
 import { useContext, useEffect, useRef, useState } from "react";
+import { FocusContext, IFocusApp } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/cardbar";
-import { FocusContext, IFocusApp } from "../types";
 import { DataGridEx } from "./DataGridEx";
 
 export function InboxPage() {
