@@ -13,12 +13,11 @@ import {
   GridRowsProp,
 } from "@mui/x-data-grid";
 import update from "immutability-helper";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { FocusContext, IFocusApp } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardAction, CardListView } from "../lib/components/CardList";
 import { Card } from "../lib/proto/focus_pb";
-import { DataGridEx } from "./DataGridEx";
 
 export function InboxPage() {
   const app: IFocusApp = useContext(FocusContext);
@@ -290,6 +289,17 @@ export function InboxPage() {
     cardBarRef.current && cardBarRef.current.toggle();
   }
 
+  const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
+    setItems((prevItems: Card.AsObject[]) =>
+      update(prevItems, {
+        $splice: [
+          [dragIndex, 1],
+          [hoverIndex, 0, prevItems[dragIndex] as Card.AsObject],
+        ],
+      })
+    );
+  }, []);
+
   return (
     <>
       <Box display="flex">
@@ -301,28 +311,13 @@ export function InboxPage() {
         </Box>
       </Box>
 
-      <Box sx={{ width: 1 }}>
-        <CardListView
-          items={items}
-          showCardNo={true}
-          onChange={handleCardChange}
-          onActionClick={handleCardAction}
-        />
-
-        <DataGridEx
-          columns={columns}
-          rows={rows}
-          autoHeight={true}
-          hideFooter={true}
-          columnHeaderHeight={0}
-          editMode="row"
-          processRowUpdate={processRowUpdate}
-          onProcessRowUpdateError={(e) => app.toast(e.message, "error")}
-          getRowClassName={(params) =>
-            `super-app-theme--${params.row.card.completedat ? "Filled" : ""}`
-          }
-        />
-      </Box>
+      <CardListView
+        items={items}
+        showCardNo={false}
+        onChange={handleCardChange}
+        onActionClick={handleCardAction}
+        moveCard={moveCard}
+      />
       <CardBar ref={cardBarRef} />
     </>
   );
