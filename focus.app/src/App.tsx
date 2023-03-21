@@ -63,6 +63,7 @@ function App() {
                 />
                 <Route path="/planning" element={<PlanningPage />} />
                 <Route path="/performance" element={<PerformancePage />} />
+                <Route path="/demo/dnd" element={<DnDDemo />} />
                 <Route path="*" element={<ErrorPage />} />
               </Routes>
             </Box>
