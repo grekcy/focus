@@ -67,21 +67,43 @@ export namespace Card {
   }
 }
 
-export class CardListResp extends jspb.Message {
+export class ListCardReq extends jspb.Message {
+  getExcludeCompleted(): boolean;
+  setExcludeCompleted(value: boolean): ListCardReq;
+
+  getExcludeChallenges(): boolean;
+  setExcludeChallenges(value: boolean): ListCardReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListCardReq.AsObject;
+  static toObject(includeInstance: boolean, msg: ListCardReq): ListCardReq.AsObject;
+  static serializeBinaryToWriter(message: ListCardReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListCardReq;
+  static deserializeBinaryFromReader(message: ListCardReq, reader: jspb.BinaryReader): ListCardReq;
+}
+
+export namespace ListCardReq {
+  export type AsObject = {
+    excludeCompleted: boolean,
+    excludeChallenges: boolean,
+  }
+}
+
+export class ListCardResp extends jspb.Message {
   getItemsList(): Array<Card>;
-  setItemsList(value: Array<Card>): CardListResp;
-  clearItemsList(): CardListResp;
+  setItemsList(value: Array<Card>): ListCardResp;
+  clearItemsList(): ListCardResp;
   addItems(value?: Card, index?: number): Card;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): CardListResp.AsObject;
-  static toObject(includeInstance: boolean, msg: CardListResp): CardListResp.AsObject;
-  static serializeBinaryToWriter(message: CardListResp, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): CardListResp;
-  static deserializeBinaryFromReader(message: CardListResp, reader: jspb.BinaryReader): CardListResp;
+  toObject(includeInstance?: boolean): ListCardResp.AsObject;
+  static toObject(includeInstance: boolean, msg: ListCardResp): ListCardResp.AsObject;
+  static serializeBinaryToWriter(message: ListCardResp, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListCardResp;
+  static deserializeBinaryFromReader(message: ListCardResp, reader: jspb.BinaryReader): ListCardResp;
 }
 
-export namespace CardListResp {
+export namespace ListCardResp {
   export type AsObject = {
     itemsList: Array<Card.AsObject>,
   }

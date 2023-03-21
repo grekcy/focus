@@ -12,13 +12,29 @@ import {
   GridRowModel,
   GridRowsProp,
 } from "@mui/x-data-grid";
+import update from "immutability-helper";
 import { useContext, useEffect, useRef, useState } from "react";
 import { FocusContext, IFocusApp } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
+import { CardAction, CardListView } from "../lib/components/CardList";
+import { Card } from "../lib/proto/focus_pb";
 import { DataGridEx } from "./DataGridEx";
 
 export function InboxPage() {
   const app: IFocusApp = useContext(FocusContext);
+  useEffect(() => {
+    const handler = app
+      .client()!
+      .addEventListener("card.created", async (cardNo: number) => {
+        await app
+          .client()
+          ?.getCard(cardNo)
+          .then((r) => setItems((p) => update(p, { $push: [r] })))
+          .catch((e) => app.toast(e.message, "error"));
+      });
+
+    return () => app.client()!.removeEventListener(handler);
+  }, []);
 
   const columns: GridColDef[] = [
     {
@@ -97,11 +113,12 @@ export function InboxPage() {
     if (!service) return;
 
     (async () => {
-      await service.completeCard(cardNo, complete);
+      const updated = await service.completeCard(cardNo, complete);
+
       setRows(
         rows.map((r) => {
           if (r.cardNo === cardNo) {
-            r.card.completedat = !r.card.completedat;
+            r.card = updated;
           }
           return r;
         })
@@ -162,6 +179,27 @@ export function InboxPage() {
     })();
   }
 
+  function deleteCard(cardNo: number) {
+    if (deletingCard) return;
+
+    setDeletingCard(true);
+    console.log(`deleting ${cardNo}`);
+
+    const service = app.client();
+    if (!service) return;
+
+    (async () => {
+      await service!
+        .deleteCard(cardNo)
+        .then((r) =>
+          setItems((prev) => prev.filter((item) => item.cardNo !== cardNo))
+        )
+        .catch((e) => app.toast(e, "error"))
+        .finally(() => setDeletingCard(false));
+    })();
+  }
+
+  const [items, setItems] = useState<Card.AsObject[]>([]);
   const [rows, setRows] = useState<GridRowsProp>([]);
   useEffect(() => {
     refreshRows();
@@ -175,16 +213,13 @@ export function InboxPage() {
       await service
         .listCards()
         .then((r) => {
+          setItems(r);
           setRows(
             r.map((c) => {
               return {
                 id: c.cardNo,
                 cardNo: c.cardNo,
-                rank: c.rank,
                 subject: c.subject,
-                createdAt: c.createdAt,
-                completedAt: c.completedAt,
-                depth: c.depth,
                 card: c,
               };
             })
@@ -205,11 +240,49 @@ export function InboxPage() {
       .updateCardSubject(newRow.card.cardNo, newRow.subject)
       .then((r) => {
         const updatedRow = { ...newRow };
-        setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+        const index = rows.findIndex((row) => row.id === newRow.id);
+
+        setRows((prevItems) =>
+          update(prevItems, { index: { $set: updatedRow } })
+        );
         return updatedRow;
       })
       .catch((e: any) => app.toast(e.message, "error"))
       .finally(() => setUpdating(false));
+  }
+
+  function handleCardChange(index: number, subject: string) {
+    (async () => {
+      const card = items[index];
+      await app
+        .client()!
+        .updateCardSubject(card.cardNo, subject)
+        .then(() => {
+          card.subject = subject;
+
+          setItems((prevItems: Card.AsObject[]) =>
+            update(prevItems, { index: { $set: card } })
+          );
+        })
+        .catch((e) => app.toast(e.message));
+    })();
+  }
+
+  function handleCardAction(index: number, action: CardAction) {
+    const card = items[index];
+    switch (action) {
+      case CardAction.COMPLETE:
+        setCompleted(card.cardNo, true);
+        break;
+      case CardAction.INPROGRESS:
+        setCompleted(card.cardNo, false);
+        break;
+      case CardAction.DELETE:
+        deleteCard(card.cardNo);
+        break;
+      default:
+        app.toast(`unknown action: ${action}`, "error");
+    }
   }
 
   const cardBarRef = useRef<ICardBar>(null);
@@ -229,6 +302,13 @@ export function InboxPage() {
       </Box>
 
       <Box sx={{ width: 1 }}>
+        <CardListView
+          items={items}
+          showCardNo={true}
+          onChange={handleCardChange}
+          onActionClick={handleCardAction}
+        />
+
         <DataGridEx
           columns={columns}
           rows={rows}

@@ -1,3 +1,4 @@
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
@@ -9,29 +10,52 @@ import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Link } from "react-router-dom";
 import { Card } from "../proto/focus_pb";
+import { EmptyIcon } from "./Icons";
 import { InlineEdit } from "./InlineEdit";
+
+export enum CardAction {
+  COMPLETE = 1,
+  INPROGRESS = 1,
+  DELETE = 3,
+}
 
 interface CardListViewProp {
   items: Card.AsObject[];
-  onChange?: (value: string) => void;
+  showCardNo?: boolean;
+  onChange?: (index: number, value: string) => void;
   moveCard?: (dragIndex: number, hoverIndex: number) => void;
+  onActionClick?: (index: number, action: CardAction) => void;
 }
 
-export function CardListView({ items, onChange, moveCard }: CardListViewProp) {
+export function CardListView({
+  items,
+  showCardNo = true,
+  onChange,
+  moveCard,
+  onActionClick,
+}: CardListViewProp) {
+  function hasChild(cardNo: number): boolean {
+    return items.findIndex((item) => item.parentCardNo === cardNo) !== -1;
+  }
+
+  function handleChange(index: number, subject: string) {
+    onChange && onChange(index, subject);
+  }
+
   return (
     <DndProvider backend={HTML5Backend}>
-      <Box width={1}>
-        {items.map((item, i) => (
-          <CardItem
-            key={item.cardNo}
-            index={i}
-            cardNo={item.cardNo}
-            text={item.subject}
-            onChange={onChange}
-            moveCard={moveCard}
-          />
-        ))}
-      </Box>
+      {items.map((item, i) => (
+        <CardItem
+          key={item.cardNo}
+          index={i}
+          card={item}
+          showCardNo={showCardNo}
+          onChange={(v) => handleChange(i, v)}
+          onActionClick={onActionClick}
+          moveCard={moveCard}
+          hasChild={hasChild}
+        />
+      ))}
     </DndProvider>
   );
 }
@@ -47,22 +71,30 @@ export const ItemTypes = {
 };
 
 interface ItemProp {
-  cardNo: number;
+  card: Card.AsObject;
   index: number; // index of items, used in dnd
-  text?: string;
   selected?: boolean;
+  visible?: boolean;
+  showCardNo?: boolean;
+  hasChild?: (cardNo: number) => boolean;
   onChange?: (value: string) => void;
+  onActionClick?: (index: number, action: CardAction) => void;
   moveCard?: (dragIndex: number, hoverIndex: number) => void; // QUESTION: 여기에? 있는게 이상한 느낌? 더 공부 필요
 }
 
 function CardItem({
-  cardNo,
-  text = "",
+  card,
   index,
   selected = false,
+  visible = true,
+  showCardNo = true,
+  hasChild,
   onChange,
+  onActionClick,
   moveCard,
 }: ItemProp) {
+  //
+  // Drag&Drop supports
   const ref = useRef<HTMLDivElement>(null);
 
   const [{ handlerId }, drop] = useDrop<
@@ -129,6 +161,7 @@ function CardItem({
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.CARD,
     item: () => {
+      const cardNo = card.cardNo;
       return { cardNo, index };
     },
     collect: (monitor: any) => ({
@@ -139,10 +172,17 @@ function CardItem({
   const opacity = isDragging ? 0 : 1;
   drag(drop(ref));
 
+  function handleActionClick(index: number, action: CardAction) {
+    onActionClick && onActionClick(index, action);
+  }
+
+  const _hasChild = hasChild && hasChild(card.cardNo);
+
   return (
     <Box
       component="div"
       ref={ref}
+      visibility={visible ? "inherit" : "hidden"}
       sx={{
         display: "flex",
         border: "1px solid lightgray",
@@ -162,23 +202,52 @@ function CardItem({
       >
         <DragIndicatorIcon />
       </Box>
-      <Box sx={{ flexGrow: 0, pr: 1 }}>
-        <Link to={`/cards/` + cardNo}>{cardNo}</Link>
-      </Box>
+      {card.depth > 0 && (
+        <Box sx={{ flexGrow: 0, width: card.depth * 20 }}></Box>
+      )}
+      <IconButton size="small">
+        {_hasChild ? (
+          <ArrowDropDownIcon fontSize="small" />
+        ) : (
+          <EmptyIcon fontSize="small" />
+        )}
+      </IconButton>
+      {showCardNo && (
+        <>
+          <Box sx={{ flexGrow: 0, pr: 1 }}>
+            <Link to={`/cards/` + card.cardNo}>{card.cardNo}</Link>
+          </Box>
+        </>
+      )}
       <Box sx={{ flexGrow: 1 }}>
         <InlineEdit
-          value={text}
+          value={card.subject}
           onSubmit={(e, value) => onChange && onChange(value)}
         />
       </Box>
       <Box sx={{ flexGrow: 0, color: "grey", height: 0 }}>
-        <IconButton>
-          <TaskAltIcon fontSize="small" />
-        </IconButton>
-        <IconButton>
-          <TripOriginIcon fontSize="small" />
-        </IconButton>
-        <IconButton>
+        {card.completedAt ? (
+          <IconButton
+            onClick={() => {
+              handleActionClick(index, CardAction.COMPLETE);
+            }}
+          >
+            <TaskAltIcon fontSize="small" />
+          </IconButton>
+        ) : (
+          <IconButton
+            onClick={() => {
+              handleActionClick(index, CardAction.INPROGRESS);
+            }}
+          >
+            <TripOriginIcon fontSize="small" />
+          </IconButton>
+        )}
+        <IconButton
+          onClick={() => {
+            handleActionClick(index, CardAction.DELETE);
+          }}
+        >
           <DeleteIcon fontSize="small" />
         </IconButton>
       </Box>

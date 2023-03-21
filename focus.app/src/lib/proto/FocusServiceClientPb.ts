@@ -151,29 +151,29 @@ export class V1Alpha1Client {
   methodDescriptorlistCards = new grpcWeb.MethodDescriptor(
     '/V1Alpha1/listCards',
     grpcWeb.MethodType.UNARY,
-    google_protobuf_empty_pb.Empty,
-    focus_pb.CardListResp,
-    (request: google_protobuf_empty_pb.Empty) => {
+    focus_pb.ListCardReq,
+    focus_pb.ListCardResp,
+    (request: focus_pb.ListCardReq) => {
       return request.serializeBinary();
     },
-    focus_pb.CardListResp.deserializeBinary
+    focus_pb.ListCardResp.deserializeBinary
   );
 
   listCards(
-    request: google_protobuf_empty_pb.Empty,
-    metadata: grpcWeb.Metadata | null): Promise<focus_pb.CardListResp>;
+    request: focus_pb.ListCardReq,
+    metadata: grpcWeb.Metadata | null): Promise<focus_pb.ListCardResp>;
 
   listCards(
-    request: google_protobuf_empty_pb.Empty,
+    request: focus_pb.ListCardReq,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
-               response: focus_pb.CardListResp) => void): grpcWeb.ClientReadableStream<focus_pb.CardListResp>;
+               response: focus_pb.ListCardResp) => void): grpcWeb.ClientReadableStream<focus_pb.ListCardResp>;
 
   listCards(
-    request: google_protobuf_empty_pb.Empty,
+    request: focus_pb.ListCardReq,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
-               response: focus_pb.CardListResp) => void) {
+               response: focus_pb.ListCardResp) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
@@ -238,28 +238,28 @@ export class V1Alpha1Client {
     '/V1Alpha1/patchCard',
     grpcWeb.MethodType.UNARY,
     focus_pb.PatchCardReq,
-    google_protobuf_empty_pb.Empty,
+    focus_pb.Card,
     (request: focus_pb.PatchCardReq) => {
       return request.serializeBinary();
     },
-    google_protobuf_empty_pb.Empty.deserializeBinary
+    focus_pb.Card.deserializeBinary
   );
 
   patchCard(
     request: focus_pb.PatchCardReq,
-    metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
+    metadata: grpcWeb.Metadata | null): Promise<focus_pb.Card>;
 
   patchCard(
     request: focus_pb.PatchCardReq,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
-               response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+               response: focus_pb.Card) => void): grpcWeb.ClientReadableStream<focus_pb.Card>;
 
   patchCard(
     request: focus_pb.PatchCardReq,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
-               response: google_protobuf_empty_pb.Empty) => void) {
+               response: focus_pb.Card) => void) {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +

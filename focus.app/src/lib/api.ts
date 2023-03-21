@@ -5,15 +5,23 @@ import {
   UInt64Value,
 } from "google-protobuf/google/protobuf/wrappers_pb";
 import { V1Alpha1Client } from "./proto/FocusServiceClientPb";
-import { Card, CardField, PatchCardReq, RankCardReq } from "./proto/focus_pb";
+import {
+  Card,
+  CardField,
+  ListCardReq,
+  PatchCardReq,
+  RankCardReq,
+} from "./proto/focus_pb";
 
 export class FocusAPI {
   s: V1Alpha1Client;
   metadata: { [s: string]: string };
+  listeners: { [event: string]: EventListener[] };
 
   constructor(endpoint: string) {
     this.s = new V1Alpha1Client(endpoint);
     this.metadata = {};
+    this.listeners = {};
   }
 
   version = async () => {
@@ -26,14 +34,22 @@ export class FocusAPI {
     const s = new StringValue();
     s.setValue(subject);
 
-    return await this.s
+    const r = await this.s
       .quickAddCard(s, this.metadata)
       .then((r) => r.toObject());
+
+    const listeners = this.listeners["card.created"];
+    listeners.forEach((h) => h(r.cardNo));
+
+    return r;
   };
 
-  listCards = async () => {
+  listCards = async (excludeCompleted = true, excludeChallenges = true) => {
+    const req = new ListCardReq();
+    req.setExcludeCompleted(excludeCompleted);
+    req.setExcludeChallenges(excludeChallenges);
     return await this.s
-      .listCards(new Empty(), this.metadata)
+      .listCards(req, this.metadata)
       .then((r) => r.toObject())
       .then((r) => r.itemsList);
   };
@@ -88,4 +104,22 @@ export class FocusAPI {
     no.setValue(cardNo);
     await this.s.deleteCard(no, this.metadata);
   };
+
+  addEventListener = (event: string, handler: EventListener) => {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(handler);
+    return handler;
+  };
+
+  removeEventListener = (listener: EventListener) => {
+    this.listeners = Object.fromEntries(
+      Object.entries(this.listeners).map(([k, v]) => {
+        return [k, v.filter((h) => h !== listener)];
+      })
+    );
+  };
 }
+
+type EventListener = (resId: number) => void;

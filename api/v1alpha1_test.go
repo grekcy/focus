@@ -8,12 +8,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"github.com/whitekid/goxp/fixtures"
+	"github.com/whitekid/goxp/fx"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"focus/config"
 	"focus/databases"
 	"focus/helper"
+	"focus/models"
 	"focus/proto"
 )
 
@@ -64,6 +66,18 @@ func TestQuickAdd(t *testing.T) {
 			require.Equal(t, got, got1)
 		})
 	}
+}
+
+func TestListCards(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	ctx, service := newTestClient(ctx, t)
+
+	items, err := service.listCards(ctx, nil, ListOpt{excludeCompleted: true})
+	require.NoError(t, err)
+	items = fx.Filter(items, func(item *models.Card) bool { return item.ParentCardNo != nil && *item.ParentCardNo > 0 })
+	require.NotEmpty(t, items)
 }
 
 func TestCompleteCard(t *testing.T) {

@@ -217,13 +217,13 @@ func modelToProto(in *models.Card) *proto.Card {
 	}
 }
 
-func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, _ *emptypb.Empty) (*proto.CardListResp, error) {
-	r, err := s.listCards(ctx, nil, ListOpt{excludeCompleted: true})
+func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCardReq) (*proto.ListCardResp, error) {
+	r, err := s.listCards(ctx, nil, ListOpt{excludeCompleted: req.ExcludeCompleted})
 	if err != nil {
 		return nil, err
 	}
 
-	return &proto.CardListResp{
+	return &proto.ListCardResp{
 		Items: fx.Map(r, func(c *models.Card) *proto.Card { return modelToProto(c) }),
 	}, nil
 }
@@ -283,7 +283,7 @@ func (s *v1alpha1ServiceImpl) getCard(ctx context.Context, cardNo uint) (*models
 	}
 }
 
-func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCardReq) (*emptypb.Empty, error) {
+func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCardReq) (*proto.Card, error) {
 	card, err := s.getCard(ctx, uint(req.Card.CardNo))
 	if err != nil {
 		return nil, err
@@ -325,5 +325,10 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 		return nil, err
 	}
 
-	return helper.Empty(), nil
+	card, err = s.getCard(ctx, uint(req.Card.CardNo))
+	if err != nil {
+		return nil, err
+	}
+
+	return modelToProto(card), nil
 }

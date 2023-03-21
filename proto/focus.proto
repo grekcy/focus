@@ -13,9 +13,9 @@ service V1Alpha1 {
   rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
 
   rpc quickAddCard(google.protobuf.StringValue) returns (Card);
-  rpc listCards(google.protobuf.Empty) returns (CardListResp) {}
+  rpc listCards(ListCardReq) returns (ListCardResp) {}
   rpc getCard(google.protobuf.UInt64Value) returns (Card) {}
-  rpc patchCard(PatchCardReq) returns (google.protobuf.Empty) {}
+  rpc patchCard(PatchCardReq) returns (Card) {}
   rpc rankUpCard(RankCardReq) returns (google.protobuf.Empty) {}
   rpc rankDownCard(RankCardReq) returns (google.protobuf.Empty) {}
   rpc deleteCard(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {}
@@ -32,7 +32,12 @@ message Card {
   string content = 8;
 }
 
-message CardListResp { repeated Card items = 1; }
+message ListCardReq {
+  bool exclude_completed = 1;
+  bool exclude_challenges = 2;
+}
+
+message ListCardResp { repeated Card items = 1; }
 
 message RankCardReq {
   uint64 card_no = 1;

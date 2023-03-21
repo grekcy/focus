@@ -1,6 +1,5 @@
-import update from "immutability-helper";
-
 import { Box, Button, Typography } from "@mui/material";
+import update from "immutability-helper";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { FocusContext, IFocusApp } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
@@ -21,7 +20,7 @@ export function TodayPage() {
     (async () => {
       app
         .client()!
-        .listCards()
+        .listCards(true, false)
         .then((r) => setItems(r))
         .catch((e) => app.toast(e.message, "error"));
     })();
@@ -38,6 +37,23 @@ export function TodayPage() {
     );
   }, []);
 
+  function handleCardChange(index: number, subject: string) {
+    (async () => {
+      const card = items[index];
+      await app
+        .client()!
+        .updateCardSubject(card.cardNo, subject)
+        .then(() => {
+          card.subject = subject;
+
+          setItems((prevItems: Card.AsObject[]) =>
+            update(prevItems, { index: { $set: card } })
+          );
+        })
+        .catch((e) => app.toast(e.message));
+    })();
+  }
+
   return (
     <>
       <Box display="flex">
@@ -51,7 +67,7 @@ export function TodayPage() {
 
       <CardListView
         items={items}
-        onChange={(v) => app.toast(v)}
+        onChange={handleCardChange}
         moveCard={moveCard}
       />
       <CardBar ref={cardBarRef} />

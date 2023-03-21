@@ -13,6 +13,7 @@ export interface IFocusApp {
 export const FocusContext = createContext<IFocusApp>({
   toggleSidebar() {},
   toast(message: string, severity?: AlertColor) {},
+
   client() {
     return null;
   },
