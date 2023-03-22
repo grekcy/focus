@@ -50,7 +50,7 @@ export function TodayPage() {
             update(prevItems, { index: { $set: card } })
           );
         })
-        .catch((e) => app.toast(e.message));
+        .catch((e) => app.toast(e.message,"error"));
     })();
   }
 

@@ -6,7 +6,6 @@ import {
   useContext,
   useEffect,
   useImperativeHandle,
-  useRef,
   useState,
 } from "react";
 import { FocusContext, IFocusApp } from "../../FocusProvider";
@@ -56,8 +55,6 @@ export const CardBar = forwardRef(
           .catch((e) => app.toast(e.message, "error"));
       })();
     }, [cardNo]);
-
-    const divRef = useRef<HTMLDivElement>(null);
 
     return (
       <>

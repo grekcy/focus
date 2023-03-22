@@ -78,7 +78,7 @@ export class FocusAPI {
     req.addFields(CardField.COMPLETED_AT);
     req.setCard(card);
 
-    return await this.s.patchCard(req, this.metadata);
+    return await this.s.patchCard(req, this.metadata).then((r) => r.toObject());
   };
 
   updateCardSubject = async (cardNo: number, subject: string) => {
