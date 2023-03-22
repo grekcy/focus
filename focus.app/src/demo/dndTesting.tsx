@@ -88,7 +88,7 @@ function Card({ id, text, index, moveCard }: CardProps) {
       // to avoid expensive index searches.
       item.index = hoverIndex;
     },
-    // drop: (item, monitor) => moveCard(item.index, index),
+    drop: (item, monitor) => console.log(`drop(): item=${item.index}, index=${index}`),
   });
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.CARD,

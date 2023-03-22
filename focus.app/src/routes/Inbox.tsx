@@ -1,6 +1,6 @@
 import { Box, Button, Typography } from "@mui/material";
 import update from "immutability-helper";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { FocusContext, IFocusApp } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardAction, CardListView } from "../lib/components/CardList";
@@ -50,45 +50,6 @@ export function InboxPage() {
 
       setCards((p) => update(p, { index: { $set: updated } }));
     })();
-  }
-
-  const [ranking, setRanking] = useState(false);
-  async function rankUp(cardNo: number) {
-    if (ranking) return;
-    const index = cards.findIndex((c) => c.cardNo === cardNo);
-    if (index === 0) {
-      app.toast("can't not move up top card", "info");
-      return;
-    }
-
-    setRanking(true);
-    await app
-      .client()!
-      .rankUpCard(cardNo, cards[index - 1].cardNo)
-      .then(() => {
-        throw new Error("update()로 변경");
-      })
-      .catch((e: any) => app.toast(e.message, "error"))
-      .finally(() => setRanking(false));
-  }
-
-  async function rankDown(cardNo: number) {
-    if (ranking) return;
-    const index = cards.findIndex((c) => c.cardNo === cardNo);
-    if (index === cards.length - 1) {
-      app.toast("can't not move down last card", "info");
-      return;
-    }
-
-    setRanking(true);
-    await app
-      .client()!
-      .rankDownCard(cardNo, cards[index + 1].cardNo)
-      .then(() => {
-        throw new Error("update()로 변경");
-      })
-      .catch((e: any) => app.toast(e.message, "error"))
-      .finally(() => setRanking(false));
   }
 
   const [deletingCard, setDeletingCard] = useState(false);
@@ -150,18 +111,40 @@ export function InboxPage() {
     cardBarRef.current && cardBarRef.current.toggle();
   }
 
-  const onHover = useCallback((dragIndex: number, hoverIndex: number) => {
-    console.log(`hover: dragIndex: ${dragIndex}, hoverIndex: ${hoverIndex}`);
+  const [dragStartCardNo, setDragStartCardNo] = useState(-1);
+  const [dragging, setDragging] = useState(false);
 
-    setCards((prevItems: Card.AsObject[]) =>
-      update(prevItems, {
+  function onDrogOver(dragIndex: number, hoverIndex: number) {
+    if (!dragging) {
+      setDragStartCardNo(cards[dragIndex].cardNo);
+    }
+    setDragging(true);
+
+    setCards((p: Card.AsObject[]) =>
+      update(p, {
         $splice: [
           [dragIndex, 1],
-          [hoverIndex, 0, prevItems[dragIndex] as Card.AsObject],
+          [hoverIndex, 0, p[dragIndex]],
         ],
       })
     );
-  }, []);
+  }
+
+  async function onDragDrop(dragIndex: number, dropIndex: number) {
+    setDragging(false);
+
+    const srcCardNo = dragStartCardNo;
+    const destCardNo = cards[dropIndex + 1].cardNo;
+
+    console.log(`onDragDrop: ${srcCardNo} ${destCardNo}`);
+
+    setDragStartCardNo(-1);
+
+    const r = await app
+      .client()!
+      .rerankCard(srcCardNo, destCardNo)
+      .catch((e) => app.toast(e.message, "error"));
+  }
 
   return (
     <>
@@ -176,10 +159,11 @@ export function InboxPage() {
 
       <CardListView
         items={cards}
-        showCardNo={false}
+        showCardNo={true}
         onChange={handleCardChange}
         onActionClick={handleCardAction}
-        onHoverCard={onHover}
+        onDrogOver={onDrogOver}
+        onDragDrop={onDragDrop}
       />
       <CardBar ref={cardBarRef} />
     </>

@@ -93,18 +93,11 @@ export class FocusAPI {
     return await this.s.patchCard(req, this.metadata);
   };
 
-  rankUpCard = async (cardNo: number, targetCardNo: number) => {
+  rerankCard = async (cardNo: number, targetCardNo: number) => {
     const req = new RankCardReq();
     req.setCardNo(cardNo);
     req.setTargetCardNo(targetCardNo);
-    return await this.s.rankUpCard(req, this.metadata);
-  };
-
-  rankDownCard = async (cardNo: number, targetCardNo: number) => {
-    const req = new RankCardReq();
-    req.setCardNo(cardNo);
-    req.setTargetCardNo(targetCardNo);
-    return await this.s.rankDownCard(req, this.metadata);
+    return await this.s.rerankCard(req, this.metadata);
   };
 
   deleteCard = async (cardNo: number) => {

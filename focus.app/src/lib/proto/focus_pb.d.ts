@@ -9,9 +9,6 @@ export class Card extends jspb.Message {
   getCardNo(): number;
   setCardNo(value: number): Card;
 
-  getRank(): number;
-  setRank(value: number): Card;
-
   getParentCardNo(): number;
   setParentCardNo(value: number): Card;
   hasParentCardNo(): boolean;
@@ -44,7 +41,6 @@ export class Card extends jspb.Message {
 export namespace Card {
   export type AsObject = {
     cardNo: number,
-    rank: number,
     parentCardNo?: number,
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
@@ -54,12 +50,12 @@ export namespace Card {
 
   export enum ParentCardNoCase { 
     _PARENT_CARD_NO_NOT_SET = 0,
-    PARENT_CARD_NO = 3,
+    PARENT_CARD_NO = 2,
   }
 
   export enum CompletedAtCase { 
     _COMPLETED_AT_NOT_SET = 0,
-    COMPLETED_AT = 5,
+    COMPLETED_AT = 4,
   }
 }
 

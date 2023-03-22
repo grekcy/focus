@@ -29,16 +29,18 @@ interface CardListViewProp {
   items: Card.AsObject[];
   showCardNo?: boolean;
   onChange?: (index: number, value: string) => void;
-  onHoverCard?: (dragIndex: number, hoverIndex: number) => void;
   onActionClick?: (index: number, action: CardAction) => void;
+  onDrogOver?: (dragIndex: number, hoverIndex: number) => void;
+  onDragDrop?: (dragIndex: number, dropIndex: number) => void;
 }
 
 export function CardListView({
   items,
   showCardNo = true,
   onChange,
-  onHoverCard,
   onActionClick,
+  onDrogOver,
+  onDragDrop,
 }: CardListViewProp) {
   function hasChild(cardNo: number): boolean {
     return items.findIndex((item) => item.parentCardNo === cardNo) !== -1;
@@ -58,7 +60,10 @@ export function CardListView({
           showCardNo={showCardNo}
           onChange={(v) => handleChange(i, v)}
           onActionClick={onActionClick}
-          onHoverCard={onHoverCard}
+          onDragOver={onDrogOver}
+          onDragDrop={(dragIndex, dropIndex) =>
+            onDragDrop && onDragDrop(dragIndex, dropIndex)
+          }
           hasChild={hasChild}
         />
       ))}
@@ -85,7 +90,8 @@ interface ItemProp {
   hasChild?: (cardNo: number) => boolean;
   onChange?: (value: string) => void;
   onActionClick?: (index: number, action: CardAction) => void;
-  onHoverCard?: (dragIndex: number, hoverIndex: number) => void;
+  onDragOver?: (dragIndex: number, hoverIndex: number) => void;
+  onDragDrop?: (dragIndex: number, dropIndex: number) => void;
 }
 
 function CardItem({
@@ -97,11 +103,23 @@ function CardItem({
   hasChild,
   onChange,
   onActionClick,
-  onHoverCard,
+  onDragOver,
+  onDragDrop,
 }: ItemProp) {
   //
   // Drag&Drop supports
   const ref = useRef<HTMLDivElement>(null);
+
+  const [{ isDragging }, drag] = useDrag({
+    type: ItemTypes.CARD,
+    item: () => {
+      const id = card.cardNo;
+      return { id, index };
+    },
+    collect: (monitor: DragSourceMonitor<{ id: number; index: number }>) => ({
+      isDragging: !!monitor.isDragging(),
+    }),
+  });
 
   const [{ handlerId }, drop] = useDrop<
     DragItem,
@@ -153,7 +171,7 @@ function CardItem({
       }
 
       // Time to actually perform the action
-      onHoverCard && onHoverCard(dragIndex, hoverIndex);
+      onDragOver && onDragOver(dragIndex, hoverIndex);
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
@@ -161,17 +179,7 @@ function CardItem({
       // to avoid expensive index searches.
       item.index = hoverIndex;
     },
-  });
-
-  const [{ isDragging }, drag] = useDrag({
-    type: ItemTypes.CARD,
-    item: () => {
-      const id = card.cardNo;
-      return { id, index };
-    },
-    collect: (monitor: DragSourceMonitor<{ id: number; index: number }>) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
+    drop: (item, monitor) => onDragDrop && onDragDrop(index, item.index),
   });
 
   const opacity = isDragging ? 0 : 1;
@@ -180,8 +188,6 @@ function CardItem({
   function handleActionClick(index: number, action: CardAction) {
     onActionClick && onActionClick(index, action);
   }
-
-  const _hasChild = hasChild && hasChild(card.cardNo);
 
   return (
     <Box
@@ -211,7 +217,7 @@ function CardItem({
         <Box sx={{ flexGrow: 0, width: card.depth * 20 }}></Box>
       )} */}
       <IconButton size="small">
-        {_hasChild ? (
+        {hasChild && hasChild(card.cardNo) ? (
           <ArrowDropDownIcon fontSize="small" />
         ) : (
           <EmptyIcon fontSize="small" />

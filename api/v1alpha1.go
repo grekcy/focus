@@ -114,9 +114,7 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 	return modelToProto(newCard), nil
 }
 
-func (s *v1alpha1ServiceImpl) RankUpCard(ctx context.Context, req *proto.RankCardReq) (*emptypb.Empty, error) {
-	log.Debugf("rank up: card=%v, target_card=%v", req.CardNo, req.TargetCardNo)
-
+func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCardReq) (*emptypb.Empty, error) {
 	card, err := s.getCard(ctx, uint(req.CardNo))
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "card not found: %v", req.CardNo)
@@ -127,55 +125,61 @@ func (s *v1alpha1ServiceImpl) RankUpCard(ctx context.Context, req *proto.RankCar
 		return nil, status.Errorf(codes.NotFound, "target card not found: %v", req.TargetCardNo)
 	}
 
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		if tx := s.db.Model(&models.Card{}).
-			Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
-			Where("rank BETWEEN ? AND ?", targetCard.Rank, card.Rank).
-			Update("rank", gorm.Expr("rank + 1")); tx.Error != nil {
-			return tx.Error
-		}
-
-		if tx := s.db.Model(card).Update("rank", targetCard.Rank); tx.Error != nil {
-			return tx.Error
-		}
-
-		return nil
-	}); err != nil {
-		return nil, err
+	if card.Rank == targetCard.Rank {
+		return nil, status.Errorf(codes.InvalidArgument, "card and target are equal")
 	}
 
-	return helper.Empty(), nil
-}
-func (s *v1alpha1ServiceImpl) RankDownCard(ctx context.Context, req *proto.RankCardReq) (*emptypb.Empty, error) {
-	log.Debugf("rank down: card=%v, target_card=%v", req.CardNo, req.TargetCardNo)
+	if card.Rank > targetCard.Rank { // rank up
+		//
+		//  1
+		//  2   target.rank   <new rank here>
+		//  3
+		//  4
+		//  5   card.rank
+		//  6
+		if err := s.db.Transaction(func(tx *gorm.DB) error {
+			if tx := s.db.Model(&models.Card{}).
+				Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
+				Where("rank BETWEEN ? AND ?", targetCard.Rank, card.Rank).
+				Where("parent_card_no = ?", card.ParentCardNo).
+				Update("rank", gorm.Expr("rank + 1")); tx.Error != nil {
+				return tx.Error
+			}
 
-	card, err := s.getCard(ctx, uint(req.CardNo))
-	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "card not found: %v", req.CardNo)
-	}
+			if tx := s.db.Model(card).Update("rank", targetCard.Rank); tx.Error != nil {
+				return tx.Error
+			}
 
-	targetCard, err := s.getCard(ctx, uint(req.TargetCardNo))
-	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "target card not found: %v", req.TargetCardNo)
-	}
-
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		if tx := s.db.Model(&models.Card{}).
-			Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
-			Where("rank BETWEEN ? AND ?", card.Rank, targetCard.Rank).
-			Update("rank", gorm.Expr("rank - 1")); tx.Error != nil {
-			return tx.Error
+			return nil
+		}); err != nil {
+			return nil, err
 		}
+	} else { // rank down
+		//
+		//  1
+		//  2   card.rank
+		//  3
+		//  4
+		//  5   target.rank   <new rank here>
+		//  6
+		if err := s.db.Transaction(func(tx *gorm.DB) error {
+			if tx := s.db.Model(&models.Card{}).
+				Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
+				Where("rank BETWEEN ? AND ?", card.Rank, targetCard.Rank).
+				Where("parent_card_no = ?", card.ParentCardNo).
+				Update("rank", gorm.Expr("rank - 1")); tx.Error != nil {
+				return tx.Error
+			}
 
-		if tx := s.db.Model(card).Update("rank", targetCard.Rank); tx.Error != nil {
-			return tx.Error
+			if tx := s.db.Model(card).Update("rank", targetCard.Rank); tx.Error != nil {
+				return tx.Error
+			}
+
+			return nil
+		}); err != nil {
+			return nil, err
 		}
-
-		return nil
-	}); err != nil {
-		return nil, err
 	}
-
 	return helper.Empty(), nil
 }
 
@@ -204,7 +208,6 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 func modelToProto(in *models.Card) *proto.Card {
 	return &proto.Card{
 		CardNo:       uint64(in.CardNo),
-		Rank:         uint64(in.Rank),
 		ParentCardNo: helper.P(in.ParentCardNo),
 		CreatedAt:    timestamppb.New(in.CreatedAt),
 		CompletedAt: goxp.TernaryCF(in.CompletedAt == nil,

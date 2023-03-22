@@ -78,8 +78,7 @@ const (
 	V1Alpha1_GetCard_FullMethodName      = "/V1Alpha1/getCard"
 	V1Alpha1_GetCards_FullMethodName     = "/V1Alpha1/getCards"
 	V1Alpha1_PatchCard_FullMethodName    = "/V1Alpha1/patchCard"
-	V1Alpha1_RankUpCard_FullMethodName   = "/V1Alpha1/rankUpCard"
-	V1Alpha1_RankDownCard_FullMethodName = "/V1Alpha1/rankDownCard"
+	V1Alpha1_RerankCard_FullMethodName   = "/V1Alpha1/rerankCard"
 	V1Alpha1_DeleteCard_FullMethodName   = "/V1Alpha1/deleteCard"
 )
 
@@ -93,8 +92,7 @@ type V1Alpha1Client interface {
 	GetCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*Card, error)
 	GetCards(ctx context.Context, in *GetCardReq, opts ...grpc.CallOption) (*GetCardResp, error)
 	PatchCard(ctx context.Context, in *PatchCardReq, opts ...grpc.CallOption) (*Card, error)
-	RankUpCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	RankDownCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RerankCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -160,18 +158,9 @@ func (c *v1Alpha1Client) PatchCard(ctx context.Context, in *PatchCardReq, opts .
 	return out, nil
 }
 
-func (c *v1Alpha1Client) RankUpCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *v1Alpha1Client) RerankCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, V1Alpha1_RankUpCard_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *v1Alpha1Client) RankDownCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, V1Alpha1_RankDownCard_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, V1Alpha1_RerankCard_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -197,8 +186,7 @@ type V1Alpha1Server interface {
 	GetCard(context.Context, *wrapperspb.UInt64Value) (*Card, error)
 	GetCards(context.Context, *GetCardReq) (*GetCardResp, error)
 	PatchCard(context.Context, *PatchCardReq) (*Card, error)
-	RankUpCard(context.Context, *RankCardReq) (*emptypb.Empty, error)
-	RankDownCard(context.Context, *RankCardReq) (*emptypb.Empty, error)
+	RerankCard(context.Context, *RankCardReq) (*emptypb.Empty, error)
 	DeleteCard(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error)
 	mustEmbedUnimplementedV1Alpha1Server()
 }
@@ -225,11 +213,8 @@ func (UnimplementedV1Alpha1Server) GetCards(context.Context, *GetCardReq) (*GetC
 func (UnimplementedV1Alpha1Server) PatchCard(context.Context, *PatchCardReq) (*Card, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PatchCard not implemented")
 }
-func (UnimplementedV1Alpha1Server) RankUpCard(context.Context, *RankCardReq) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RankUpCard not implemented")
-}
-func (UnimplementedV1Alpha1Server) RankDownCard(context.Context, *RankCardReq) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RankDownCard not implemented")
+func (UnimplementedV1Alpha1Server) RerankCard(context.Context, *RankCardReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RerankCard not implemented")
 }
 func (UnimplementedV1Alpha1Server) DeleteCard(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCard not implemented")
@@ -355,38 +340,20 @@ func _V1Alpha1_PatchCard_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _V1Alpha1_RankUpCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _V1Alpha1_RerankCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RankCardReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(V1Alpha1Server).RankUpCard(ctx, in)
+		return srv.(V1Alpha1Server).RerankCard(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: V1Alpha1_RankUpCard_FullMethodName,
+		FullMethod: V1Alpha1_RerankCard_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(V1Alpha1Server).RankUpCard(ctx, req.(*RankCardReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _V1Alpha1_RankDownCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RankCardReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(V1Alpha1Server).RankDownCard(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: V1Alpha1_RankDownCard_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(V1Alpha1Server).RankDownCard(ctx, req.(*RankCardReq))
+		return srv.(V1Alpha1Server).RerankCard(ctx, req.(*RankCardReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -441,12 +408,8 @@ var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _V1Alpha1_PatchCard_Handler,
 		},
 		{
-			MethodName: "rankUpCard",
-			Handler:    _V1Alpha1_RankUpCard_Handler,
-		},
-		{
-			MethodName: "rankDownCard",
-			Handler:    _V1Alpha1_RankDownCard_Handler,
+			MethodName: "rerankCard",
+			Handler:    _V1Alpha1_RerankCard_Handler,
 		},
 		{
 			MethodName: "deleteCard",

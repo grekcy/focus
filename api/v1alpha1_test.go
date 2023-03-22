@@ -183,7 +183,7 @@ func TestRankDown(t *testing.T) {
 	defer teardown()
 
 	_ = card2
-	_, err := service.RankDownCard(ctx, &proto.RankCardReq{
+	_, err := service.RerankCard(ctx, &proto.RankCardReq{
 		CardNo:       card1.CardNo,
 		TargetCardNo: card3.CardNo,
 	})

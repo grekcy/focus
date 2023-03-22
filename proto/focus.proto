@@ -17,19 +17,17 @@ service V1Alpha1 {
   rpc getCard(google.protobuf.UInt64Value) returns (Card) {}
   rpc getCards(GetCardReq) returns (GetCardResp) {}
   rpc patchCard(PatchCardReq) returns (Card) {}
-  rpc rankUpCard(RankCardReq) returns (google.protobuf.Empty) {}
-  rpc rankDownCard(RankCardReq) returns (google.protobuf.Empty) {}
+  rpc rerankCard(RankCardReq) returns (google.protobuf.Empty) {}
   rpc deleteCard(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {}
 }
 
 message Card {
   uint64 card_no = 1;
-  uint64 rank = 2;
-  optional uint64 parent_card_no = 3;
-  google.protobuf.Timestamp created_at = 4;
-  optional google.protobuf.Timestamp completed_at = 5;
-  string subject = 6;
-  string content = 7;
+  optional uint64 parent_card_no = 2;
+  google.protobuf.Timestamp created_at = 3;
+  optional google.protobuf.Timestamp completed_at = 4;
+  string subject = 5;
+  string content = 6;
 }
 
 message ListCardReq {
