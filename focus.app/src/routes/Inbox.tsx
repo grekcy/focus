@@ -130,7 +130,7 @@ export function InboxPage() {
             update(prevItems, { index: { $set: card } })
           );
         })
-        .catch((e) => app.toast(e.message,"error"));
+        .catch((e) => app.toast(e.message, "error"));
     })();
   }
 
@@ -156,7 +156,9 @@ export function InboxPage() {
     cardBarRef.current && cardBarRef.current.toggle();
   }
 
-  const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
+  const onHover = useCallback((dragIndex: number, hoverIndex: number) => {
+    console.log(`hover: dragIndex: ${dragIndex}, hoverIndex: ${hoverIndex}`);
+
     setCards((prevItems: Card.AsObject[]) =>
       update(prevItems, {
         $splice: [
@@ -183,7 +185,7 @@ export function InboxPage() {
         showCardNo={false}
         onChange={handleCardChange}
         onActionClick={handleCardAction}
-        moveCard={moveCard}
+        onHoverCard={onHover}
       />
       <CardBar ref={cardBarRef} />
     </>

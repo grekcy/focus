@@ -23,7 +23,7 @@ interface CardListViewProp {
   items: Card.AsObject[];
   showCardNo?: boolean;
   onChange?: (index: number, value: string) => void;
-  moveCard?: (dragIndex: number, hoverIndex: number) => void;
+  onHoverCard?: (dragIndex: number, hoverIndex: number) => void;
   onActionClick?: (index: number, action: CardAction) => void;
 }
 
@@ -31,7 +31,7 @@ export function CardListView({
   items,
   showCardNo = true,
   onChange,
-  moveCard,
+  onHoverCard,
   onActionClick,
 }: CardListViewProp) {
   function hasChild(cardNo: number): boolean {
@@ -52,7 +52,7 @@ export function CardListView({
           showCardNo={showCardNo}
           onChange={(v) => handleChange(i, v)}
           onActionClick={onActionClick}
-          moveCard={moveCard}
+          onHoverCard={onHoverCard}
           hasChild={hasChild}
         />
       ))}
@@ -79,7 +79,7 @@ interface ItemProp {
   hasChild?: (cardNo: number) => boolean;
   onChange?: (value: string) => void;
   onActionClick?: (index: number, action: CardAction) => void;
-  moveCard?: (dragIndex: number, hoverIndex: number) => void; // QUESTION: 여기에? 있는게 이상한 느낌? 더 공부 필요
+  onHoverCard?: (dragIndex: number, hoverIndex: number) => void;
 }
 
 function CardItem({
@@ -91,7 +91,7 @@ function CardItem({
   hasChild,
   onChange,
   onActionClick,
-  moveCard,
+  onHoverCard,
 }: ItemProp) {
   //
   // Drag&Drop supports
@@ -148,7 +148,7 @@ function CardItem({
       }
 
       // Time to actually perform the action
-      moveCard && moveCard(dragIndex, hoverIndex);
+      onHoverCard && onHoverCard(dragIndex, hoverIndex);
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,

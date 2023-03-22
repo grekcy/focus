@@ -50,7 +50,7 @@ export function TodayPage() {
             update(prevItems, { index: { $set: card } })
           );
         })
-        .catch((e) => app.toast(e.message,"error"));
+        .catch((e) => app.toast(e.message, "error"));
     })();
   }
 
@@ -68,7 +68,7 @@ export function TodayPage() {
       <CardListView
         items={items}
         onChange={handleCardChange}
-        moveCard={moveCard}
+        onHoverCard={moveCard}
       />
       <CardBar ref={cardBarRef} />
     </>

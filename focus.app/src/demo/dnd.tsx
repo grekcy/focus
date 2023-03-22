@@ -1,6 +1,6 @@
 import type { Identifier, XYCoord } from "dnd-core";
 import update from "immutability-helper";
-import { FC, useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
@@ -21,7 +21,7 @@ export const ItemTypes = {
   CARD: "card",
 };
 
-export const Card: FC<CardProps> = ({ id, text, index, moveCard }) => {
+export function Card({ id, text, index, moveCard }: CardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [{ handlerId }, drop] = useDrop<
     DragItem,
@@ -110,7 +110,7 @@ export const Card: FC<CardProps> = ({ id, text, index, moveCard }) => {
       {text}
     </div>
   );
-};
+}
 
 export interface Item {
   id: number;
