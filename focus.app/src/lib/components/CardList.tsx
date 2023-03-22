@@ -6,7 +6,13 @@ import TripOriginIcon from "@mui/icons-material/TripOrigin";
 import { Box, IconButton } from "@mui/material";
 import type { Identifier, XYCoord } from "dnd-core";
 import { useRef } from "react";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
+import {
+  DndProvider,
+  DragSourceMonitor,
+  DropTargetMonitor,
+  useDrag,
+  useDrop,
+} from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Link } from "react-router-dom";
 import { Card } from "../proto/focus_pb";
@@ -103,15 +109,14 @@ function CardItem({
     { handlerId: Identifier | null }
   >({
     accept: ItemTypes.CARD,
-    collect(monitor) {
+    collect(monitor: DropTargetMonitor<DragItem, void>) {
       return {
         handlerId: monitor.getHandlerId(),
       };
     },
-    hover(item: DragItem, monitor) {
-      if (!ref.current) {
-        return;
-      }
+    hover(item: DragItem, monitor: DropTargetMonitor<DragItem, void>) {
+      if (!ref.current) return;
+
       const dragIndex = item.index;
       const hoverIndex = index;
 
@@ -161,11 +166,11 @@ function CardItem({
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.CARD,
     item: () => {
-      const cardNo = card.cardNo;
-      return { cardNo, index };
+      const id = card.cardNo;
+      return { id, index };
     },
-    collect: (monitor: any) => ({
-      isDragging: monitor.isDragging(),
+    collect: (monitor: DragSourceMonitor<{ id: number; index: number }>) => ({
+      isDragging: !!monitor.isDragging(),
     }),
   });
 

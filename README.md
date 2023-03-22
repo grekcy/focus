@@ -1,5 +1,7 @@
 # Focus
 
+Collobration make easy for personal and orginazations.
+
 ## setup dev envoronment
 
 ### create PostgreSQL database

@@ -23,6 +23,19 @@ export function InboxPage() {
     return () => app.client()!.removeEventListener(handler);
   }, []);
 
+  const [cards, setCards] = useState<Card.AsObject[]>([]);
+  useEffect(() => {
+    (async () => {
+      const service = app.client();
+      if (!service) return;
+
+      await service
+        .listCards()
+        .then((r) => setCards(r))
+        .catch((e) => app.toast(e.message, "error"));
+    })();
+  }, []);
+
   function setCompleted(cardNo: number, complete: boolean) {
     if (!cardNo) {
       app.toast(`invalid cardNo: ${cardNo}`, "error");
@@ -35,7 +48,7 @@ export function InboxPage() {
     (async () => {
       const updated = await service.completeCard(cardNo, complete);
 
-      setCards((prev) => update(prev, { index: { $set: updated } }));
+      setCards((p) => update(p, { index: { $set: updated } }));
     })();
   }
 
@@ -92,28 +105,9 @@ export function InboxPage() {
     (async () => {
       await service!
         .deleteCard(cardNo)
-        .then((r) =>
-          setCards((prev) => prev.filter((item) => item.cardNo !== cardNo))
-        )
+        .then((r) => setCards((p) => p.filter((c) => c.cardNo !== cardNo)))
         .catch((e) => app.toast(e, "error"))
         .finally(() => setDeletingCard(false));
-    })();
-  }
-
-  const [cards, setCards] = useState<Card.AsObject[]>([]);
-  useEffect(() => {
-    refreshCards();
-  }, []);
-
-  function refreshCards() {
-    (async () => {
-      const service = app.client();
-      if (!service) return;
-
-      await service
-        .listCards()
-        .then((r) => setCards(r))
-        .catch((e) => app.toast(e.message, "error"));
     })();
   }
 

@@ -1,10 +1,17 @@
-import type { Identifier, XYCoord } from "dnd-core";
+import type { Identifier } from "dnd-core";
 import update from "immutability-helper";
 import { useCallback, useRef, useState } from "react";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
+import {
+  DndProvider,
+  DragSourceMonitor,
+  DropTargetMonitor,
+  XYCoord,
+  useDrag,
+  useDrop,
+} from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
-export interface CardProps {
+interface CardProps {
   id: any;
   text: string;
   index: number;
@@ -17,11 +24,11 @@ interface DragItem {
   type: string;
 }
 
-export const ItemTypes = {
+const ItemTypes = {
   CARD: "card",
 };
 
-export function Card({ id, text, index, moveCard }: CardProps) {
+function Card({ id, text, index, moveCard }: CardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [{ handlerId }, drop] = useDrop<
     DragItem,
@@ -29,15 +36,14 @@ export function Card({ id, text, index, moveCard }: CardProps) {
     { handlerId: Identifier | null }
   >({
     accept: ItemTypes.CARD,
-    collect(monitor) {
+    collect(monitor: DropTargetMonitor<DragItem, void>) {
       return {
         handlerId: monitor.getHandlerId(),
       };
     },
-    hover(item: DragItem, monitor) {
-      if (!ref.current) {
-        return;
-      }
+    hover(item: DragItem, monitor: DropTargetMonitor<DragItem, void>) {
+      if (!ref.current) return;
+
       const dragIndex = item.index;
       const hoverIndex = index;
 
@@ -82,46 +88,49 @@ export function Card({ id, text, index, moveCard }: CardProps) {
       // to avoid expensive index searches.
       item.index = hoverIndex;
     },
+    // drop: (item, monitor) => moveCard(item.index, index),
   });
-
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.CARD,
     item: () => {
       return { id, index };
     },
-    collect: (monitor: any) => ({
-      isDragging: monitor.isDragging(),
+    collect: (monitor: DragSourceMonitor<{ id: number; index: number }>) => ({
+      isDragging: !!monitor.isDragging(),
     }),
+    end: (item, monitor) => console.log("drag end"),
   });
 
-  const opacity = isDragging ? 0 : 1;
   drag(drop(ref));
 
-  const style = {
-    border: "1px dashed gray",
-    padding: "0.5rem 1rem",
-    marginBottom: ".5rem",
-    backgroundColor: "white",
-    cursor: "move",
-  };
-
   return (
-    <div ref={ref} style={{ ...style, opacity }} data-handler-id={handlerId}>
+    <div
+      ref={ref}
+      style={{
+        border: "1px dashed gray",
+        padding: "0.5rem 1rem",
+        marginBottom: ".5rem",
+        backgroundColor: "white",
+        cursor: "move",
+        opacity: isDragging ? 0 : 1,
+      }}
+      data-handler-id={handlerId}
+    >
       {text}
     </div>
   );
 }
 
-export interface Item {
+interface Item {
   id: number;
   text: string;
 }
 
-export interface ContainerState {
+interface ContainerState {
   cards: Item[];
 }
 
-export function DnDDemo() {
+export function DragAndDropSortable() {
   const [cards, setCards] = useState([
     {
       id: 1,
@@ -154,6 +163,8 @@ export function DnDDemo() {
   ]);
 
   const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
+    console.log(`moveCard: dragIndex=${dragIndex}, hoverIndex=${hoverIndex}`);
+
     setCards((prevCards: Item[]) =>
       update(prevCards, {
         $splice: [
@@ -180,7 +191,7 @@ export function DnDDemo() {
   );
 
   const style = {
-    width: "100%",
+    width: "400",
   };
 
   return (

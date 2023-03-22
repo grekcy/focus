@@ -7,7 +7,8 @@ import { AppBar } from "./AppBar";
 import { FocusContext, IFocusApp } from "./FocusProvider";
 import { DrawerHeader, SideBar } from "./SideBar";
 import { DemoPage } from "./demo/DemoPage";
-import { DnDDemo } from "./demo/dnd";
+import { DragAndDropSortable } from "./demo/dndSotrable";
+import { DragAndDropCancel } from "./demo/dndCancel";
 import { FocusAPI } from "./lib/api";
 import { CardPage } from "./routes/Cards";
 import { ChallengePage } from "./routes/Challenge";
@@ -65,7 +66,14 @@ function App() {
                 <Route path="/planning" element={<PlanningPage />} />
                 <Route path="/performance" element={<PerformancePage />} />
                 <Route path="/demo/" element={<DemoPage />} />
-                <Route path="/demo/dnd" element={<DnDDemo />} />
+                <Route
+                  path="/demo/dnd-sortable"
+                  element={<DragAndDropSortable />}
+                />
+                <Route
+                  path="/demo/dnd-cancel"
+                  element={<DragAndDropCancel />}
+                />
                 <Route path="*" element={<ErrorPage />} />
               </Routes>
             </Box>
