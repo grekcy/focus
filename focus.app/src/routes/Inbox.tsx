@@ -48,7 +48,7 @@ export function InboxPage() {
     (async () => {
       const updated = await service.completeCard(cardNo, complete);
 
-      setCards((p) => update(p, { index: { $set: updated } }));
+      setCards((p) => p.map((c) => (c.cardNo === cardNo ? updated : c)));
     })();
   }
 
@@ -135,8 +135,6 @@ export function InboxPage() {
 
     const srcCardNo = dragStartCardNo;
     const destCardNo = cards[dropIndex + 1].cardNo;
-
-    console.log(`onDragDrop: ${srcCardNo} ${destCardNo}`);
 
     setDragStartCardNo(-1);
 

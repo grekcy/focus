@@ -20,9 +20,9 @@ import { EmptyIcon } from "./Icons";
 import { InlineEdit } from "./InlineEdit";
 
 export enum CardAction {
-  COMPLETE = 1,
-  INPROGRESS = 1,
-  DELETE = 3,
+  COMPLETE,
+  INPROGRESS,
+  DELETE,
 }
 
 interface CardListViewProp {
@@ -239,17 +239,13 @@ function CardItem({
       <Box sx={{ flexGrow: 0, color: "grey", height: 0 }}>
         {card.completedAt ? (
           <IconButton
-            onClick={() => {
-              handleActionClick(index, CardAction.COMPLETE);
-            }}
+            onClick={() => handleActionClick(index, CardAction.INPROGRESS)}
           >
             <TaskAltIcon fontSize="small" />
           </IconButton>
         ) : (
           <IconButton
-            onClick={() => {
-              handleActionClick(index, CardAction.INPROGRESS);
-            }}
+            onClick={() => handleActionClick(index, CardAction.COMPLETE)}
           >
             <TripOriginIcon fontSize="small" />
           </IconButton>
