@@ -5,18 +5,19 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { AppBar } from "./AppBar";
 import { FocusContext, IFocusApp } from "./FocusProvider";
+import { DrawerHeader, SideBar } from "./SideBar";
+import { DemoPage } from "./demo/DemoPage";
 import { DnDDemo } from "./demo/dnd";
 import { FocusAPI } from "./lib/api";
-import { ErrorPage } from "./routes/ErrorPage";
-import { InboxPage } from "./routes/Inbox";
-import { Root } from "./routes/Root";
-import { TodayPage } from "./routes/Today";
 import { CardPage } from "./routes/Cards";
 import { ChallengePage } from "./routes/Challenge";
+import { ErrorPage } from "./routes/ErrorPage";
 import { ForecastPage } from "./routes/Forecast";
+import { InboxPage } from "./routes/Inbox";
 import { PerformancePage } from "./routes/Performance";
 import { PlanningPage } from "./routes/Planning";
-import { DrawerHeader, SideBar } from "./sidebar";
+import { Root } from "./routes/Root";
+import { TodayPage } from "./routes/Today";
 
 function App() {
   const [openSideBar, setOpenSideBar] = useState(false);
@@ -63,6 +64,7 @@ function App() {
                 />
                 <Route path="/planning" element={<PlanningPage />} />
                 <Route path="/performance" element={<PerformancePage />} />
+                <Route path="/demo/" element={<DemoPage />} />
                 <Route path="/demo/dnd" element={<DnDDemo />} />
                 <Route path="*" element={<ErrorPage />} />
               </Routes>

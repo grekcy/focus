@@ -1,10 +1,10 @@
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import CalendarViewWeekIcon from "@mui/icons-material/CalendarViewWeek";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import FlagIcon from "@mui/icons-material/Flag";
 import InboxIcon from "@mui/icons-material/Inbox";
 import InsightsIcon from "@mui/icons-material/Insights";
+import MovieIcon from "@mui/icons-material/Movie";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import {
   Box,
@@ -134,14 +134,19 @@ const pages = [
     icon: InsightsIcon,
     tooltip: "performance",
   },
-  { title: "-" },
-  {
-    href: "/demo/dnd",
-    title: "DnD",
-    icon: DragIndicatorIcon,
-    tooltip: "DnD Demo",
-  },
 ];
+
+if (process.env.REACT_APP_ENV === "development") {
+  pages.push(
+    { title: "-" },
+    {
+      href: "/demo/",
+      title: "Demo",
+      icon: MovieIcon,
+      tooltip: "Demo",
+    }
+  );
+}
 
 export const SideBar = forwardRef(
   ({ open }: SideBarProps, ref: Ref<ISideBar>) => {

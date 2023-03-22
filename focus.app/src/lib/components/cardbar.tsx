@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { FocusContext, IFocusApp } from "../../FocusProvider";
-import { DrawerHeader } from "../../sidebar";
+import { DrawerHeader } from "../../SideBar";
 import { Card } from "../proto/focus_pb";
 import { InlineEdit } from "./InlineEdit";
 
