@@ -44,32 +44,18 @@ type UserWorkspace struct {
 type Card struct {
 	*gorm.Model
 
-	WorkspaceID  uint       `gorm:"not null"`
+	WorkspaceID  uint       `gorm:"not null;uniqueIndex:idx_card_no"`
 	CreatorID    uint       `gorm:"not null"`
-	CardNo       uint       `gorm:"not null;index"`
+	CardNo       uint       `gorm:"not null;uniqueIndex:idx_card_no"`
 	Rank         uint       `gorm:"not null;index;default:0"`
 	ParentCardNo *uint      `grom:"index"`
-	Depth        uint       `gorm:"not null;default:0"`
 	CompletedAt  *time.Time `gorm:"index"`
 	Subject      string     `gorm:"type:varchar(500);not null;default:''"`
 	Content      string     `gorm:"type:text;not null;default:''"`
 
 	Creator   *User      `gorm:"foreignKey:CreatorID"`
 	Workspace *Workspace `gorm:"foreignKey:WorkspaceID"`
-}
-
-type Challenge struct {
-	*gorm.Model
-
-	WorkspaceID uint   `gorm:"not null"`
-	CreatorID   uint   `gorm:"not null"`
-	OwnerID     uint   `gorm:"not null"`
-	Name        string `gorm:"type:varchar(100);not null;check:name<>''"`
-
-	Creator   *User      `gorm:"foreignkey:CreatorID"`
-	Owner     *User      `gorm:"foreignkey:OwnerID"`
-	Cards     []*Card    `gorm:"many2many:challenge_cards"`
-	Workspace *Workspace `gorm:"foreignKey:WorkspaceID"`
+	Laebels   []*Labels  `gorm:"many2many:card_labels"`
 }
 
 type Labels struct {

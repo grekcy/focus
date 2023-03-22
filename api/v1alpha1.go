@@ -206,7 +206,6 @@ func modelToProto(in *models.Card) *proto.Card {
 		CardNo:       uint64(in.CardNo),
 		Rank:         uint64(in.Rank),
 		ParentCardNo: helper.P(in.ParentCardNo),
-		Depth:        uint32(in.Depth),
 		CreatedAt:    timestamppb.New(in.CreatedAt),
 		CompletedAt: goxp.TernaryCF(in.CompletedAt == nil,
 			func() *timestamppb.Timestamp { return nil },

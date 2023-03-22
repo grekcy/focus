@@ -202,9 +202,9 @@ function CardItem({
       >
         <DragIndicatorIcon />
       </Box>
-      {card.depth > 0 && (
+      {/* {card.depth > 0 && (
         <Box sx={{ flexGrow: 0, width: card.depth * 20 }}></Box>
-      )}
+      )} */}
       <IconButton size="small">
         {_hasChild ? (
           <ArrowDropDownIcon fontSize="small" />

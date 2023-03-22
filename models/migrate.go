@@ -7,7 +7,7 @@ import (
 
 func Migrate(db *gorm.DB) error {
 	models := [][]any{
-		{&Metadata{}, &User{}, &Card{}, &Challenge{}, &Workspace{}, &UserWorkspace{}},
+		{&Metadata{}, &User{}, &Card{}, &Workspace{}, &UserWorkspace{}},
 	}
 
 	for _, m := range models {
