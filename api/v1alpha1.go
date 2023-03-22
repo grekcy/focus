@@ -125,8 +125,8 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 		return nil, status.Errorf(codes.NotFound, "target card not found: %v", req.TargetCardNo)
 	}
 
-	if card.Rank == targetCard.Rank {
-		return nil, status.Errorf(codes.InvalidArgument, "card and target are equal")
+	if card.CardNo == targetCard.CardNo {
+		return nil, status.Errorf(codes.InvalidArgument, "card and target are equal: %v", card.CardNo)
 	}
 
 	if card.Rank > targetCard.Rank { // rank up
@@ -141,7 +141,6 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 			if tx := s.db.Model(&models.Card{}).
 				Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
 				Where("rank BETWEEN ? AND ?", targetCard.Rank, card.Rank).
-				Where("parent_card_no = ?", card.ParentCardNo).
 				Update("rank", gorm.Expr("rank + 1")); tx.Error != nil {
 				return tx.Error
 			}
@@ -160,13 +159,13 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 		//  2   card.rank
 		//  3
 		//  4
-		//  5   target.rank   <new rank here>
+		//  5   target.rank <new rank here>
 		//  6
+		//
 		if err := s.db.Transaction(func(tx *gorm.DB) error {
 			if tx := s.db.Model(&models.Card{}).
 				Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
 				Where("rank BETWEEN ? AND ?", card.Rank, targetCard.Rank).
-				Where("parent_card_no = ?", card.ParentCardNo).
 				Update("rank", gorm.Expr("rank - 1")); tx.Error != nil {
 				return tx.Error
 			}

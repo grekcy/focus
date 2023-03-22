@@ -47,7 +47,7 @@ type Card struct {
 	WorkspaceID  uint       `gorm:"not null;uniqueIndex:idx_card_no"`
 	CreatorID    uint       `gorm:"not null"`
 	CardNo       uint       `gorm:"not null;uniqueIndex:idx_card_no"`
-	Rank         uint       `gorm:"not null;index;default:0"`
+	Rank         uint       `gorm:"not null;default:0"`
 	ParentCardNo *uint      `grom:"index"`
 	CompletedAt  *time.Time `gorm:"index"`
 	Subject      string     `gorm:"type:varchar(500);not null;default:''"`

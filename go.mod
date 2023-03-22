@@ -11,7 +11,7 @@ require (
 	github.com/whitekid/cobrax v0.0.0-20230316054516-c4338cdfe72c
 	github.com/whitekid/gormx v0.0.0-20230222021154-a2fac842229c
 	github.com/whitekid/goxp v0.0.0-20230317034230-382ba50fc378
-	google.golang.org/grpc v1.53.0
+	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
 	gorm.io/gorm v1.24.6
 )

@@ -111,12 +111,14 @@ export function InboxPage() {
     cardBarRef.current && cardBarRef.current.toggle();
   }
 
+  const [dragStartIndex, setDragStartIndex] = useState(-1);
   const [dragStartCardNo, setDragStartCardNo] = useState(-1);
   const [dragging, setDragging] = useState(false);
 
   function onDrogOver(dragIndex: number, hoverIndex: number) {
     if (!dragging) {
       setDragStartCardNo(cards[dragIndex].cardNo);
+      setDragStartIndex(dragIndex);
     }
     setDragging(true);
 
@@ -133,10 +135,21 @@ export function InboxPage() {
   async function onDragDrop(dragIndex: number, dropIndex: number) {
     setDragging(false);
 
+    const rankUp = dragStartIndex > dropIndex;
+
+    console.log(rankUp);
+
     const srcCardNo = dragStartCardNo;
-    const destCardNo = cards[dropIndex + 1].cardNo;
+    let destCardNo: number = -1;
+
+    if (rankUp) {
+      destCardNo = cards[dropIndex + 1].cardNo;
+    } else {
+      destCardNo = cards[dropIndex - 1].cardNo;
+    }
 
     setDragStartCardNo(-1);
+    setDragStartIndex(-1);
 
     const r = await app
       .client()!
@@ -157,7 +170,7 @@ export function InboxPage() {
 
       <CardListView
         items={cards}
-        showCardNo={true}
+        showCardNo={false}
         onChange={handleCardChange}
         onActionClick={handleCardAction}
         onDrogOver={onDrogOver}
