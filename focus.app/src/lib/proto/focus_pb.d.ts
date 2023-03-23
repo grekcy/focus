@@ -5,6 +5,32 @@ import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb';
 
 
+export class User extends jspb.Message {
+  getId(): number;
+  setId(value: number): User;
+
+  getEmail(): string;
+  setEmail(value: string): User;
+
+  getName(): string;
+  setName(value: string): User;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): User.AsObject;
+  static toObject(includeInstance: boolean, msg: User): User.AsObject;
+  static serializeBinaryToWriter(message: User, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): User;
+  static deserializeBinaryFromReader(message: User, reader: jspb.BinaryReader): User;
+}
+
+export namespace User {
+  export type AsObject = {
+    id: number,
+    email: string,
+    name: string,
+  }
+}
+
 export class Card extends jspb.Message {
   getCardNo(): number;
   setCardNo(value: number): Card;
@@ -32,6 +58,9 @@ export class Card extends jspb.Message {
   hasCompletedAt(): boolean;
   clearCompletedAt(): Card;
 
+  getCreatorId(): number;
+  setCreatorId(value: number): Card;
+
   getSubject(): string;
   setSubject(value: string): Card;
 
@@ -54,6 +83,7 @@ export namespace Card {
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     updatedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    creatorId: number,
     subject: string,
     content: string,
   }

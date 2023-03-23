@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import update from "immutability-helper";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { FocusContext, IFocusApp } from "../FocusProvider";
@@ -60,9 +60,7 @@ export function TodayPage() {
         <Typography variant="h5" flexGrow={1}>
           Today
         </Typography>
-        <Box flexGrow={0}>
-          <Button onClick={() => cardBarToggle()}>Show Card</Button>
-        </Box>
+        <Box flexGrow={0}></Box>
       </Box>
 
       <CardListView

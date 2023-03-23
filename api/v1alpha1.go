@@ -220,8 +220,9 @@ func modelToProto(in *CardWithDepth) *proto.Card {
 			func() *timestamppb.Timestamp { return nil },
 			func() *timestamppb.Timestamp { return timestamppb.New(*in.CompletedAt) },
 		),
-		Subject: in.Subject,
-		Content: in.Content,
+		CreatorId: uint64(in.CreatorID),
+		Subject:   in.Subject,
+		Content:   in.Content,
 	}
 }
 

@@ -58,7 +58,7 @@ function App() {
                 <Route path="/inbox" element={<InboxPage />} />
                 <Route path="/today" element={<TodayPage />} />
                 <Route path="/forecast" element={<ForecastPage />} />
-                <Route path="/cards/:cardId" element={<CardPage />} />
+                <Route path="/cards/:cardNo" element={<CardPage />} />
                 <Route
                   path="/challenges/:challengeId"
                   element={<ChallengePage />}

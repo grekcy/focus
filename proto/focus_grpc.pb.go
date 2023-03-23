@@ -73,6 +73,7 @@ var Focus_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	V1Alpha1_Version_FullMethodName      = "/V1Alpha1/version"
+	V1Alpha1_GetUser_FullMethodName      = "/V1Alpha1/getUser"
 	V1Alpha1_QuickAddCard_FullMethodName = "/V1Alpha1/quickAddCard"
 	V1Alpha1_ListCards_FullMethodName    = "/V1Alpha1/listCards"
 	V1Alpha1_GetCard_FullMethodName      = "/V1Alpha1/getCard"
@@ -87,6 +88,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type V1Alpha1Client interface {
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
+	GetUser(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*User, error)
 	QuickAddCard(ctx context.Context, in *wrapperspb.StringValue, opts ...grpc.CallOption) (*Card, error)
 	ListCards(ctx context.Context, in *ListCardReq, opts ...grpc.CallOption) (*ListCardResp, error)
 	GetCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*Card, error)
@@ -107,6 +109,15 @@ func NewV1Alpha1Client(cc grpc.ClientConnInterface) V1Alpha1Client {
 func (c *v1Alpha1Client) Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
 	out := new(wrapperspb.StringValue)
 	err := c.cc.Invoke(ctx, V1Alpha1_Version_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *v1Alpha1Client) GetUser(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := c.cc.Invoke(ctx, V1Alpha1_GetUser_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -181,6 +192,7 @@ func (c *v1Alpha1Client) DeleteCard(ctx context.Context, in *wrapperspb.UInt64Va
 // for forward compatibility
 type V1Alpha1Server interface {
 	Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
+	GetUser(context.Context, *wrapperspb.UInt64Value) (*User, error)
 	QuickAddCard(context.Context, *wrapperspb.StringValue) (*Card, error)
 	ListCards(context.Context, *ListCardReq) (*ListCardResp, error)
 	GetCard(context.Context, *wrapperspb.UInt64Value) (*Card, error)
@@ -197,6 +209,9 @@ type UnimplementedV1Alpha1Server struct {
 
 func (UnimplementedV1Alpha1Server) Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
+}
+func (UnimplementedV1Alpha1Server) GetUser(context.Context, *wrapperspb.UInt64Value) (*User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
 func (UnimplementedV1Alpha1Server) QuickAddCard(context.Context, *wrapperspb.StringValue) (*Card, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method QuickAddCard not implemented")
@@ -246,6 +261,24 @@ func _V1Alpha1_Version_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(V1Alpha1Server).Version(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _V1Alpha1_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(wrapperspb.UInt64Value)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(V1Alpha1Server).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: V1Alpha1_GetUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(V1Alpha1Server).GetUser(ctx, req.(*wrapperspb.UInt64Value))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -386,6 +419,10 @@ var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "version",
 			Handler:    _V1Alpha1_Version_Handler,
+		},
+		{
+			MethodName: "getUser",
+			Handler:    _V1Alpha1_GetUser_Handler,
 		},
 		{
 			MethodName: "quickAddCard",

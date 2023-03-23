@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import update from "immutability-helper";
 import { useContext, useEffect, useRef, useState } from "react";
 import { FocusContext, IFocusApp } from "../FocusProvider";
@@ -126,24 +126,29 @@ export function InboxPage() {
   const cardBarRef = useRef<ICardBar>(null);
 
   const [dragStartIndex, setDragStartIndex] = useState(-1);
-  const [dragStartCardNo, setDragStartCardNo] = useState(-1);
+  const [dragStartCard, setDragStartCard] = useState<Card.AsObject | null>(
+    null
+  );
   const [dragging, setDragging] = useState(false);
 
   function onDragOver(dragIndex: number, hoverIndex: number) {
-    if (cards[dragIndex].parentCardNo !== cards[hoverIndex].parentCardNo) {
-      console.log("parent_card_no not equals, cancel rerank");
-      return;
-    }
+    const dragCard = cards[dragIndex];
+    const hoverCard = cards[hoverIndex];
 
-    console.log(`onDragOver: dragIndex=${dragIndex}, hoverIndex=${hoverIndex}`);
-
-
+    let draggigCard = dragStartCard;
     if (!dragging) {
-      setDragStartCardNo(cards[dragIndex].cardNo);
+      draggigCard = dragCard;
+      setDragStartCard(dragCard);
       setDragStartIndex(dragIndex);
     }
     setDragging(true);
 
+    if (draggigCard!.parentCardNo !== hoverCard.parentCardNo) {
+      console.log("parent_card_no not equals, cancel rerank");
+      return;
+    }
+
+    // child가 있으면 통으로 이동해야함...
     setCards((p: Card.AsObject[]) =>
       update(p, {
         $splice: [
@@ -159,16 +164,12 @@ export function InboxPage() {
 
     const rankUp = dragStartIndex > dropIndex;
 
-    const srcCardNo = dragStartCardNo;
-    let destCardNo: number = -1;
+    const srcCardNo = dragStartCard!.cardNo;
+    const destCardNo = rankUp
+      ? cards[dropIndex + 1].cardNo
+      : cards[dropIndex - 1].cardNo;
 
-    if (rankUp) {
-      destCardNo = cards[dropIndex + 1].cardNo;
-    } else {
-      destCardNo = cards[dropIndex - 1].cardNo;
-    }
-
-    setDragStartCardNo(-1);
+    setDragStartCard(null);
     setDragStartIndex(-1);
 
     await app
@@ -183,18 +184,12 @@ export function InboxPage() {
         <Typography variant="h5" flexGrow={1}>
           Inbox cards
         </Typography>
-        <Box flexGrow={0}>
-          <Button
-            onClick={() => cardBarRef.current && cardBarRef.current.toggle()}
-          >
-            Show Card
-          </Button>
-        </Box>
+        <Box flexGrow={0}></Box>
       </Box>
 
       <CardListView
         items={cards}
-        showCardNo={false}
+        showCardNo={true}
         onDoubleClick={() => cardBarRef.current && cardBarRef.current.toggle()}
         onSelect={(index) =>
           cardBarRef.current &&
