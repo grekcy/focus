@@ -14,6 +14,9 @@ export class Card extends jspb.Message {
   hasParentCardNo(): boolean;
   clearParentCardNo(): Card;
 
+  getDepth(): number;
+  setDepth(value: number): Card;
+
   getCreatedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
   setCreatedAt(value?: google_protobuf_timestamp_pb.Timestamp): Card;
   hasCreatedAt(): boolean;
@@ -42,6 +45,7 @@ export namespace Card {
   export type AsObject = {
     cardNo: number,
     parentCardNo?: number,
+    depth: number,
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     subject: string,
@@ -55,7 +59,7 @@ export namespace Card {
 
   export enum CompletedAtCase { 
     _COMPLETED_AT_NOT_SET = 0,
-    COMPLETED_AT = 4,
+    COMPLETED_AT = 5,
   }
 }
 
@@ -190,4 +194,5 @@ export namespace PatchCardReq {
 export enum CardField { 
   SUBJECT = 0,
   COMPLETED_AT = 1,
+  CONTENT = 2,
 }

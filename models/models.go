@@ -49,6 +49,7 @@ type Card struct {
 	CardNo       uint       `gorm:"not null;uniqueIndex:idx_card_no"`
 	Rank         uint       `gorm:"not null;default:0"`
 	ParentCardNo *uint      `grom:"index"`
+	Depth        uint       `gorm:"not null;default:0"`
 	CompletedAt  *time.Time `gorm:"index"`
 	Subject      string     `gorm:"type:varchar(500);not null;default:''"`
 	Content      string     `gorm:"type:text;not null;default:''"`

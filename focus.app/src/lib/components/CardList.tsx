@@ -5,7 +5,7 @@ import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import TripOriginIcon from "@mui/icons-material/TripOrigin";
 import { Box, IconButton } from "@mui/material";
 import type { Identifier, XYCoord } from "dnd-core";
-import { useRef } from "react";
+import { useContext, useRef, useState } from "react";
 import {
   DndProvider,
   DragSourceMonitor,
@@ -15,6 +15,7 @@ import {
 } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Link } from "react-router-dom";
+import { FocusContext, IFocusApp } from "../../FocusProvider";
 import { Card } from "../proto/focus_pb";
 import { EmptyIcon } from "./Icons";
 import { InlineEdit } from "./InlineEdit";
@@ -28,6 +29,8 @@ export enum CardAction {
 interface CardListViewProp {
   items: Card.AsObject[];
   showCardNo?: boolean;
+  onDoubleClick?: () => void;
+  onSelect?: (index: number) => void;
   onChange?: (index: number, value: string) => void;
   onActionClick?: (index: number, action: CardAction) => void;
   onDrogOver?: (dragIndex: number, hoverIndex: number) => void;
@@ -37,11 +40,15 @@ interface CardListViewProp {
 export function CardListView({
   items,
   showCardNo = true,
+  onDoubleClick,
+  onSelect,
   onChange,
   onActionClick,
   onDrogOver,
   onDragDrop,
 }: CardListViewProp) {
+  const app: IFocusApp = useContext(FocusContext);
+
   function hasChild(cardNo: number): boolean {
     return items.findIndex((item) => item.parentCardNo === cardNo) !== -1;
   }
@@ -50,23 +57,36 @@ export function CardListView({
     onChange && onChange(index, subject);
   }
 
+  const [selected, setSelected] = useState(-1);
+  function handleCardClick(index: number) {
+    setSelected(index);
+    if (index !== selected && onSelect) onSelect(index);
+  }
+
   return (
     <DndProvider backend={HTML5Backend}>
-      {items.map((item, i) => (
-        <CardItem
-          key={item.cardNo}
-          index={i}
-          card={item}
-          showCardNo={showCardNo}
-          onChange={(v) => handleChange(i, v)}
-          onActionClick={onActionClick}
-          onDragOver={onDrogOver}
-          onDragDrop={(dragIndex, dropIndex) =>
-            onDragDrop && onDragDrop(dragIndex, dropIndex)
-          }
-          hasChild={hasChild}
-        />
-      ))}
+      <Box
+        component="div"
+        onDoubleClick={() => onDoubleClick && onDoubleClick()}
+      >
+        {items.map((item, i) => (
+          <CardItem
+            key={item.cardNo}
+            index={i}
+            card={item}
+            selected={selected === i}
+            showCardNo={showCardNo}
+            onClick={(index) => handleCardClick(index)}
+            onChange={(v) => handleChange(i, v)}
+            onActionClick={onActionClick}
+            onDragOver={onDrogOver}
+            onDragDrop={(dragIndex, dropIndex) =>
+              onDragDrop && onDragDrop(dragIndex, dropIndex)
+            }
+            hasChild={hasChild}
+          />
+        ))}
+      </Box>
     </DndProvider>
   );
 }
@@ -88,6 +108,7 @@ interface ItemProp {
   visible?: boolean;
   showCardNo?: boolean;
   hasChild?: (cardNo: number) => boolean;
+  onClick?: (index: number) => void;
   onChange?: (value: string) => void;
   onActionClick?: (index: number, action: CardAction) => void;
   onDragOver?: (dragIndex: number, hoverIndex: number) => void;
@@ -101,6 +122,7 @@ function CardItem({
   visible = true,
   showCardNo = true,
   hasChild,
+  onClick,
   onChange,
   onActionClick,
   onDragOver,
@@ -189,6 +211,8 @@ function CardItem({
     onActionClick && onActionClick(index, action);
   }
 
+  const app: IFocusApp = useContext(FocusContext);
+
   return (
     <Box
       component="div"
@@ -201,8 +225,9 @@ function CardItem({
         cursor: "move",
         backgroundColor: selected ? "action.selected" : "",
         opacity: opacity,
+        width: 1,
       }}
-      width={1}
+      onClick={() => onClick && onClick(index)}
     >
       <Box
         sx={{
@@ -213,10 +238,10 @@ function CardItem({
       >
         <DragIndicatorIcon />
       </Box>
-      {/* {card.depth > 0 && (
+      {card.depth > 0 && (
         <Box sx={{ flexGrow: 0, width: card.depth * 20 }}></Box>
-      )} */}
-      <IconButton size="small">
+      )}
+      <IconButton size="small" onClick={() => app.toast("not implemented")}>
         {hasChild && hasChild(card.cardNo) ? (
           <ArrowDropDownIcon fontSize="small" />
         ) : (

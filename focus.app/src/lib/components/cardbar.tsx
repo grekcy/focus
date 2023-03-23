@@ -36,7 +36,6 @@ export const CardBar = forwardRef(
         setOpen((p) => !p);
       },
       setCardNo(cardNo: number) {
-        setOpen(true);
         setCardNo(cardNo);
       },
     }));
@@ -56,27 +55,54 @@ export const CardBar = forwardRef(
       })();
     }, [cardNo]);
 
+    function handleSubjectChanged(subject: string) {
+      cardNo && app.client()!.updateCardSubject(cardNo, subject);
+    }
+
+    function handleDescriptionChanged(content: string) {
+      cardNo && app.client()!.updateCardContent(cardNo, content);
+    }
+
+    function CardPanel() {
+      return (
+        <>
+          <Typography variant="h6">Subject: </Typography>
+          <InlineEdit
+            value={card?.subject}
+            onSubmit={(target, value) => handleSubjectChanged(value)}
+          />
+          <Typography variant="h6">Description:</Typography>
+          <InlineEdit
+            multiline
+            value={card?.content}
+            onSubmit={(target, value) => handleDescriptionChanged(value)}
+          />
+          <Box>
+            Created:
+            {card?.createdAt &&
+              new Date(card?.createdAt.seconds * 1000).toLocaleString()}
+          </Box>
+        </>
+      );
+    }
+
     return (
       <>
-        <Drawer
-          open={open}
-          anchor="right"
-          variant="persistent"
-          sx={{ width: 400 }}
-        >
+        <Drawer open={open} anchor="right" variant="persistent">
           <DrawerHeader />
           <DrawerHeader>
-            <Typography>Card: {cardNo}</Typography>
+            <Typography>Card-{cardNo}</Typography>
             <IconButton key="x" onClick={() => setOpen((p) => !p)}>
               <ChevronRightIcon />
             </IconButton>
           </DrawerHeader>
           <Divider />
-          <Box sx={{ p: 1, width: 300 }}>
-            <Typography variant="overline">Subject:</Typography>
-            <InlineEdit value={card?.subject} />
-            <Typography variant="overline">Description:</Typography>
-            <InlineEdit multiline value={card?.content} />
+          <Box sx={{ p: 1, width: 400 }}>
+            {cardNo ? (
+              <CardPanel />
+            ) : (
+              <Typography>Please select card!</Typography>
+            )}
           </Box>
         </Drawer>
       </>

@@ -7,8 +7,8 @@ import { AppBar } from "./AppBar";
 import { FocusContext, IFocusApp } from "./FocusProvider";
 import { DrawerHeader, SideBar } from "./SideBar";
 import { DemoPage } from "./demo/DemoPage";
-import { DragAndDropSortable } from "./demo/dndSotrable";
 import { DragAndDropCancel } from "./demo/dndCancel";
+import { DragAndDropSortable } from "./demo/dndSotrable";
 import { FocusAPI } from "./lib/api";
 import { CardPage } from "./routes/Cards";
 import { ChallengePage } from "./routes/Challenge";
@@ -51,7 +51,7 @@ function App() {
           <Box sx={{ display: "flex" }}>
             <AppBar open={openSideBar} />
             <SideBar open={openSideBar} />
-            <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+            <Box component="main" sx={{ flexGrow: 1, p: 3 }} tabIndex={0}>
               <DrawerHeader />
               <Routes>
                 <Route index element={<Root />} errorElement={<ErrorPage />} />

@@ -1,12 +1,14 @@
+import AddIcon from "@mui/icons-material/Add";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
   Avatar,
   Box,
   IconButton,
-  Input,
+  InputAdornment,
   ListItemButton,
   SvgIcon,
   SvgIconProps,
+  TextField,
   Toolbar,
 } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
@@ -91,13 +93,20 @@ export function AppBar({ open }: AppBarProps) {
         </Box>
         <Box sx={{ flexGrow: 1, display: { xs: "flex" } }} />
         <Box sx={{ flexGrow: 0, display: { xs: "flex" } }}>
-          <Input
-            sx={{ color: "inherit" }}
-            id="quick-add"
+          <TextField
+            variant="standard"
             placeholder="add card to inbox..."
             value={qucikAddSubject}
             onChange={(e) => setQucikAddSubject(e.target.value)}
             onKeyUp={onQuickAddKeyUp}
+            InputProps={{
+              sx: { color: "inherit" },
+              startAdornment: (
+                <InputAdornment position="start">
+                  <AddIcon sx={{ color: "white" }} />
+                </InputAdornment>
+              ),
+            }}
           />
         </Box>
         <Box sx={{ flexGrow: 0 }}>

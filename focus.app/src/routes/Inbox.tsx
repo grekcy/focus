@@ -19,8 +19,22 @@ export function InboxPage() {
           .then((r) => setCards((p) => update(p, { $push: [r] })))
           .catch((e) => app.toast(e.message, "error"));
       });
+    const handler2 = app
+      .client()!
+      .addEventListener("card.updated", async (cardNo: number) => {
+        await app
+          .client()
+          ?.getCard(cardNo)
+          .then((r) =>
+            setCards((p) => p.map((c) => (c.cardNo === cardNo ? r : c)))
+          )
+          .catch((e) => app.toast(e.message, "error"));
+      });
 
-    return () => app.client()!.removeEventListener(handler);
+    return () => {
+      app.client()!.removeEventListener(handler);
+      app.client()!.removeEventListener(handler2);
+    };
   }, []);
 
   const [cards, setCards] = useState<Card.AsObject[]>([]);
@@ -46,9 +60,12 @@ export function InboxPage() {
     if (!service) return;
 
     (async () => {
-      const updated = await service.completeCard(cardNo, complete);
-
-      setCards((p) => p.map((c) => (c.cardNo === cardNo ? updated : c)));
+      await service
+        .completeCard(cardNo, complete)
+        .then((r) =>
+          setCards((p) => p.map((c) => (c.cardNo === cardNo ? r : c)))
+        )
+        .catch((e) => app.toast(e.message));
     })();
   }
 
@@ -107,9 +124,6 @@ export function InboxPage() {
   }
 
   const cardBarRef = useRef<ICardBar>(null);
-  function cardBarToggle() {
-    cardBarRef.current && cardBarRef.current.toggle();
-  }
 
   const [dragStartIndex, setDragStartIndex] = useState(-1);
   const [dragStartCardNo, setDragStartCardNo] = useState(-1);
@@ -137,8 +151,6 @@ export function InboxPage() {
 
     const rankUp = dragStartIndex > dropIndex;
 
-    console.log(rankUp);
-
     const srcCardNo = dragStartCardNo;
     let destCardNo: number = -1;
 
@@ -151,7 +163,7 @@ export function InboxPage() {
     setDragStartCardNo(-1);
     setDragStartIndex(-1);
 
-    const r = await app
+    await app
       .client()!
       .rerankCard(srcCardNo, destCardNo)
       .catch((e) => app.toast(e.message, "error"));
@@ -164,13 +176,22 @@ export function InboxPage() {
           Inbox cards
         </Typography>
         <Box flexGrow={0}>
-          <Button onClick={() => cardBarToggle()}>Show Card</Button>
+          <Button
+            onClick={() => cardBarRef.current && cardBarRef.current.toggle()}
+          >
+            Show Card
+          </Button>
         </Box>
       </Box>
 
       <CardListView
         items={cards}
         showCardNo={false}
+        onDoubleClick={() => cardBarRef.current && cardBarRef.current.toggle()}
+        onSelect={(index) =>
+          cardBarRef.current &&
+          cardBarRef.current.setCardNo(cards[index].cardNo)
+        }
         onChange={handleCardChange}
         onActionClick={handleCardAction}
         onDrogOver={onDrogOver}

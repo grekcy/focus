@@ -24,10 +24,11 @@ service V1Alpha1 {
 message Card {
   uint64 card_no = 1;
   optional uint64 parent_card_no = 2;
-  google.protobuf.Timestamp created_at = 3;
-  optional google.protobuf.Timestamp completed_at = 4;
-  string subject = 5;
-  string content = 6;
+  uint32 depth = 3;
+  google.protobuf.Timestamp created_at = 4;
+  optional google.protobuf.Timestamp completed_at = 5;
+  string subject = 6;
+  string content = 7;
 }
 
 message ListCardReq {
@@ -49,6 +50,7 @@ message RankCardReq {
 enum CardField {
   SUBJECT = 0;
   COMPLETED_AT = 1;
+  CONTENT = 2;
 }
 
 message PatchCardReq {

@@ -24,6 +24,12 @@ export function InlineEdit({
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
+    setEditingValue(value);
+  }, [value]);
+
+  useEffect(() => {
+    if (!editing) return;
+
     setPrevValue(editingValue);
   }, [editing]);
 
@@ -49,7 +55,9 @@ export function InlineEdit({
         (e.nativeEvent.target! as HTMLInputElement).blur();
         break;
       case "Escape":
+        setEditingValue(prevValue);
         (e.nativeEvent.target! as HTMLInputElement).blur();
+        break;
     }
   }
 

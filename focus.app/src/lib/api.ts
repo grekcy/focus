@@ -35,14 +35,10 @@ export class FocusAPI {
     const s = new StringValue();
     s.setValue(subject);
 
-    const r = await this.s
+    return await this.s
       .quickAddCard(s, this.metadata)
-      .then((r) => r.toObject());
-
-    const listeners = this.listeners["card.created"];
-    listeners.forEach((h) => h(r.cardNo));
-
-    return r;
+      .then((r) => r.toObject())
+      .then((r) => this.notify(r, "card.created", r.cardNo));
   };
 
   listCards = async (excludeCompleted = true, excludeChallenges = true) => {
@@ -86,11 +82,39 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setSubject(subject);
 
-    const req = new PatchCardReq();
-    req.addFields(CardField.SUBJECT);
-    req.setCard(card);
+    return await this.patchCard(card.toObject(), CardField.SUBJECT);
+  };
 
-    return await this.s.patchCard(req, this.metadata);
+  updateCardContent = async (cardNo: number, content: string) => {
+    const card = new Card();
+    card.setCardNo(cardNo);
+    card.setContent(content);
+
+    return await this.patchCard(card.toObject(), CardField.CONTENT);
+  };
+
+  patchCard = async (card: Card.AsObject, ...fields: CardField[]) => {
+    const req = new PatchCardReq();
+    const c = new Card();
+    c.setCardNo(card.cardNo);
+    fields.forEach((field) => {
+      switch (field) {
+        case CardField.SUBJECT:
+          c.setSubject(card.subject);
+          break;
+        case CardField.CONTENT:
+          c.setContent(card.content);
+          break;
+        default:
+          throw new Error(`not supported: ${field.toString()}`);
+      }
+    });
+    req.setCard(c);
+    req.setFieldsList(fields);
+
+    return await this.s
+      .patchCard(req, this.metadata)
+      .then((r) => this.notify(r, "card.updated", card.cardNo));
   };
 
   rerankCard = async (cardNo: number, targetCardNo: number) => {
@@ -106,7 +130,7 @@ export class FocusAPI {
     await this.s.deleteCard(no, this.metadata);
   };
 
-  addEventListener = (event: string, handler: EventListener) => {
+  addEventListener = (event: Event, handler: EventListener) => {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }
@@ -121,6 +145,14 @@ export class FocusAPI {
       })
     );
   };
+
+  notify = (r: any, event: Event, cardNo: number) => {
+    const listeners = this.listeners[event];
+    listeners.forEach((h) => h(cardNo));
+    return r;
+  };
 }
+
+export type Event = "card.created" | "card.updated";
 
 type EventListener = (resId: number) => void;

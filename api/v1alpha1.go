@@ -208,6 +208,7 @@ func modelToProto(in *models.Card) *proto.Card {
 	return &proto.Card{
 		CardNo:       uint64(in.CardNo),
 		ParentCardNo: helper.P(in.ParentCardNo),
+		Depth:        uint32(in.Depth),
 		CreatedAt:    timestamppb.New(in.CreatedAt),
 		CompletedAt: goxp.TernaryCF(in.CompletedAt == nil,
 			func() *timestamppb.Timestamp { return nil },
@@ -234,6 +235,30 @@ type ListOpt struct {
 	excludeCompleted bool
 }
 
+/*
+NOTE Tree 순서대로 쿼리하는 방법은 아래처럼 recursive를 사용하면 된다.
+이 경우 depth를 지속적으로 코드상에서 괸리해야할 필요가 있어 코드 복잡도가 증가한다.
+따라서 depth가 필요한 경우에 계속 유지하자.
+
+즉 parent_card_no는 트리 관계를 유지, depth는 화면 표시용도
+
+refer: https://www.alibabacloud.com/blog/postgresql-recursive-query-examples-of-depth-first-and-breadth-first-search_599373
+
+WITH RECURSIVE cte AS (
+
+	    SELECT cards.*, 0 as depth
+	    FROM cards
+	    WHERE parent_card_no IS NULL AND workspace_id = 1 AND completed_at is null and deleted_at is null
+	UNION ALL
+	    SELECT cards.*, depth + 1 AS depth
+	    FROM cards
+	    JOIN cte ON cte.card_no = cards.parent_card_no
+
+)
+SEARCH DEPTH FIRST BY rank SET ordercol
+SELECT card_no, depth, subject FROM cte
+ORDER BY ordercol
+*/
 func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card, opt ListOpt) ([]*models.Card, error) {
 	log.Debugf("listCards(): where=%v", where)
 
@@ -330,6 +355,8 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 		switch field {
 		case proto.CardField_SUBJECT:
 			updates["subject"] = req.Card.Subject
+		case proto.CardField_CONTENT:
+			updates["content"] = req.Card.Content
 		case proto.CardField_COMPLETED_AT:
 			if req.Card.CompletedAt == nil {
 				if card.CompletedAt == nil {
