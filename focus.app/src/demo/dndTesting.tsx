@@ -1,3 +1,4 @@
+import { Box } from "@mui/material";
 import type { Identifier } from "dnd-core";
 import update from "immutability-helper";
 import { useCallback, useRef, useState } from "react";
@@ -29,6 +30,8 @@ const ItemTypes = {
 };
 
 function Card({ id, text, index, moveCard }: CardProps) {
+  const [canDrop, setCanDrop] = useState(true);
+
   const ref = useRef<HTMLDivElement>(null);
   const [{ handlerId }, drop] = useDrop<
     DragItem,
@@ -79,6 +82,12 @@ function Card({ id, text, index, moveCard }: CardProps) {
         return;
       }
 
+      // setCanDrop(hoverIndex % 2 == 0);
+      console.log(`hoverIndex=${hoverIndex}`);
+      if (hoverIndex % 2 === 0) {
+        return;
+      }
+
       // Time to actually perform the action
       moveCard(dragIndex, hoverIndex);
 
@@ -88,7 +97,8 @@ function Card({ id, text, index, moveCard }: CardProps) {
       // to avoid expensive index searches.
       item.index = hoverIndex;
     },
-    drop: (item, monitor) => console.log(`drop(): item=${item.index}, index=${index}`),
+    // drop: (item, monitor) =>
+    //   console.log(`drop(): item=${item.index}, index=${index}`),
   });
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.CARD,
@@ -98,15 +108,15 @@ function Card({ id, text, index, moveCard }: CardProps) {
     collect: (monitor: DragSourceMonitor<{ id: number; index: number }>) => ({
       isDragging: !!monitor.isDragging(),
     }),
-    end: (item, monitor) => console.log("drag end"),
+    // end: (item, monitor) => console.log("drag end"),
   });
 
   drag(drop(ref));
 
   return (
-    <div
+    <Box
       ref={ref}
-      style={{
+      sx={{
         border: "1px dashed gray",
         padding: "0.5rem 1rem",
         marginBottom: ".5rem",
@@ -117,7 +127,7 @@ function Card({ id, text, index, moveCard }: CardProps) {
       data-handler-id={handlerId}
     >
       {text}
-    </div>
+    </Box>
   );
 }
 
@@ -163,8 +173,6 @@ export function DragAndDropTesting() {
   ]);
 
   const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
-    console.log(`moveCard: dragIndex=${dragIndex}, hoverIndex=${hoverIndex}`);
-
     setCards((prevCards: Item[]) =>
       update(prevCards, {
         $splice: [
@@ -195,10 +203,8 @@ export function DragAndDropTesting() {
   };
 
   return (
-    <>
-      <DndProvider backend={HTML5Backend}>
-        <div style={style}>{cards.map((card, i) => renderCard(card, i))}</div>
-      </DndProvider>
-    </>
+    <DndProvider backend={HTML5Backend}>
+      <div style={style}>{cards.map((card, i) => renderCard(card, i))}</div>
+    </DndProvider>
   );
 }

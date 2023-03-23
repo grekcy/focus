@@ -33,7 +33,7 @@ interface CardListViewProp {
   onSelect?: (index: number) => void;
   onChange?: (index: number, value: string) => void;
   onActionClick?: (index: number, action: CardAction) => void;
-  onDrogOver?: (dragIndex: number, hoverIndex: number) => void;
+  onDragOver?: (dragIndex: number, hoverIndex: number) => void;
   onDragDrop?: (dragIndex: number, dropIndex: number) => void;
 }
 
@@ -44,7 +44,7 @@ export function CardListView({
   onSelect,
   onChange,
   onActionClick,
-  onDrogOver,
+  onDragOver,
   onDragDrop,
 }: CardListViewProp) {
   const app: IFocusApp = useContext(FocusContext);
@@ -79,7 +79,7 @@ export function CardListView({
             onClick={(index) => handleCardClick(index)}
             onChange={(v) => handleChange(i, v)}
             onActionClick={onActionClick}
-            onDragOver={onDrogOver}
+            onDragOver={onDragOver}
             onDragDrop={(dragIndex, dropIndex) =>
               onDragDrop && onDragDrop(dragIndex, dropIndex)
             }

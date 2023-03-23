@@ -56,11 +56,21 @@ export const CardBar = forwardRef(
     }, [cardNo]);
 
     function handleSubjectChanged(subject: string) {
-      cardNo && app.client()!.updateCardSubject(cardNo, subject);
+      if (!card) return;
+      app
+        .client()!
+        .updateCardSubject(card.cardNo, subject)
+        .then((r) => (card.subject = subject))
+        .catch((e) => app.toast(e.message, "error"));
     }
 
     function handleDescriptionChanged(content: string) {
-      cardNo && app.client()!.updateCardContent(cardNo, content);
+      if (!card) return;
+      app
+        .client()!
+        .updateCardContent(card.cardNo, content)
+        .then((r) => (card.content = content))
+        .catch((e) => app.toast(e.message, "error"));
     }
 
     function CardPanel() {

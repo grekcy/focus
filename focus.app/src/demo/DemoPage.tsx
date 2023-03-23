@@ -1,8 +1,28 @@
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { useState } from "react";
+import { Cursors } from "./Cursors";
 import { DragAndDropCancel } from "./dndCancel";
 import { DragAndDropSortable } from "./dndSotrable";
 import { DragAndDropTesting } from "./dndTesting";
+
+const demos = [
+  {
+    label: "Drag: Testing",
+    children: <DragAndDropTesting />,
+  },
+  {
+    label: "Drag: Sortable",
+    children: <DragAndDropSortable />,
+  },
+  {
+    label: "Drag: Cancel",
+    children: <DragAndDropCancel />,
+  },
+  {
+    label: "Drag: Cursors",
+    children: <Cursors />,
+  },
+];
 
 export function DemoPage() {
   const [value, setValue] = useState(0);
@@ -13,23 +33,19 @@ export function DemoPage() {
 
   return (
     <>
-      <h1>Demo</h1>
+      <Typography variant="h5">Demo</Typography>
 
       <Tabs value={value} onChange={handleChange}>
-        <Tab label="Drag: Testing" {...a11yProps(0)}></Tab>
-        <Tab label="Drag: Sortable" {...a11yProps(1)}></Tab>
-        <Tab label="Drag: Cancel" {...a11yProps(2)}></Tab>
+        {demos.map((demo, i) => (
+          <Tab label={demo.label} {...a11yProps(i)} />
+        ))}
       </Tabs>
 
-      <TabPanel value={value} index={0}>
-        <DragAndDropTesting />
-      </TabPanel>
-      <TabPanel value={value} index={1}>
-        <DragAndDropSortable />
-      </TabPanel>
-      <TabPanel value={value} index={2}>
-        <DragAndDropCancel />
-      </TabPanel>
+      {demos.map((demo, i) => (
+        <TabPanel value={value} index={i}>
+          {demo.children}
+        </TabPanel>
+      ))}
     </>
   );
 }

@@ -129,7 +129,15 @@ export function InboxPage() {
   const [dragStartCardNo, setDragStartCardNo] = useState(-1);
   const [dragging, setDragging] = useState(false);
 
-  function onDrogOver(dragIndex: number, hoverIndex: number) {
+  function onDragOver(dragIndex: number, hoverIndex: number) {
+    if (cards[dragIndex].parentCardNo !== cards[hoverIndex].parentCardNo) {
+      console.log("parent_card_no not equals, cancel rerank");
+      return;
+    }
+
+    console.log(`onDragOver: dragIndex=${dragIndex}, hoverIndex=${hoverIndex}`);
+
+
     if (!dragging) {
       setDragStartCardNo(cards[dragIndex].cardNo);
       setDragStartIndex(dragIndex);
@@ -194,7 +202,7 @@ export function InboxPage() {
         }
         onChange={handleCardChange}
         onActionClick={handleCardAction}
-        onDrogOver={onDrogOver}
+        onDragOver={onDragOver}
         onDragDrop={onDragDrop}
       />
       <CardBar ref={cardBarRef} />

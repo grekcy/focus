@@ -68,7 +68,7 @@ export function TodayPage() {
       <CardListView
         items={items}
         onChange={handleCardChange}
-        onDrogOver={moveCard}
+        onDragOver={moveCard}
       />
       <CardBar ref={cardBarRef} />
     </>
