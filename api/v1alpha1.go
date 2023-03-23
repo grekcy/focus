@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"time"
 
 	"github.com/whitekid/goxp"
 	"github.com/whitekid/goxp/fx"
@@ -210,6 +211,7 @@ func modelToProto(in *models.Card) *proto.Card {
 		ParentCardNo: helper.P(in.ParentCardNo),
 		Depth:        uint32(in.Depth),
 		CreatedAt:    timestamppb.New(in.CreatedAt),
+		UpdatedAt:    timestamppb.New(in.UpdatedAt),
 		CompletedAt: goxp.TernaryCF(in.CompletedAt == nil,
 			func() *timestamppb.Timestamp { return nil },
 			func() *timestamppb.Timestamp { return timestamppb.New(*in.CompletedAt) },
@@ -379,6 +381,7 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 	}
 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
+		updates["updated_at"] = time.Now()
 		if tx := s.db.Model(card).UpdateColumns(updates); tx.Error != nil {
 			return tx.Error
 		}

@@ -77,10 +77,16 @@ export const CardBar = forwardRef(
             value={card?.content}
             onSubmit={(target, value) => handleDescriptionChanged(value)}
           />
+          <Divider textAlign="left">Dates</Divider>
           <Box>
             Created:
             {card?.createdAt &&
               new Date(card?.createdAt.seconds * 1000).toLocaleString()}
+          </Box>
+          <Box>
+            Updated:
+            {card?.updatedAt &&
+              new Date(card?.updatedAt.seconds * 1000).toLocaleString()}
           </Box>
         </>
       );

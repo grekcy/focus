@@ -22,6 +22,11 @@ export class Card extends jspb.Message {
   hasCreatedAt(): boolean;
   clearCreatedAt(): Card;
 
+  getUpdatedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setUpdatedAt(value?: google_protobuf_timestamp_pb.Timestamp): Card;
+  hasUpdatedAt(): boolean;
+  clearUpdatedAt(): Card;
+
   getCompletedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
   setCompletedAt(value?: google_protobuf_timestamp_pb.Timestamp): Card;
   hasCompletedAt(): boolean;
@@ -47,6 +52,7 @@ export namespace Card {
     parentCardNo?: number,
     depth: number,
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    updatedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     subject: string,
     content: string,
@@ -59,7 +65,7 @@ export namespace Card {
 
   export enum CompletedAtCase { 
     _COMPLETED_AT_NOT_SET = 0,
-    COMPLETED_AT = 5,
+    COMPLETED_AT = 6,
   }
 }
 

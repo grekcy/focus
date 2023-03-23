@@ -26,9 +26,10 @@ message Card {
   optional uint64 parent_card_no = 2;
   uint32 depth = 3;
   google.protobuf.Timestamp created_at = 4;
-  optional google.protobuf.Timestamp completed_at = 5;
-  string subject = 6;
-  string content = 7;
+  google.protobuf.Timestamp updated_at = 5;
+  optional google.protobuf.Timestamp completed_at = 6;
+  string subject = 7;
+  string content = 8;
 }
 
 message ListCardReq {
