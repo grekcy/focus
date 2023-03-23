@@ -15,7 +15,6 @@ import (
 	"focus/config"
 	"focus/databases"
 	"focus/helper"
-	"focus/models"
 	"focus/proto"
 )
 
@@ -74,10 +73,32 @@ func TestListCards(t *testing.T) {
 
 	ctx, service := newTestClient(ctx, t)
 
-	items, err := service.listCards(ctx, nil, ListOpt{excludeCompleted: true})
-	require.NoError(t, err)
-	items = fx.Filter(items, func(item *models.Card) bool { return item.ParentCardNo != nil && *item.ParentCardNo > 0 })
-	require.NotEmpty(t, items)
+	type args struct {
+		opts ListOpt
+	}
+	tests := [...]struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{`exclude_completed`, args{ListOpt{excludeCompleted: true}}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := service.listCards(ctx, nil, tt.args.opts)
+			require.Truef(t, (err != nil) == tt.wantErr, `listCards() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
+			if tt.wantErr {
+				return
+			}
+
+			require.NotEmpty(t, got)
+
+			if tt.args.opts.excludeCompleted {
+				fx.Each(got, func(_ int, c *CardWithDepth) { require.Nil(t, c.CompletedAt) })
+			}
+		})
+	}
+
 }
 
 func TestGetCard(t *testing.T) {
@@ -95,7 +116,7 @@ func TestGetCard(t *testing.T) {
 	items, err := service.listCards(ctx, nil, ListOpt{excludeCompleted: true})
 	require.NoError(t, err)
 	require.NotEmpty(t, items)
-	cardNo := fx.Map(items, func(x *models.Card) uint64 { return uint64(x.CardNo) })
+	cardNo := fx.Map(items, func(x *CardWithDepth) uint64 { return uint64(x.CardNo) })
 
 	got, err := service.GetCards(ctx, &proto.GetCardReq{CardNos: cardNo})
 	require.NoError(t, err)

@@ -2,8 +2,10 @@ package api
 
 import (
 	"context"
+	"fmt"
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/whitekid/goxp"
 	"github.com/whitekid/goxp/fx"
 	"github.com/whitekid/goxp/log"
@@ -59,23 +61,25 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	newCard := &models.Card{
-		Subject:     in.Value,
-		CreatorID:   s.user(ctx).ID,
-		WorkspaceID: s.defaultWorkspace(ctx).ID,
+	newCard := &CardWithDepth{
+		Card: &models.Card{
+			Subject:     in.Value,
+			CreatorID:   s.user(ctx).ID,
+			WorkspaceID: s.defaultWorkspace(ctx).ID,
+		},
 	}
 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		// TODO workspace 별로 card_no를 계산해야 할 것임
 		cardNo := int64(0)
-		if tx := s.db.Model(&models.Card{}).Unscoped().
+		if tx := s.db.Unscoped().Model(&models.Card{}).
 			Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
 			Count(&cardNo); tx.Error != nil {
 			return status.Error(codes.Internal, "fail to get card count")
 		}
 
 		if cardNo != 0 {
-			if err := s.db.Model(&models.Card{}).Unscoped().
+			if err := s.db.Unscoped().Model(&models.Card{}).
 				Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
 				Select("max(card_no)").Row().Scan(&cardNo); err != nil {
 				log.Errorf("%v", err)
@@ -86,7 +90,7 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 		newCard.CardNo = uint(cardNo) + 1
 
 		rank := int64(0)
-		if tx := s.db.Model(&models.Card{}).Unscoped().
+		if tx := s.db.Unscoped().Model(&models.Card{}).
 			Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
 			Count(&rank); tx.Error != nil {
 			return status.Error(codes.Internal, "fail to get rank")
@@ -103,7 +107,7 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 
 		newCard.Rank = uint(rank) + 1
 
-		if tx := s.db.Save(newCard); tx.Error != nil {
+		if tx := s.db.Save(newCard.Card); tx.Error != nil {
 			return status.Errorf(codes.Internal, "fail to save card")
 		}
 
@@ -146,7 +150,7 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 				return tx.Error
 			}
 
-			if tx := s.db.Model(card).Update("rank", targetCard.Rank); tx.Error != nil {
+			if tx := s.db.Model(card.Card).Update("rank", targetCard.Rank); tx.Error != nil {
 				return tx.Error
 			}
 
@@ -171,7 +175,7 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 				return tx.Error
 			}
 
-			if tx := s.db.Model(card).Update("rank", targetCard.Rank); tx.Error != nil {
+			if tx := s.db.Model(card.Card).Update("rank", targetCard.Rank); tx.Error != nil {
 				return tx.Error
 			}
 
@@ -205,7 +209,7 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 	return helper.Empty(), nil
 }
 
-func modelToProto(in *models.Card) *proto.Card {
+func modelToProto(in *CardWithDepth) *proto.Card {
 	return &proto.Card{
 		CardNo:       uint64(in.CardNo),
 		ParentCardNo: helper.P(in.ParentCardNo),
@@ -228,7 +232,7 @@ func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCard
 	}
 
 	return &proto.ListCardResp{
-		Items: fx.Map(r, func(c *models.Card) *proto.Card { return modelToProto(c) }),
+		Items: fx.Map(r, func(c *CardWithDepth) *proto.Card { return modelToProto(c) }),
 	}, nil
 }
 
@@ -237,13 +241,14 @@ type ListOpt struct {
 	excludeCompleted bool
 }
 
+type CardWithDepth struct {
+	*models.Card
+
+	Depth uint
+}
+
 /*
 NOTE Tree 순서대로 쿼리하는 방법은 아래처럼 recursive를 사용하면 된다.
-이 경우 depth를 지속적으로 코드상에서 괸리해야할 필요가 있어 코드 복잡도가 증가한다.
-따라서 depth가 필요한 경우에 계속 유지하자.
-
-즉 parent_card_no는 트리 관계를 유지, depth는 화면 표시용도
-
 refer: https://www.alibabacloud.com/blog/postgresql-recursive-query-examples-of-depth-first-and-breadth-first-search_599373
 
 WITH RECURSIVE cte AS (
@@ -258,26 +263,69 @@ WITH RECURSIVE cte AS (
 
 )
 SEARCH DEPTH FIRST BY rank SET ordercol
-SELECT card_no, depth, subject FROM cte
+SELECT * FROM cte
 ORDER BY ordercol
 */
-func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card, opt ListOpt) ([]*models.Card, error) {
-	log.Debugf("listCards(): where=%v", where)
+func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card, opt ListOpt) ([]*CardWithDepth, error) {
+	log.Debugf("listCards(): where=%+v", where)
 
-	tx := s.db
-	if opt.excludeCompleted {
-		tx = tx.Where("completed_at IS NULL")
-	}
+	// non recursive query는 시작할 카드를 지정함
+	nonRecursiveQuery := s.db.ToSQL(func(tx *gorm.DB) *gorm.DB {
+		tx = tx.Model(&models.Card{}).
+			Select("cards.*, 0 as depth").
+			Where("parent_card_no IS NULL").
+			Where("workspace_id = ?", s.defaultWorkspace(ctx).ID)
+		if where != nil {
+			if where.ParentCardNo != nil && *where.ParentCardNo > 0 {
+				tx = tx.Where("parent_card_no = ?", where.ParentCardNo)
+			} else {
+				tx = tx.Where("parent_card_no IS NULL")
+			}
+		}
 
-	if len(opt.CardNo) > 0 {
-		tx = tx.Where("card_no IN ?", opt.CardNo)
-	}
+		tx = tx.Find(&[]models.Card{})
 
-	r := make([]*models.Card, 0)
-	if tx := tx.Order("rank, created_at").
-		Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
-		Where(where).Find(&r); tx.Error != nil {
-		return nil, status.Errorf(codes.Internal, "fail to find cards: %+v", tx.Error)
+		return tx
+	})
+
+	query := s.db.ToSQL(func(tx *gorm.DB) *gorm.DB {
+		tx = tx.Select("*")
+		if opt.excludeCompleted {
+			tx = tx.Where("completed_at IS NULL")
+		}
+
+		if where != nil {
+			if where.CardNo != 0 {
+				tx = tx.Where("card_no = ?", where.CardNo)
+			}
+		}
+
+		if len(opt.CardNo) > 0 {
+			if where != nil && where.CardNo > 0 {
+				tx.AddError(errors.New(`can not provide card no and card no list`))
+				return tx
+			}
+
+			tx = tx.Where("card_no IN ?", opt.CardNo)
+		}
+
+		tx = tx.Table("cte").Order("ordercol, rank, created_at").Find(&[]models.Card{})
+
+		return tx
+	})
+
+	r := make([]*CardWithDepth, 0)
+	if tx := s.db.Raw(fmt.Sprintf(`WITH RECURSIVE cte AS (
+        %s
+    UNION ALL
+        SELECT cards.*, depth + 1 AS depth
+        FROM cards
+        JOIN cte ON cte.card_no = cards.parent_card_no
+)
+SEARCH DEPTH FIRST BY rank SET ordercol
+%s
+`, nonRecursiveQuery, query)).Scan(&r); tx.Error != nil {
+		return nil, status.Errorf(codes.Internal, "fail to list cards: %+v", errors.Wrap(tx.Error, "list card failed"))
 	}
 
 	return r, nil
@@ -323,14 +371,14 @@ func (s *v1alpha1ServiceImpl) GetCards(ctx context.Context, req *proto.GetCardRe
 		Items: make(map[uint64]*proto.Card),
 	}
 
-	fx.Each(r, func(_ int, c *models.Card) {
+	fx.Each(r, func(_ int, c *CardWithDepth) {
 		resp.Items[uint64(c.CardNo)] = modelToProto(c)
 	})
 
 	return resp, nil
 }
 
-func (s *v1alpha1ServiceImpl) getCard(ctx context.Context, cardNo uint) (*models.Card, error) {
+func (s *v1alpha1ServiceImpl) getCard(ctx context.Context, cardNo uint) (*CardWithDepth, error) {
 	r, err := s.listCards(ctx, &models.Card{CardNo: cardNo}, ListOpt{})
 	if err != nil {
 		return nil, err
@@ -382,7 +430,7 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		updates["updated_at"] = time.Now()
-		if tx := s.db.Model(card).UpdateColumns(updates); tx.Error != nil {
+		if tx := s.db.Model(card.Card).UpdateColumns(updates); tx.Error != nil {
 			return tx.Error
 		}
 
