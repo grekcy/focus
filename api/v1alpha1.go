@@ -70,43 +70,23 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 	}
 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		// TODO workspace 별로 card_no를 계산해야 할 것임
-		cardNo := int64(0)
-		if tx := s.db.Unscoped().Model(&models.Card{}).
+		if err := s.db.Unscoped().Model(&models.Card{}).
 			Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
-			Count(&cardNo); tx.Error != nil {
-			return status.Error(codes.Internal, "fail to get card count")
+			Select("COALESCE(max(card_no), 0, max(card_no)) + 1").Row().Scan(&newCard.CardNo); err != nil {
+			log.Errorf("%v", err)
+			return status.Errorf(codes.Internal, "fail to get card_no")
 		}
 
-		if cardNo != 0 {
-			if err := s.db.Unscoped().Model(&models.Card{}).
-				Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
-				Select("max(card_no)").Row().Scan(&cardNo); err != nil {
-				log.Errorf("%v", err)
-				return status.Errorf(codes.Internal, "fail to get card_no")
-			}
+		if err := s.db.Model(&models.Card{}).Unscoped().
+			Where(&models.Card{
+				WorkspaceID:  s.defaultWorkspace(ctx).ID,
+				ParentCardNo: helper.P(0),
+			}).
+			Select("COALESCE(max(rank), 0, max(rank)) +1").Row().Scan(&newCard.Rank); err != nil {
+			return status.Errorf(codes.Internal, "fail to get rank")
 		}
 
-		newCard.CardNo = uint(cardNo) + 1
-
-		rank := int64(0)
-		if tx := s.db.Unscoped().Model(&models.Card{}).
-			Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
-			Count(&rank); tx.Error != nil {
-			return status.Error(codes.Internal, "fail to get rank")
-		}
-
-		if rank != 0 {
-			if err := s.db.Model(&models.Card{}).Unscoped().
-				Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
-				Select("max(rank)").Row().Scan(&rank); err != nil {
-				log.Errorf("%v", err)
-				return status.Errorf(codes.Internal, "fail to get rank")
-			}
-		}
-
-		newCard.Rank = uint(rank) + 1
-
+		log.Debugf("@@@@ create card: %+v", newCard.Card)
 		if tx := s.db.Save(newCard.Card); tx.Error != nil {
 			return status.Errorf(codes.Internal, "fail to save card")
 		}
@@ -116,7 +96,7 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 		return nil, err
 	}
 
-	return modelToProto(newCard), nil
+	return cardToProto(newCard), nil
 }
 
 func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCardReq) (*emptypb.Empty, error) {
@@ -209,10 +189,10 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 	return helper.Empty(), nil
 }
 
-func modelToProto(in *CardWithDepth) *proto.Card {
+func cardToProto(in *CardWithDepth) *proto.Card {
 	return &proto.Card{
 		CardNo:       uint64(in.CardNo),
-		ParentCardNo: helper.P(in.ParentCardNo),
+		ParentCardNo: helper.PP(in.ParentCardNo),
 		Depth:        uint32(in.Depth),
 		CreatedAt:    timestamppb.New(in.CreatedAt),
 		UpdatedAt:    timestamppb.New(in.UpdatedAt),
@@ -233,7 +213,7 @@ func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCard
 	}
 
 	return &proto.ListCardResp{
-		Items: fx.Map(r, func(c *CardWithDepth) *proto.Card { return modelToProto(c) }),
+		Items: fx.Map(r, func(c *CardWithDepth) *proto.Card { return cardToProto(c) }),
 	}, nil
 }
 
@@ -346,7 +326,7 @@ func (s *v1alpha1ServiceImpl) GetCard(ctx context.Context, cardNo *wrapperspb.UI
 		return nil, err
 	}
 
-	return modelToProto(card), nil
+	return cardToProto(card), nil
 }
 
 func (s *v1alpha1ServiceImpl) GetCards(ctx context.Context, req *proto.GetCardReq) (*proto.GetCardResp, error) {
@@ -373,7 +353,7 @@ func (s *v1alpha1ServiceImpl) GetCards(ctx context.Context, req *proto.GetCardRe
 	}
 
 	fx.Each(r, func(_ int, c *CardWithDepth) {
-		resp.Items[uint64(c.CardNo)] = modelToProto(c)
+		resp.Items[uint64(c.CardNo)] = cardToProto(c)
 	})
 
 	return resp, nil
@@ -445,5 +425,5 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 		return nil, err
 	}
 
-	return modelToProto(card), nil
+	return cardToProto(card), nil
 }

@@ -3,11 +3,14 @@ import { Card } from "./proto/focus_pb";
 
 const endpoint = "http://127.0.0.1:8080";
 
-const statusInternal = 13;
-const statusInvalidArgument = 3;
+enum Status {
+  Internal = 13,
+  InvalidArgument = 3,
+}
 
 describe("focus API", () => {
   const service = new FocusAPI(endpoint);
+  service.setToken("whitekid@gmail.com"); // TODO use jtw token
 
   test("get version", async () => {
     const got = await service.version();
@@ -25,7 +28,7 @@ describe("focus API", () => {
   test("quick add: empty subject", async () => {
     const card = new Card();
     const got = await service.quickAddCard("").catch((e) => e);
-    expect(got.code).toEqual(statusInvalidArgument);
+    expect(got.code).toEqual(Status.InvalidArgument);
   });
 
   test("quick add", async () => {

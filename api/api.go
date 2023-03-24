@@ -76,16 +76,18 @@ type key string
 
 const (
 	keyDB            key = "focus.db"
+	keyToken         key = "focus.token"
 	keyUser          key = "focus.user"
 	keyUserWorkspace key = "focus.user.workspace"
 )
 
 func authInterceptor(db *gorm.DB) func(ctx context.Context) (context.Context, error) {
 	return func(ctx context.Context) (context.Context, error) {
-		// token, err := grpc_auth.AuthFromMD(ctx, "bearer")
-		// if err != nil {
-		// return nil, err
-		// }
+		token, err := grpc_auth.AuthFromMD(ctx, "bearer")
+		if err != nil {
+			return nil, err
+		}
+		ctx = context.WithValue(ctx, keyToken, token)
 
 		// tokenInfo, err := parseToken(token)
 		// if err != nil {
@@ -113,18 +115,19 @@ func userClaimFromToken(struct{}) string {
 // context.WithValue(keyUserWorkspace): *models.Workspace; default workspace for current user
 func extractUserInfo(ctx context.Context) (context.Context, error) {
 	db := ctx.Value(keyDB).(*gorm.DB)
+	token := ctx.Value(keyToken).(string) // TODO use jwt token
 
 	user := &models.User{}
-	if tx := db.First(user, 1); tx.Error != nil {
+	if tx := db.First(user, &models.User{Email: token}); tx.Error != nil {
 		return nil, status.Error(codes.Unauthenticated, "user not found")
 	}
 	ctx = context.WithValue(ctx, keyUser, user)
 
-	userWorkspace := &models.UserWorkspace{
+	userWorkspace := &models.UserWorkspace{}
+	if tx := db.Preload("Workspace").Where(&models.UserWorkspace{
 		UserID: user.ID,
 		Role:   models.RoleDefault,
-	}
-	if tx := db.Preload("Workspace").Where(userWorkspace).First(userWorkspace); tx.Error != nil {
+	}).First(userWorkspace); tx.Error != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "user workspace not found: %v", tx.Error)
 	}
 

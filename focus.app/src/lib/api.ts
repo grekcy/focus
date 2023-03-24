@@ -16,10 +16,11 @@ import {
 
 export class FocusAPI {
   s: V1Alpha1Client;
+  token: string = "";
   listeners: { [event: string]: EventListener[] };
 
   constructor(endpoint: string) {
-    const authInterceptor = new AuthInterceptor("sample-token");
+    const authInterceptor = new AuthInterceptor(this.getToken);
     const options = {
       unaryInterceptors: [authInterceptor],
       streamInterceptors: [authInterceptor],
@@ -27,6 +28,14 @@ export class FocusAPI {
     this.s = new V1Alpha1Client(endpoint, null, options);
     this.listeners = {};
   }
+
+  setToken = (token: string) => {
+    this.token = token;
+  };
+
+  getToken = (): string => {
+    return this.token;
+  };
 
   version = async () => {
     return await this.s.version(new Empty(), null).then((r) => r.toObject());
@@ -39,7 +48,10 @@ export class FocusAPI {
     return await this.s
       .quickAddCard(s, null)
       .then((r) => r.toObject())
-      .then((r) => this.notify(r, "card.created", r.cardNo));
+      .then((r) => {
+        this.notify(r, "card.created", r.cardNo);
+        return r;
+      });
   };
 
   listCards = async (excludeCompleted = true, excludeChallenges = true) => {
@@ -113,9 +125,10 @@ export class FocusAPI {
     req.setCard(c);
     req.setFieldsList(fields);
 
-    return await this.s
-      .patchCard(req, null)
-      .then((r) => this.notify(r, "card.updated", card.cardNo));
+    return await this.s.patchCard(req, null).then((r) => {
+      this.notify(r, "card.updated", card.cardNo);
+      return r;
+    });
   };
 
   rerankCard = async (cardNo: number, targetCardNo: number) => {
@@ -149,26 +162,29 @@ export class FocusAPI {
 
   notify = (r: any, event: Event, cardNo: number) => {
     const listeners = this.listeners[event];
-    listeners.forEach((h) => h(cardNo));
+    if (listeners) listeners.forEach((h) => h(cardNo));
     return r;
   };
 }
 
 class AuthInterceptor {
-  token: string;
+  getToken: () => string;
 
-  constructor(token: string) {
-    this.token = token;
+  constructor(tokenGetter: () => string) {
+    this.getToken = tokenGetter;
   }
 
-  intercept(request: any, invoker: any) {
+  intercept = (request: any, invoker: any) => {
     const metadata = request.getMetadata();
-    if (this.token) {
+    const token = this.getToken();
+
+    if (token) {
       metadata["Access-Control-Allow-Origin"] = "*";
-      metadata.Authorization = "Bearer " + this.token;
+      metadata.Authorization = "Bearer " + token;
     }
+    
     return invoker(request);
-  }
+  };
 }
 
 export type Event = "card.created" | "card.updated";

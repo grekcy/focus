@@ -1,4 +1,5 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import CancelIcon from "@mui/icons-material/Cancel";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
@@ -24,6 +25,7 @@ export enum CardAction {
   COMPLETE,
   INPROGRESS,
   DELETE,
+  UNDELETE,
 }
 
 interface CardListViewProp {
@@ -276,13 +278,16 @@ function CardItem({
             <TripOriginIcon fontSize="small" />
           </IconButton>
         )}
-        <IconButton
-          onClick={() => {
-            handleActionClick(index, CardAction.DELETE);
-          }}
-        >
+        <IconButton onClick={() => handleActionClick(index, CardAction.DELETE)}>
           <DeleteIcon fontSize="small" />
         </IconButton>
+        {false && (
+          <IconButton
+            onClick={() => handleActionClick(index, CardAction.DELETE)}
+          >
+            <CancelIcon fontSize="small" />
+          </IconButton>
+        )}
       </Box>
     </Box>
   );

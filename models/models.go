@@ -62,8 +62,7 @@ type Labels struct {
 	*gorm.Model
 
 	WorkspaceID uint   `gorm:"not null"`
-	Label       string `gorm:"varchar(50);index;not null;lable<>''"`
-	Name        string `gorm:"varchar(50);not null;check:name<>''"`
+	Label       string `gorm:"type:varchar(50);index;not null;lable<>''"`
 
 	Workspace *Workspace `gorm:"foreignKey:WorkspaceID"`
 }

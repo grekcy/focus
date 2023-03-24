@@ -143,12 +143,6 @@ export function InboxPage() {
     }
     setDragging(true);
 
-    if (draggigCard!.parentCardNo !== hoverCard.parentCardNo) {
-      console.log("parent_card_no not equals, cancel rerank");
-      return;
-    }
-
-    // child가 있으면 통으로 이동해야함...
     setCards((p: Card.AsObject[]) =>
       update(p, {
         $splice: [
@@ -159,22 +153,24 @@ export function InboxPage() {
     );
   }
 
+  // update rank to server
   async function onDragDrop(dragIndex: number, dropIndex: number) {
     setDragging(false);
-
-    const rankUp = dragStartIndex > dropIndex;
-
-    const srcCardNo = dragStartCard!.cardNo;
-    const destCardNo = rankUp
-      ? cards[dropIndex + 1].cardNo
-      : cards[dropIndex - 1].cardNo;
-
     setDragStartCard(null);
     setDragStartIndex(-1);
 
+    const srcCardNo = dragStartCard!.cardNo;
+    const rankUp = dragStartIndex > dropIndex;
+    const destCard = rankUp ? cards[dropIndex + 1] : cards[dropIndex - 1];
+
+    // 다른 parent_no로 drop되면 조정
+    dragStartCard!.parentCardNo = destCard.parentCardNo;
+    dragStartCard!.depth = destCard.depth;
+
+    return; // TODO 일단 UI에서 작업
     await app
       .client()!
-      .rerankCard(srcCardNo, destCardNo)
+      .rerankCard(srcCardNo, destCard.cardNo)
       .catch((e) => app.toast(e.message, "error"));
   }
 

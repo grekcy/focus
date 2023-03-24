@@ -29,6 +29,7 @@ function App() {
 
   // TODO authentication
   const service = new FocusAPI("http://localhost:8080");
+  service.setToken("whitekid@gmail.com");
 
   const impl: IFocusApp = {
     toggleSidebar() {

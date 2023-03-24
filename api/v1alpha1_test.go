@@ -22,6 +22,7 @@ func newTestClient(ctx context.Context, t *testing.T) (context.Context, *v1alpha
 	db, err := databases.Open(fmt.Sprintf("pgsql://%s:%s@%s/%s", config.DBUser(), config.DBPassword(), config.DBHostname(), config.DBName()))
 	require.NoError(t, err)
 
+	ctx = context.WithValue(ctx, keyToken, "whitekid@gmail.com")
 	ctx = context.WithValue(ctx, keyDB, db)
 	ctx, err = extractUserInfo(ctx)
 	require.NoError(t, err)

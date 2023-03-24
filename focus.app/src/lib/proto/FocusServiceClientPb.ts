@@ -22,27 +22,6 @@ import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty
 import * as google_protobuf_wrappers_pb from 'google-protobuf/google/protobuf/wrappers_pb';
 
 
-export class FocusClient {
-  client_: grpcWeb.AbstractClientBase;
-  hostname_: string;
-  credentials_: null | { [index: string]: string; };
-  options_: null | { [index: string]: any; };
-
-  constructor (hostname: string,
-               credentials?: null | { [index: string]: string; },
-               options?: null | { [index: string]: any; }) {
-    if (!options) options = {};
-    if (!credentials) credentials = {};
-    options['format'] = 'binary';
-
-    this.client_ = new grpcWeb.GrpcWebClientBase(options);
-    this.hostname_ = hostname.replace(/\/+$/, '');
-    this.credentials_ = credentials;
-    this.options_ = options;
-  }
-
-}
-
 export class V1Alpha1Client {
   client_: grpcWeb.AbstractClientBase;
   hostname_: string;

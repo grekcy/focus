@@ -20,57 +20,6 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-const ()
-
-// FocusClient is the client API for Focus service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type FocusClient interface {
-}
-
-type focusClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewFocusClient(cc grpc.ClientConnInterface) FocusClient {
-	return &focusClient{cc}
-}
-
-// FocusServer is the server API for Focus service.
-// All implementations must embed UnimplementedFocusServer
-// for forward compatibility
-type FocusServer interface {
-	mustEmbedUnimplementedFocusServer()
-}
-
-// UnimplementedFocusServer must be embedded to have forward compatible implementations.
-type UnimplementedFocusServer struct {
-}
-
-func (UnimplementedFocusServer) mustEmbedUnimplementedFocusServer() {}
-
-// UnsafeFocusServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to FocusServer will
-// result in compilation errors.
-type UnsafeFocusServer interface {
-	mustEmbedUnimplementedFocusServer()
-}
-
-func RegisterFocusServer(s grpc.ServiceRegistrar, srv FocusServer) {
-	s.RegisterService(&Focus_ServiceDesc, srv)
-}
-
-// Focus_ServiceDesc is the grpc.ServiceDesc for Focus service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var Focus_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "Focus",
-	HandlerType: (*FocusServer)(nil),
-	Methods:     []grpc.MethodDesc{},
-	Streams:     []grpc.StreamDesc{},
-	Metadata:    "focus.proto",
-}
-
 const (
 	V1Alpha1_Version_FullMethodName      = "/V1Alpha1/version"
 	V1Alpha1_GetUser_FullMethodName      = "/V1Alpha1/getUser"
