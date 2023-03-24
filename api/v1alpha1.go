@@ -97,6 +97,8 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 }
 
 func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCardReq) (*emptypb.Empty, error) {
+	log.Debugf("rerankCard: card=%v, target=%v", req.CardNo, req.TargetCardNo)
+
 	card, err := s.getCard(ctx, uint(req.CardNo))
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "card not found: %v", req.CardNo)
@@ -120,14 +122,24 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 		//  5   card.rank
 		//  6
 		if err := s.db.Transaction(func(tx *gorm.DB) error {
-			if tx := s.db.Model(&models.Card{}).
+			tx = s.db.Model(&models.Card{}).
 				Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
-				Where("rank BETWEEN ? AND ?", targetCard.Rank, card.Rank).
-				Update("rank", gorm.Expr("rank + 1")); tx.Error != nil {
+				Where("rank BETWEEN ? AND ?", targetCard.Rank, card.Rank)
+
+			if targetCard.ParentCardNo == nil {
+				tx = tx.Where("parent_card_no IS NULL")
+			} else {
+				tx = tx.Where("parent_card_no = ?", targetCard.ParentCardNo)
+			}
+
+			if tx := tx.UpdateColumn("rank", gorm.Expr("rank + 1")); tx.Error != nil {
 				return tx.Error
 			}
 
-			if tx := s.db.Model(card.Card).Update("rank", targetCard.Rank); tx.Error != nil {
+			if tx := s.db.Model(card.Card).UpdateColumns(map[string]any{
+				"rank":           targetCard.Rank,
+				"parent_card_no": targetCard.ParentCardNo,
+			}); tx.Error != nil {
 				return tx.Error
 			}
 
@@ -145,14 +157,24 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 		//  6
 		//
 		if err := s.db.Transaction(func(tx *gorm.DB) error {
-			if tx := s.db.Model(&models.Card{}).
+			tx = s.db.Model(&models.Card{}).
 				Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
-				Where("rank BETWEEN ? AND ?", card.Rank, targetCard.Rank).
-				Update("rank", gorm.Expr("rank - 1")); tx.Error != nil {
+				Where("rank BETWEEN ? AND ?", card.Rank, targetCard.Rank-1)
+
+			if targetCard.ParentCardNo == nil {
+				tx = tx.Where("parent_card_no IS NULL")
+			} else {
+				tx = tx.Where("parent_card_no = ?", targetCard.ParentCardNo)
+			}
+
+			if tx := tx.UpdateColumn("rank", gorm.Expr("rank - 1")); tx.Error != nil {
 				return tx.Error
 			}
 
-			if tx := s.db.Model(card.Card).Update("rank", targetCard.Rank); tx.Error != nil {
+			if tx := s.db.Model(card.Card).UpdateColumns(map[string]any{
+				"rank":           targetCard.Rank - 1,
+				"parent_card_no": targetCard.ParentCardNo,
+			}); tx.Error != nil {
 				return tx.Error
 			}
 
@@ -301,8 +323,7 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card,
         JOIN cte ON cte.card_no = cards.parent_card_no
 )
 SEARCH DEPTH FIRST BY rank SET ordercol
-%s
-`, nonRecursiveQuery, query)).Scan(&r); tx.Error != nil {
+%s`, nonRecursiveQuery, query)).Scan(&r); tx.Error != nil {
 		return nil, status.Errorf(codes.Internal, "fail to list cards: %+v", errors.Wrap(tx.Error, "list card failed"))
 	}
 

@@ -10,10 +10,6 @@ export function TodayPage() {
   const app: IFocusApp = useContext(FocusContext);
 
   const cardBarRef = useRef<ICardBar>(null);
-  function cardBarToggle() {
-    cardBarRef.current && cardBarRef.current.toggle();
-  }
-
   const [items, setItems] = useState<Card.AsObject[]>([]);
 
   useEffect(() => {

@@ -273,7 +273,6 @@ function CardItem({
           <EmptyIcon fontSize="small" />
         )}
       </IconButton>
-      {card.parentCardNo}&nbsp;
       {showCardNo && (
         <>
           <Box sx={{ flexGrow: 0, pr: 1 }}>

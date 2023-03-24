@@ -182,7 +182,7 @@ class AuthInterceptor {
       metadata["Access-Control-Allow-Origin"] = "*";
       metadata.Authorization = "Bearer " + token;
     }
-    
+
     return invoker(request);
   };
 }

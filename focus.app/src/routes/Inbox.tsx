@@ -194,26 +194,19 @@ export function InboxPage() {
     const chunk = getChildCards(srcIndex);
     const destCard = cards[dropIndex + chunk.length + 1];
 
-    console.log(`src=${srcCard.subject}, dest=${destCard.subject}}`);
-
     // 다른 parent_no로 drop되면 parent, depth 조정
     if (dragStartCard?.parentCardNo !== destCard.parentCardNo) {
       const depthBegin = destCard.depth;
 
       // child depth 조정
       travel(dragStartCard!.cardNo, (depth: number, card: Card.AsObject) => {
-        console.log(
-          `dest.subject=${destCard.subject} dest.depth=${destCard.depth}, depth=${depth}`
-        );
         card.depth = depthBegin + depth;
-        console.log(`callback: ${card.subject} ${depth}`);
       });
 
       dragStartCard!.depth = destCard.depth;
       dragStartCard!.parentCardNo = destCard.parentCardNo;
     }
 
-    return; // TODO 일단 UI에서 작업
     await app
       .client()!
       .rerankCard(srcCard.cardNo, destCard.cardNo)
@@ -247,7 +240,7 @@ export function InboxPage() {
 
       <CardListView
         items={cards}
-        showCardNo={true}
+        showCardNo={false}
         onDoubleClick={() => cardBarRef.current && cardBarRef.current.toggle()}
         onSelect={(index) =>
           cardBarRef.current &&
