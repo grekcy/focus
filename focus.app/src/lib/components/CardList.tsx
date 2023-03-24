@@ -65,6 +65,22 @@ export function CardListView({
     if (index !== selected && onSelect) onSelect(index);
   }
 
+  function handleCanDrop(dragIndex: number, hoverIndex: number): boolean {
+    if (dragIndex === -1 || hoverIndex === -1) return false;
+    return !isParent(dragIndex, hoverIndex);
+  }
+
+  // return true if items[i] is parent of items[j]
+  function isParent(i: number, j: number): boolean {
+    if (items[i].cardNo === items[j].parentCardNo) return true;
+
+    if (items[j].parentCardNo === 0) return false;
+    const p = items.findIndex((c) => c.cardNo === items[j].parentCardNo);
+    if (p === -1) return false;
+
+    return isParent(i, p);
+  }
+
   return (
     <DndProvider backend={HTML5Backend}>
       <Box
@@ -81,7 +97,10 @@ export function CardListView({
             onClick={(index) => handleCardClick(index)}
             onChange={(v) => handleChange(i, v)}
             onActionClick={onActionClick}
-            onDragOver={onDragOver}
+            onDragOver={(dragIndex, hoverIndex) =>
+              onDragOver && onDragOver(dragIndex, hoverIndex)
+            }
+            onCanDrop={handleCanDrop}
             onDragDrop={(dragIndex, dropIndex) =>
               onDragDrop && onDragDrop(dragIndex, dropIndex)
             }
@@ -113,8 +132,9 @@ interface ItemProp {
   onClick?: (index: number) => void;
   onChange?: (value: string) => void;
   onActionClick?: (index: number, action: CardAction) => void;
-  onDragOver?: (dragIndex: number, hoverIndex: number) => void;
-  onDragDrop?: (dragIndex: number, dropIndex: number) => void;
+  onDragOver: (dragIndex: number, hoverIndex: number) => void;
+  onCanDrop: (dragIndex: number, hoverIndex: number) => boolean;
+  onDragDrop: (dragIndex: number, dropIndex: number) => void;
 }
 
 function CardItem({
@@ -128,6 +148,7 @@ function CardItem({
   onChange,
   onActionClick,
   onDragOver,
+  onCanDrop,
   onDragDrop,
 }: ItemProp) {
   //
@@ -194,8 +215,10 @@ function CardItem({
         return;
       }
 
+      if (!onCanDrop(dragIndex, hoverIndex)) return;
+
       // Time to actually perform the action
-      onDragOver && onDragOver(dragIndex, hoverIndex);
+      onDragOver(dragIndex, hoverIndex);
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,

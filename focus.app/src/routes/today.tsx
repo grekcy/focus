@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import update from "immutability-helper";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { FocusContext, IFocusApp } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView } from "../lib/components/CardList";
@@ -26,7 +26,7 @@ export function TodayPage() {
     })();
   }, []);
 
-  const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
+  function onDragOver(dragIndex: number, hoverIndex: number) {
     setItems((prevItems: Card.AsObject[]) =>
       update(prevItems, {
         $splice: [
@@ -35,7 +35,7 @@ export function TodayPage() {
         ],
       })
     );
-  }, []);
+  }
 
   function handleCardChange(index: number, subject: string) {
     (async () => {
@@ -66,7 +66,7 @@ export function TodayPage() {
       <CardListView
         items={items}
         onChange={handleCardChange}
-        onDragOver={moveCard}
+        onDragOver={onDragOver}
       />
       <CardBar ref={cardBarRef} />
     </>

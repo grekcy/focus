@@ -78,10 +78,7 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 		}
 
 		if err := s.db.Model(&models.Card{}).Unscoped().
-			Where(&models.Card{
-				WorkspaceID:  s.defaultWorkspace(ctx).ID,
-				ParentCardNo: helper.P(0),
-			}).
+			Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
 			Select("COALESCE(max(rank), 0, max(rank)) +1").Row().Scan(&newCard.Rank); err != nil {
 			return status.Errorf(codes.Internal, "fail to get rank")
 		}
