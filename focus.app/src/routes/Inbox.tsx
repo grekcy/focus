@@ -143,11 +143,16 @@ export function InboxPage() {
     }
     setDragging(true);
 
+    let chunk: number[] = [dragIndex];
+    if (hasChild(dragIndex)) {
+      chunk.push(...getChildCards(dragIndex));
+    }
+
     setCards((p: Card.AsObject[]) =>
       update(p, {
         $splice: [
-          [dragIndex, 1],
-          [hoverIndex, 0, p[dragIndex]],
+          [dragIndex, chunk.length],
+          [hoverIndex, 0, ...chunk.map((i) => p[i])],
         ],
       })
     );
@@ -181,34 +186,54 @@ export function InboxPage() {
     setDragStartCard(null);
     setDragStartIndex(-1);
 
-    const srcCardNo = dragStartCard!.cardNo;
-    const rankUp = dragStartIndex > dropIndex;
-    const destCard = rankUp ? cards[dropIndex + 1] : cards[dropIndex - 1];
+    if (!dragStartCard) return;
 
-    // 다른 parent_no로 drop되면 조정
-    dragStartCard!.parentCardNo = destCard.parentCardNo;
-    dragStartCard!.depth = destCard.depth;
+    const srcCard = dragStartCard;
+    const srcIndex = cards.findIndex((c) => c === srcCard);
+    if (srcIndex === -1) return;
+    const chunk = getChildCards(srcIndex);
+    const destCard = cards[dropIndex + chunk.length + 1];
 
-    if (hasChild(dragIndex)) {
-      // move with child
-      // TODO drag할 때 같이 보이도록 해보자
-      const child = getChildCards(dragIndex);
-      console.log(`has child... ${cards[dragIndex].subject}, ${child}`);
-      setCards((p: Card.AsObject[]) =>
-        update(p, {
-          $splice: [
-            [child[0], child.length],
-            [dropIndex + (rankUp ? 1 : -1), 0, ...child.map((i) => p[i])],
-          ],
-        })
-      );
+    console.log(`src=${srcCard.subject}, dest=${destCard.subject}}`);
+
+    // 다른 parent_no로 drop되면 parent, depth 조정
+    if (dragStartCard?.parentCardNo !== destCard.parentCardNo) {
+      const depthBegin = destCard.depth;
+
+      // child depth 조정
+      travel(dragStartCard!.cardNo, (depth: number, card: Card.AsObject) => {
+        console.log(
+          `dest.subject=${destCard.subject} dest.depth=${destCard.depth}, depth=${depth}`
+        );
+        card.depth = depthBegin + depth;
+        console.log(`callback: ${card.subject} ${depth}`);
+      });
+
+      dragStartCard!.depth = destCard.depth;
+      dragStartCard!.parentCardNo = destCard.parentCardNo;
     }
 
     return; // TODO 일단 UI에서 작업
     await app
       .client()!
-      .rerankCard(srcCardNo, destCard.cardNo)
+      .rerankCard(srcCard.cardNo, destCard.cardNo)
       .catch((e) => app.toast(e.message, "error"));
+  }
+
+  function travel(
+    cardNo: number,
+    callback: (depth: number, card: Card.AsObject) => void
+  ) {
+    function travel_(depth: number, cardNo: number) {
+      cards
+        .filter((c) => c.parentCardNo === cardNo)
+        .forEach((c) => {
+          callback(depth, c);
+          travel_(depth + 1, c.cardNo);
+        });
+    }
+
+    travel_(1, cardNo);
   }
 
   return (
