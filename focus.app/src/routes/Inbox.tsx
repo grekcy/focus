@@ -153,6 +153,28 @@ export function InboxPage() {
     );
   }
 
+  function hasChild(index: number): boolean {
+    return (
+      cards.findIndex((c) => c.parentCardNo === cards[index].cardNo) !== -1
+    );
+  }
+
+  function getChildCards(index: number): number[] {
+    const r: number[] = [];
+    cards.forEach((c, i) => isParent(index, i) && r.push(i));
+    return r;
+  }
+
+  function isParent(i: number, j: number): boolean {
+    if (cards[i].cardNo === cards[j].parentCardNo) return true;
+
+    if (cards[j].parentCardNo === 0) return false;
+    const p = cards.findIndex((c) => c.cardNo === cards[j].parentCardNo);
+    if (p === -1) return false;
+
+    return isParent(i, p);
+  }
+
   // update rank to server
   async function onDragDrop(dragIndex: number, dropIndex: number) {
     setDragging(false);
@@ -166,6 +188,21 @@ export function InboxPage() {
     // 다른 parent_no로 drop되면 조정
     dragStartCard!.parentCardNo = destCard.parentCardNo;
     dragStartCard!.depth = destCard.depth;
+
+    if (hasChild(dragIndex)) {
+      // move with child
+      // TODO drag할 때 같이 보이도록 해보자
+      const child = getChildCards(dragIndex);
+      console.log(`has child... ${cards[dragIndex].subject}, ${child}`);
+      setCards((p: Card.AsObject[]) =>
+        update(p, {
+          $splice: [
+            [child[0], child.length],
+            [dropIndex + (rankUp ? 1 : -1), 0, ...child.map((i) => p[i])],
+          ],
+        })
+      );
+    }
 
     return; // TODO 일단 UI에서 작업
     await app
