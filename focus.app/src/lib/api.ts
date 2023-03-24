@@ -16,19 +16,20 @@ import {
 
 export class FocusAPI {
   s: V1Alpha1Client;
-  metadata: { [s: string]: string };
   listeners: { [event: string]: EventListener[] };
 
   constructor(endpoint: string) {
-    this.s = new V1Alpha1Client(endpoint);
-    this.metadata = {};
+    const authInterceptor = new AuthInterceptor("sample-token");
+    const options = {
+      unaryInterceptors: [authInterceptor],
+      streamInterceptors: [authInterceptor],
+    };
+    this.s = new V1Alpha1Client(endpoint, null, options);
     this.listeners = {};
   }
 
   version = async () => {
-    return await this.s
-      .version(new Empty(), this.metadata)
-      .then((r) => r.toObject());
+    return await this.s.version(new Empty(), null).then((r) => r.toObject());
   };
 
   quickAddCard = async (subject: string) => {
@@ -36,7 +37,7 @@ export class FocusAPI {
     s.setValue(subject);
 
     return await this.s
-      .quickAddCard(s, this.metadata)
+      .quickAddCard(s, null)
       .then((r) => r.toObject())
       .then((r) => this.notify(r, "card.created", r.cardNo));
   };
@@ -46,7 +47,7 @@ export class FocusAPI {
     req.setExcludeCompleted(excludeCompleted);
     req.setExcludeChallenges(excludeChallenges);
     return await this.s
-      .listCards(req, this.metadata)
+      .listCards(req, null)
       .then((r) => r.toObject())
       .then((r) => r.itemsList);
   };
@@ -60,7 +61,7 @@ export class FocusAPI {
     const req = new GetCardReq();
     req.setCardNosList(cardNo);
     return await this.s
-      .getCards(req, this.metadata)
+      .getCards(req, null)
       .then((r) => Object.fromEntries(r.toObject().itemsMap));
   };
 
@@ -74,7 +75,7 @@ export class FocusAPI {
     req.addFields(CardField.COMPLETED_AT);
     req.setCard(card);
 
-    return await this.s.patchCard(req, this.metadata).then((r) => r.toObject());
+    return await this.s.patchCard(req, null).then((r) => r.toObject());
   };
 
   updateCardSubject = async (cardNo: number, subject: string) => {
@@ -113,7 +114,7 @@ export class FocusAPI {
     req.setFieldsList(fields);
 
     return await this.s
-      .patchCard(req, this.metadata)
+      .patchCard(req, null)
       .then((r) => this.notify(r, "card.updated", card.cardNo));
   };
 
@@ -121,13 +122,13 @@ export class FocusAPI {
     const req = new RankCardReq();
     req.setCardNo(cardNo);
     req.setTargetCardNo(targetCardNo);
-    return await this.s.rerankCard(req, this.metadata);
+    return await this.s.rerankCard(req, null);
   };
 
   deleteCard = async (cardNo: number) => {
     const no = new UInt64Value();
     no.setValue(cardNo);
-    await this.s.deleteCard(no, this.metadata);
+    await this.s.deleteCard(no, null);
   };
 
   addEventListener = (event: Event, handler: EventListener) => {
@@ -151,6 +152,23 @@ export class FocusAPI {
     listeners.forEach((h) => h(cardNo));
     return r;
   };
+}
+
+class AuthInterceptor {
+  token: string;
+
+  constructor(token: string) {
+    this.token = token;
+  }
+
+  intercept(request: any, invoker: any) {
+    const metadata = request.getMetadata();
+    if (this.token) {
+      metadata["Access-Control-Allow-Origin"] = "*";
+      metadata.Authorization = "Bearer " + this.token;
+    }
+    return invoker(request);
+  }
 }
 
 export type Event = "card.created" | "card.updated";
