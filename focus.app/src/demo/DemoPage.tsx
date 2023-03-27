@@ -1,5 +1,6 @@
 import { Box, Tab, Tabs, Typography } from "@mui/material";
 import { useState } from "react";
+import { useFocusClient } from "../FocusProvider";
 import { Cursors } from "./Cursors";
 import { DragAndDropCancel } from "./dndCancel";
 import { DragAndDropSortable } from "./dndSotrable";
@@ -30,6 +31,8 @@ export function DemoPage() {
   const handleChange = (event: any, newValue: any) => {
     setValue(newValue);
   };
+
+  const api = useFocusClient();
 
   return (
     <>

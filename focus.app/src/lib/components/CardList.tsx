@@ -6,7 +6,8 @@ import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import TripOriginIcon from "@mui/icons-material/TripOrigin";
 import { Box, IconButton } from "@mui/material";
 import type { Identifier, XYCoord } from "dnd-core";
-import { useContext, useRef, useState } from "react";
+import update from "immutability-helper";
+import { Ref, forwardRef, useEffect, useRef, useState } from "react";
 import {
   DndProvider,
   DragSourceMonitor,
@@ -16,10 +17,11 @@ import {
 } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Link } from "react-router-dom";
-import { FocusContext, IFocusApp } from "../../FocusProvider";
+import { Key } from "ts-key-enum";
+import { useFocusApp } from "../../FocusProvider";
 import { Card } from "../proto/focus_pb";
 import { EmptyIcon } from "./Icons";
-import { InlineEdit } from "./InlineEdit";
+import { IInlineEdit, InlineEdit } from "./InlineEdit";
 
 export enum CardAction {
   COMPLETE,
@@ -49,10 +51,13 @@ export function CardListView({
   onDragOver,
   onDragDrop,
 }: CardListViewProp) {
-  const app: IFocusApp = useContext(FocusContext);
+  const [cards, setCards] = useState(items);
+  useEffect(() => {
+    setCards(items);
+  }, [items]);
 
   function hasChild(cardNo: number): boolean {
-    return items.findIndex((item) => item.parentCardNo === cardNo) !== -1;
+    return cards.findIndex((item) => item.parentCardNo === cardNo) !== -1;
   }
 
   function handleChange(index: number, subject: string) {
@@ -75,7 +80,7 @@ export function CardListView({
     if (items[i].cardNo === items[j].parentCardNo) return true;
 
     if (items[j].parentCardNo === 0) return false;
-    const p = items.findIndex((c) => c.cardNo === items[j].parentCardNo);
+    const p = cards.findIndex((c) => c.cardNo === items[j].parentCardNo);
     if (p === -1) return false;
 
     return isParent(i, p);
@@ -87,8 +92,9 @@ export function CardListView({
         component="div"
         onDoubleClick={() => onDoubleClick && onDoubleClick()}
       >
-        {items.map((item, i) => (
+        {cards.map((item, i) => (
           <CardItem
+            ref={(ref) => (refs.current[i] = ref!)}
             key={item.cardNo}
             index={i}
             card={item}
@@ -137,180 +143,189 @@ interface ItemProp {
   onDragDrop: (dragIndex: number, dropIndex: number) => void;
 }
 
-function CardItem({
-  card,
-  index,
-  selected = false,
-  visible = true,
-  showCardNo = true,
-  hasChild,
-  onClick,
-  onChange,
-  onActionClick,
-  onDragOver,
-  onCanDrop,
-  onDragDrop,
-}: ItemProp) {
-  //
-  // Drag&Drop supports
-  const ref = useRef<HTMLDivElement>(null);
+const CardItem = forwardRef(
+  (
+    {
+      card,
+      index,
+      selected = false,
+      visible = true,
+      showCardNo = true,
+      hasChild,
+      onClick,
+      onChange,
+      onActionClick,
+      onDragOver,
+      onCanDrop,
+      onDragDrop,
+    }: ItemProp,
+    ref: Ref<IInlineEdit>
+  ) => {
+    //
+    // Drag&Drop supports
+    const containerRef = useRef<HTMLDivElement>(null);
 
-  const [{ isDragging }, drag] = useDrag({
-    type: ItemTypes.CARD,
-    item: () => {
-      const id = card.cardNo;
-      return { id, index };
-    },
-    collect: (monitor: DragSourceMonitor<{ id: number; index: number }>) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  });
+    const [{ isDragging }, drag] = useDrag({
+      type: ItemTypes.CARD,
+      item: () => {
+        const id = card.cardNo;
+        return { id, index };
+      },
+      collect: (monitor: DragSourceMonitor<{ id: number; index: number }>) => ({
+        isDragging: !!monitor.isDragging(),
+      }),
+    });
 
-  const [{ handlerId }, drop] = useDrop<
-    DragItem,
-    void,
-    { handlerId: Identifier | null }
-  >({
-    accept: ItemTypes.CARD,
-    collect(monitor: DropTargetMonitor<DragItem, void>) {
-      return {
-        handlerId: monitor.getHandlerId(),
-      };
-    },
-    hover(item: DragItem, monitor: DropTargetMonitor<DragItem, void>) {
-      if (!ref.current) return;
+    const [{ handlerId }, drop] = useDrop<
+      DragItem,
+      void,
+      { handlerId: Identifier | null }
+    >({
+      accept: ItemTypes.CARD,
+      collect(monitor: DropTargetMonitor<DragItem, void>) {
+        return {
+          handlerId: monitor.getHandlerId(),
+        };
+      },
+      hover(item: DragItem, monitor: DropTargetMonitor<DragItem, void>) {
+        if (!containerRef.current) return;
 
-      const dragIndex = item.index;
-      const hoverIndex = index;
+        const dragIndex = item.index;
+        const hoverIndex = index;
 
-      // Don't replace items with themselves
-      if (dragIndex === hoverIndex) {
-        return;
-      }
+        // Don't replace items with themselves
+        if (dragIndex === hoverIndex) {
+          return;
+        }
 
-      // Determine rectangle on screen
-      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+        // Determine rectangle on screen
+        const hoverBoundingRect = containerRef.current?.getBoundingClientRect();
 
-      // Get vertical middle
-      const hoverMiddleY =
-        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+        // Get vertical middle
+        const hoverMiddleY =
+          (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
-      // Determine mouse position
-      const clientOffset = monitor.getClientOffset();
+        // Determine mouse position
+        const clientOffset = monitor.getClientOffset();
 
-      // Get pixels to the top
-      const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
+        // Get pixels to the top
+        const hoverClientY =
+          (clientOffset as XYCoord).y - hoverBoundingRect.top;
 
-      // Only perform the move when the mouse has crossed half of the items height
-      // When dragging downwards, only move when the cursor is below 50%
-      // When dragging upwards, only move when the cursor is above 50%
+        // Only perform the move when the mouse has crossed half of the items height
+        // When dragging downwards, only move when the cursor is below 50%
+        // When dragging upwards, only move when the cursor is above 50%
 
-      // Dragging downwards
-      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
-        return;
-      }
+        // Dragging downwards
+        if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+          return;
+        }
 
-      // Dragging upwards
-      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
-        return;
-      }
+        // Dragging upwards
+        if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) {
+          return;
+        }
 
-      if (!onCanDrop(dragIndex, hoverIndex)) return;
+        if (!onCanDrop(dragIndex, hoverIndex)) return;
 
-      // Time to actually perform the action
-      onDragOver(dragIndex, hoverIndex);
+        // Time to actually perform the action
+        onDragOver(dragIndex, hoverIndex);
 
-      // Note: we're mutating the monitor item here!
-      // Generally it's better to avoid mutations,
-      // but it's good here for the sake of performance
-      // to avoid expensive index searches.
-      item.index = hoverIndex;
-    },
-    drop: (item, monitor) => onDragDrop && onDragDrop(index, item.index),
-  });
+        // Note: we're mutating the monitor item here!
+        // Generally it's better to avoid mutations,
+        // but it's good here for the sake of performance
+        // to avoid expensive index searches.
+        item.index = hoverIndex;
+      },
+      drop: (item, monitor) => onDragDrop && onDragDrop(index, item.index),
+    });
 
-  const opacity = isDragging ? 0 : 1;
-  drag(drop(ref));
+    const opacity = isDragging ? 0 : 1;
+    drag(drop(containerRef));
 
-  function handleActionClick(index: number, action: CardAction) {
-    onActionClick && onActionClick(index, action);
-  }
+    function handleActionClick(index: number, action: CardAction) {
+      onActionClick && onActionClick(index, action);
+    }
 
-  const app: IFocusApp = useContext(FocusContext);
+    const app = useFocusApp();
 
-  return (
-    <Box
-      component="div"
-      ref={ref}
-      visibility={visible ? "inherit" : "hidden"}
-      sx={{
-        display: "flex",
-        border: "1px solid lightgray",
-        padding: "0.5rem 1rem",
-        cursor: "move",
-        backgroundColor: selected ? "action.selected" : "",
-        opacity: opacity,
-        width: 1,
-      }}
-      onClick={() => onClick && onClick(index)}
-    >
+    return (
       <Box
+        component="div"
+        ref={containerRef}
+        visibility={visible ? "inherit" : "hidden"}
         sx={{
-          flexGrow: 0,
-          color: "GrayText",
-          height: 0,
+          display: "flex",
+          border: "1px solid lightgray",
+          padding: "0.5rem 1rem",
+          cursor: "move",
+          backgroundColor: selected ? "action.selected" : "",
+          opacity: opacity,
+          width: 1,
         }}
+        onClick={() => onClick && onClick(index)}
       >
-        <DragIndicatorIcon />
-      </Box>
-      {card.depth > 0 && (
-        <Box sx={{ flexGrow: 0, width: card.depth * 20 }}></Box>
-      )}
-      <IconButton size="small" onClick={() => app.toast("not implemented")}>
-        {hasChild && hasChild(card.cardNo) ? (
-          <ArrowDropDownIcon fontSize="small" />
-        ) : (
-          <EmptyIcon fontSize="small" />
+        <Box
+          sx={{
+            flexGrow: 0,
+            color: "GrayText",
+            height: 0,
+          }}
+        >
+          <DragIndicatorIcon />
+        </Box>
+        {card.depth > 0 && (
+          <Box sx={{ flexGrow: 0, width: card.depth * 20 }}></Box>
         )}
-      </IconButton>
-      {showCardNo && (
-        <>
-          <Box sx={{ flexGrow: 0, pr: 1 }}>
-            <Link to={`/cards/` + card.cardNo}>{card.cardNo}</Link>
-          </Box>
-        </>
-      )}
-      <Box sx={{ flexGrow: 1 }}>
-        <InlineEdit
-          value={card.subject}
-          onSubmit={(e, value) => onChange && onChange(value)}
-        />
-      </Box>
-      <Box sx={{ flexGrow: 0, color: "grey", height: 0 }}>
-        {card.completedAt ? (
-          <IconButton
-            onClick={() => handleActionClick(index, CardAction.INPROGRESS)}
-          >
-            <TaskAltIcon fontSize="small" />
-          </IconButton>
-        ) : (
-          <IconButton
-            onClick={() => handleActionClick(index, CardAction.COMPLETE)}
-          >
-            <TripOriginIcon fontSize="small" />
-          </IconButton>
-        )}
-        <IconButton onClick={() => handleActionClick(index, CardAction.DELETE)}>
-          <DeleteIcon fontSize="small" />
+        <IconButton size="small" onClick={() => app.toast("not implemented")}>
+          {hasChild && hasChild(card.cardNo) ? (
+            <ArrowDropDownIcon fontSize="small" />
+          ) : (
+            <EmptyIcon fontSize="small" />
+          )}
         </IconButton>
-        {false && (
+        {showCardNo && (
+          <>
+            <Box sx={{ flexGrow: 0, pr: 1 }}>
+              <Link to={`/cards/` + card.cardNo}>{card.cardNo}</Link>
+            </Box>
+          </>
+        )}
+        <Box sx={{ flexGrow: 1 }}>
+          <InlineEdit
+            ref={ref}
+            value={card.subject}
+            onSubmit={(e, value) => onChange && onChange(value)}
+          />
+        </Box>
+        <Box sx={{ flexGrow: 0, color: "grey", height: 0 }}>
+          {card.completedAt ? (
+            <IconButton
+              onClick={() => handleActionClick(index, CardAction.INPROGRESS)}
+            >
+              <TaskAltIcon fontSize="small" />
+            </IconButton>
+          ) : (
+            <IconButton
+              onClick={() => handleActionClick(index, CardAction.COMPLETE)}
+            >
+              <TripOriginIcon fontSize="small" />
+            </IconButton>
+          )}
           <IconButton
             onClick={() => handleActionClick(index, CardAction.DELETE)}
           >
-            <CancelIcon fontSize="small" />
+            <DeleteIcon fontSize="small" />
           </IconButton>
-        )}
+          {false && (
+            <IconButton
+              onClick={() => handleActionClick(index, CardAction.DELETE)}
+            >
+              <CancelIcon fontSize="small" />
+            </IconButton>
+          )}
+        </Box>
       </Box>
-    </Box>
-  );
-}
+    );
+  }
+);

@@ -3,12 +3,11 @@ import { Box, Divider, Drawer, IconButton, Typography } from "@mui/material";
 import {
   Ref,
   forwardRef,
-  useContext,
   useEffect,
   useImperativeHandle,
   useState,
 } from "react";
-import { FocusContext, IFocusApp } from "../../FocusProvider";
+import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { DrawerHeader } from "../../SideBar";
 import { Card } from "../proto/focus_pb";
 import { InlineEdit } from "./InlineEdit";
@@ -29,7 +28,8 @@ export const CardBar = forwardRef(
     const [cardNo, setCardNo] = useState(inCardNo);
     const [card, setCard] = useState<Card.AsObject | null>(null);
 
-    const app: IFocusApp = useContext(FocusContext);
+    const app = useFocusApp();
+    const api = useFocusClient();
 
     useImperativeHandle(ref, () => ({
       toggle() {
@@ -47,8 +47,7 @@ export const CardBar = forwardRef(
       }
 
       (async () => {
-        await app
-          .client()!
+        await api
           .getCard(cardNo)
           .then((r) => setCard(r))
           .catch((e) => app.toast(e.message, "error"));
@@ -57,19 +56,18 @@ export const CardBar = forwardRef(
 
     function handleSubjectChanged(subject: string) {
       if (!card) return;
-      app
-        .client()!
+      api
         .updateCardSubject(card.cardNo, subject)
         .then((r) => (card.subject = subject))
         .catch((e) => app.toast(e.message, "error"));
     }
 
-    function handleDescriptionChanged(content: string) {
+    async function handleDescriptionChanged(content: string) {
       if (!card) return;
-      app
-        .client()!
+
+      await api
         .updateCardContent(card.cardNo, content)
-        .then((r) => (card.content = content))
+        .then(() => (card.content = content))
         .catch((e) => app.toast(e.message, "error"));
     }
 

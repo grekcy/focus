@@ -16,11 +16,10 @@ import {
 
 export class FocusAPI {
   s: V1Alpha1Client;
-  token: string = "";
   listeners: { [event: string]: EventListener[] };
 
-  constructor(endpoint: string) {
-    const authInterceptor = new AuthInterceptor(this.getToken);
+  constructor(endpoint: string, getToken: () => string) {
+    const authInterceptor = new AuthInterceptor(getToken);
     const options = {
       unaryInterceptors: [authInterceptor],
       streamInterceptors: [authInterceptor],
@@ -28,14 +27,6 @@ export class FocusAPI {
     this.s = new V1Alpha1Client(endpoint, null, options);
     this.listeners = {};
   }
-
-  setToken = (token: string) => {
-    this.token = token;
-  };
-
-  getToken = (): string => {
-    return this.token;
-  };
 
   version = async () => {
     return await this.s.version(new Empty(), null).then((r) => r.toObject());

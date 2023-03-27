@@ -24,13 +24,12 @@ import {
   SyntheticEvent,
   createElement,
   forwardRef,
-  useContext,
   useEffect,
   useImperativeHandle,
   useState,
 } from "react";
 import { Link } from "react-router-dom";
-import { FocusContext, IFocusApp } from "./FocusProvider";
+import { useFocusApp } from "./FocusProvider";
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -161,7 +160,7 @@ export const SideBar = forwardRef(
       setCurrentOpen(open);
     }, [open]);
 
-    const app: IFocusApp = useContext(FocusContext);
+    const app = useFocusApp();
 
     return (
       <Box>

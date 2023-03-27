@@ -13,9 +13,9 @@ import {
 } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
-import { SyntheticEvent, useContext, useState } from "react";
+import { SyntheticEvent, useState } from "react";
 import { Link } from "react-router-dom";
-import { FocusContext, IFocusApp } from "./FocusProvider";
+import { useFocusApp, useFocusClient } from "./FocusProvider";
 
 const drawerWidth = 170;
 
@@ -49,7 +49,8 @@ export function AppBar({ open }: AppBarProps) {
   const [qucikAddSubject, setQucikAddSubject] = useState("");
   const [adding, setAdding] = useState(false);
 
-  const app: IFocusApp = useContext(FocusContext);
+  const app = useFocusApp();
+  const api = useFocusClient();
 
   const onQuickAddKeyUp = (e: SyntheticEvent) => {
     if ((e.nativeEvent as KeyboardEvent).key === "Enter") {
@@ -59,11 +60,8 @@ export function AppBar({ open }: AppBarProps) {
 
       setAdding(true);
 
-      const service = app.client();
-      if (!service) return;
-
       (async () => {
-        service
+        api
           .quickAddCard(subject)
           .then((r) => {
             setQucikAddSubject("");

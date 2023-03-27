@@ -1,26 +1,26 @@
 import { Box, Typography } from "@mui/material";
 import update from "immutability-helper";
-import { useContext, useEffect, useRef, useState } from "react";
-import { FocusContext, IFocusApp } from "../FocusProvider";
+import { useEffect, useRef, useState } from "react";
+import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView } from "../lib/components/CardList";
 import { Card } from "../lib/proto/focus_pb";
 
 export function TodayPage() {
-  const app: IFocusApp = useContext(FocusContext);
+  const app = useFocusApp();
+  const api = useFocusClient();
 
   const cardBarRef = useRef<ICardBar>(null);
   const [items, setItems] = useState<Card.AsObject[]>([]);
 
   useEffect(() => {
     (async () => {
-      app
-        .client()!
+      api
         .listCards(true, false)
         .then((r) => setItems(r))
         .catch((e) => app.toast(e.message, "error"));
     })();
-  }, []);
+  }, [api]);
 
   function onDragOver(dragIndex: number, hoverIndex: number) {
     setItems((prevItems: Card.AsObject[]) =>
@@ -36,8 +36,7 @@ export function TodayPage() {
   function handleCardChange(index: number, subject: string) {
     (async () => {
       const card = items[index];
-      await app
-        .client()!
+      await api
         .updateCardSubject(card.cardNo, subject)
         .then(() => {
           card.subject = subject;

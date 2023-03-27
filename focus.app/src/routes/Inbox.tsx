@@ -1,49 +1,47 @@
 import { Box, Typography } from "@mui/material";
 import update from "immutability-helper";
-import { useContext, useEffect, useRef, useState } from "react";
-import { FocusContext, IFocusApp } from "../FocusProvider";
+import { useEffect, useRef, useState } from "react";
+import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardAction, CardListView } from "../lib/components/CardList";
 import { Card } from "../lib/proto/focus_pb";
 
 export function InboxPage() {
-  const app: IFocusApp = useContext(FocusContext);
+  const app = useFocusApp();
+  const api = useFocusClient();
 
   useEffect(() => {
-    const handler = app
-      .client()!
-      .addEventListener("card.created", async (cardNo: number) => {
-        await app
-          .client()
-          ?.getCard(cardNo)
+    const handler = api.addEventListener(
+      "card.created",
+      async (cardNo: number) => {
+        await api
+          .getCard(cardNo)
           .then((r) => setCards((p) => update(p, { $push: [r] })))
           .catch((e) => app.toast(e.message, "error"));
-      });
-    const handler2 = app
-      .client()!
-      .addEventListener("card.updated", async (cardNo: number) => {
-        await app
-          .client()
-          ?.getCard(cardNo)
+      }
+    );
+    const handler2 = api.addEventListener(
+      "card.updated",
+      async (cardNo: number) => {
+        await api
+          .getCard(cardNo)
           .then((r) =>
             setCards((p) => p.map((c) => (c.cardNo === cardNo ? r : c)))
           )
           .catch((e) => app.toast(e.message, "error"));
-      });
+      }
+    );
 
     return () => {
-      app.client()!.removeEventListener(handler);
-      app.client()!.removeEventListener(handler2);
+      api.removeEventListener(handler);
+      api.removeEventListener(handler2);
     };
-  }, []);
+  }, [api]);
 
   const [cards, setCards] = useState<Card.AsObject[]>([]);
   useEffect(() => {
     (async () => {
-      const service = app.client();
-      if (!service) return;
-
-      await service
+      await api
         .listCards()
         .then((r) => setCards(r))
         .catch((e) => app.toast(e.message, "error"));
@@ -56,11 +54,8 @@ export function InboxPage() {
       return;
     }
 
-    const service = app.client();
-    if (!service) return;
-
     (async () => {
-      await service
+      await api
         .completeCard(cardNo, complete)
         .then((r) =>
           setCards((p) => p.map((c) => (c.cardNo === cardNo ? r : c)))
@@ -77,11 +72,8 @@ export function InboxPage() {
     setDeletingCard(true);
     console.log(`deleting ${cardNo}`);
 
-    const service = app.client();
-    if (!service) return;
-
     (async () => {
-      await service!
+      await api
         .deleteCard(cardNo)
         .then((r) => setCards((p) => p.filter((c) => c.cardNo !== cardNo)))
         .catch((e) => app.toast(e, "error"))
@@ -92,8 +84,7 @@ export function InboxPage() {
   function handleCardChange(index: number, subject: string) {
     (async () => {
       const card = cards[index];
-      await app
-        .client()!
+      await api
         .updateCardSubject(card.cardNo, subject)
         .then(() => {
           card.subject = subject;
@@ -207,8 +198,7 @@ export function InboxPage() {
       dragStartCard!.parentCardNo = destCard.parentCardNo;
     }
 
-    await app
-      .client()!
+    await api
       .rerankCard(srcCard.cardNo, destCard.cardNo)
       .catch((e) => app.toast(e.message, "error"));
   }

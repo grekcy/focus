@@ -1,12 +1,13 @@
 import { Divider, Typography } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { FocusContext, IFocusApp } from "../FocusProvider";
+import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { InlineEdit } from "../lib/components/InlineEdit";
 import { Card } from "../lib/proto/focus_pb";
 
 export function CardPage() {
-  const app: IFocusApp = useContext(FocusContext);
+  const app = useFocusApp();
+  const api = useFocusClient();
 
   const { cardNo } = useParams();
   const [card, setCard] = useState<Card.AsObject | null>(null);
@@ -16,8 +17,7 @@ export function CardPage() {
     const cardNoAsNumber = parseInt(cardNo!, 10);
     (async () => {
       setLoading(true);
-      await app
-        .client()!
+      await api
         .getCard(cardNoAsNumber)
         .then((r) => setCard(r))
         .catch((e) => app.toast(e.message, "error"))

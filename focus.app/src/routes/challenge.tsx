@@ -1,11 +1,8 @@
 import { Box, Button, Typography } from "@mui/material";
-import { useContext, useRef } from "react";
-import { FocusContext, IFocusApp } from "../FocusProvider";
+import { useRef } from "react";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 
 export function ChallengePage() {
-  const app: IFocusApp = useContext(FocusContext);
-
   const cardBarRef = useRef<ICardBar>(null);
   function cardBarToggle() {
     cardBarRef.current && cardBarRef.current.toggle();

@@ -9,8 +9,8 @@ enum Status {
 }
 
 describe("focus API", () => {
-  const service = new FocusAPI(endpoint);
-  service.setToken("whitekid@gmail.com"); // TODO use jtw token
+  // TODO use jtw token
+  const service = new FocusAPI(endpoint, () => "whitekid@gmail.com");
 
   test("get version", async () => {
     const got = await service.version();
@@ -26,7 +26,6 @@ describe("focus API", () => {
   });
 
   test("quick add: empty subject", async () => {
-    const card = new Card();
     const got = await service.quickAddCard("").catch((e) => e);
     expect(got.code).toEqual(Status.InvalidArgument);
   });
