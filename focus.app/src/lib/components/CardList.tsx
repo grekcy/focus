@@ -6,7 +6,15 @@ import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import TripOriginIcon from "@mui/icons-material/TripOrigin";
 import { Box, IconButton } from "@mui/material";
 import type { Identifier, XYCoord } from "dnd-core";
-import { Ref, forwardRef, useEffect, useRef, useState } from "react";
+import update from "immutability-helper";
+import {
+  Ref,
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import {
   DndProvider,
   DragSourceMonitor,
@@ -31,375 +39,493 @@ export enum CardAction {
 }
 
 interface CardListViewProp {
-  items: Card.AsObject[];
+  queryCardList: () => Promise<Card.AsObject[]>;
   showCardNo?: boolean;
   onDoubleClick?: () => void;
-  onSelect?: (index: number) => void;
-  onChange?: (index: number, value: string) => void;
-  onDragOver?: (dragIndex: number, hoverIndex: number) => void;
-  onDragDrop?: (dragIndex: number, dropIndex: number) => void;
+  onSelect?: (cardNo: number) => void;
 }
 
-export function CardListView({
-  items,
-  showCardNo = true,
-  onDoubleClick,
-  onSelect,
-  onChange,
-  onDragOver,
-  onDragDrop,
-}: CardListViewProp) {
-  const app = useFocusApp();
-  const api = useFocusClient();
+export interface ICardListView {
+  addCard: (card: Card.AsObject) => void;
+}
 
-  const [cards, setCards] = useState(items);
-  useEffect(() => {
-    setCards(items);
-  }, [items]);
+export const CardListView = forwardRef(
+  (
+    {
+      queryCardList,
+      showCardNo = true,
+      onDoubleClick,
+      onSelect,
+    }: CardListViewProp,
+    ref: Ref<ICardListView>
+  ) => {
+    const app = useFocusApp();
+    const api = useFocusClient();
 
-  function hasChild(cardNo: number): boolean {
-    return cards.findIndex((item) => item.parentCardNo === cardNo) !== -1;
-  }
+    const [cards, setCards] = useState<Card.AsObject[]>([]);
+    useEffect(() => {
+      queryCardList().then((r) => setCards(r));
+    }, [queryCardList]);
 
-  function getChildCards(index: number): number[] {
-    const r: number[] = [];
-    cards.forEach((c, i) => isParent(index, i) && r.push(i));
-    return r;
-  }
+    useImperativeHandle(ref, () => ({
+      addCard(card: Card.AsObject) {
+        setCards((p) => update(p, { $push: [card] }));
+      },
+    }));
 
-  // return true if items[i] is parent of items[j]
-  function isParent(i: number, j: number): boolean {
-    if (cards[i].cardNo === cards[j].parentCardNo) return true;
+    useEffect(() => {
+      const handler = api.addEventListener("card.updated", (cardNo: number) => {
+        const index = cards.findIndex((c) => c.cardNo === cardNo);
+        console.log(`card updated: ${cardNo}, ${index} ${cards.length}`);
+        if (index === -1) return;
 
-    if (cards[j].parentCardNo === 0) return false;
-    const p = cards.findIndex((c) => c.cardNo === cards[j].parentCardNo);
-    if (p === -1) return false;
+        api
+          .getCard(cardNo)
+          .then((r) => setCards((p) => update(p, { [index]: { $set: r } })))
+          .catch((e) => app.toast(e.message, "error"));
+      });
 
-    return isParent(i, p);
-  }
+      return () => {
+        api.removeEventListener(handler);
+      };
+    }, [api, app, cards]);
 
-  function handleChange(index: number, subject: string) {
-    onChange && onChange(index, subject);
-  }
+    function hasChild(cardNo: number): boolean {
+      return cards.findIndex((item) => item.parentCardNo === cardNo) !== -1;
+    }
 
-  const [selected, setSelected] = useState(-1);
-  function handleCardClick(index: number) {
-    setSelected(index);
-    if (index !== selected && onSelect) onSelect(index);
-  }
+    function getChildCards(index: number): number[] {
+      const r: number[] = [];
+      cards.forEach((c, i) => isParent(index, i) && r.push(i));
+      return r;
+    }
 
-  function handleCanDrop(dragIndex: number, hoverIndex: number): boolean {
-    if (dragIndex === -1 || hoverIndex === -1) return false;
-    return !isParent(dragIndex, hoverIndex);
-  }
+    // return true if items[i] is parent of items[j]
+    function isParent(i: number, j: number): boolean {
+      if (cards[i].cardNo === cards[j].parentCardNo) return true;
 
-  useHotkeys(Key.ArrowUp, () => {
-    if (selected === 0 || selected === -1) return;
-    setSelected((p) => p - 1);
-  });
+      if (cards[j].parentCardNo === 0) return false;
+      const p = cards.findIndex((c) => c.cardNo === cards[j].parentCardNo);
+      if (p === -1) return false;
 
-  useHotkeys(Key.ArrowDown, () => {
-    if (selected === cards.length - 1) return;
-    setSelected((p) => p + 1);
-  });
+      return isParent(i, p);
+    }
 
-  // TODO parent를 변경하면 이슈가 있음..
-  // parent를 변경 -> card.updated event가 발생
-  // -> 해당 카드를 가져옴 -> Inbox에서 데이터 변경
-  // -> Cards가 변경됨...
-  // 이런 경로를 거쳐서 다시 데이터가 변경되는 현상이 발생함.
-  useHotkeys("meta+ctrl+right, meta+ctrl+]", moveRight);
-  async function moveRight() {
-    const upward = findFirstSiblingUpward(selected);
-    if (upward === -1) return;
+    function handleChange(index: number, subject: string) {
+      const card = cards[index];
+      api
+        .updateCardSubject(card.cardNo, subject)
+        .then(() => {
+          card.subject = subject;
+          setCards((p) => update(p, { index: { $set: card } }));
+        })
+        .catch((e) => app.toast(e.message, "error"));
+    }
 
-    await api
-      .setParentCard(cards[selected].cardNo, cards[upward].cardNo)
-      .then(() => {
-        cards[selected].depth = cards[selected].depth + 1;
-        cards[selected].parentCardNo = cards[upward].cardNo;
+    const [selected, setSelected] = useState(-1);
+    useEffect(() => {
+      cards[selected] && onSelect && onSelect(cards[selected].cardNo);
+    }, [cards, onSelect, selected]);
 
-        const child = getChildCards(selected);
-        child.forEach((i) => (cards[i].depth = cards[i].depth + 1));
+    function handleCardClick(index: number) {
+      setSelected(index);
+    }
 
-        setCards((p) => {
-          const x = p.slice(0, selected);
-          x.push(...p.slice(selected, selected + child.length + 1));
-          x.push(...p.slice(selected + child.length + 1));
+    function handleCanDrop(dragIndex: number, hoverIndex: number): boolean {
+      if (dragIndex === -1 || hoverIndex === -1) return false;
+      return !isParent(dragIndex, hoverIndex);
+    }
 
-          return x;
-        });
-      })
-      .catch((e) => app.toast(e.message, "error"));
-  }
-
-  useHotkeys("meta+ctrl+left, meta+ctrl+[", moveLeft);
-  async function moveLeft() {
-    if (selected === 0) return;
-    if (cards[selected].depth === 0) return;
-
-    const parent = cards.findIndex(
-      (c) => c.cardNo === cards[selected].parentCardNo
+    //
+    // Drag & Drop
+    //
+    const [dragStartCard, setDragStartCard] = useState<Card.AsObject | null>(
+      null
     );
+    const [dragging, setDragging] = useState(false);
 
-    const child = getChildCards(selected);
+    function handleDragOver(dragIndex: number, hoverIndex: number) {
+      const dragCard = cards[dragIndex];
 
-    // parent의 next sibling으로 rank 조정
-    const nextSibling = findFirstSiblingDownward(parent);
-    console.log(nextSibling);
-    if (nextSibling === -1) {
-      // parent의 nextSilbing이 없으면 parent의 마지막 아이템으로 변경
-      await api
-        .setParentCard(cards[selected].cardNo, cards[parent].parentCardNo!)
-        .then((r) => {
-          const siblings = getChildCards(parent);
+      if (!dragging) {
+        setDragStartCard(dragCard);
+      }
+      setDragging(true);
+
+      let chunk: number[] = [dragIndex];
+      if (hasChild(dragIndex)) {
+        chunk.push(...getChildCards(dragIndex));
+      }
+
+      setCards((p: Card.AsObject[]) =>
+        update(p, {
+          $splice: [
+            [dragIndex, chunk.length],
+            [hoverIndex, 0, ...chunk.map((i) => p[i])],
+          ],
+        })
+      );
+    }
+
+    // update rank to server
+    function handleDragDrop(dragIndex: number, dropIndex: number) {
+      setDragging(false);
+      setDragStartCard(null);
+
+      if (!dragStartCard) return;
+
+      const srcCard = dragStartCard;
+      const srcIndex = cards.findIndex((c) => c === srcCard);
+      if (srcIndex === -1) return;
+      const chunk = getChildCards(srcIndex);
+      const destCard = cards[dropIndex + chunk.length + 1];
+
+      // 다른 parent_no로 drop되면 parent, depth 조정
+      if (dragStartCard?.parentCardNo !== destCard.parentCardNo) {
+        const depthBegin = destCard.depth;
+
+        // child depth 조정
+        walk(dragStartCard!.cardNo, (depth: number, card: Card.AsObject) => {
+          card.depth = depthBegin + depth;
+        });
+
+        dragStartCard!.depth = destCard.depth;
+        dragStartCard!.parentCardNo = destCard.parentCardNo;
+      }
+
+      api
+        .rerankCard(srcCard.cardNo, destCard.cardNo)
+        .catch((e) => app.toast(e.message, "error"));
+    }
+
+    function walk(
+      cardNo: number,
+      callback: (depth: number, card: Card.AsObject) => void
+    ) {
+      function walk_(depth: number, cardNo: number) {
+        cards
+          .filter((c) => c.parentCardNo === cardNo)
+          .forEach((c) => {
+            callback(depth, c);
+            walk_(depth + 1, c.cardNo);
+          });
+      }
+
+      walk_(1, cardNo);
+    }
+
+    //
+    // HotKeys
+    //
+
+    useHotkeys([Key.ArrowUp], selUp, { preventDefault: false });
+    function selUp() {
+      if (selected === 0 || selected === -1) return;
+      setSelected((p) => p - 1);
+      // FIXME preventDefault=true하면서 각 아이템을 scrollIntView()하고 싶은데, 잘 안됨
+      // preventDefault=false하면서 up/down 기본 동작과 같이 하니 뭐 봐줄만은 하고
+      // refs.current[selected - 1] &&
+      //   refs.current[selected - 1].scrollIntoView({ block: "start" });
+    }
+
+    useHotkeys([Key.ArrowDown], selDown, { preventDefault: false });
+    function selDown() {
+      if (selected === cards.length - 1) return;
+      setSelected((p) => p + 1);
+      // refs.current[selected + 1] &&
+      //   refs.current[selected + 1].scrollIntoView({ block: "end" });
+    }
+
+    useHotkeys(["meta+ctrl+right", "meta+ctrl+]"], moveRight);
+    function moveRight() {
+      const upward = findFirstSiblingUpward(selected);
+      if (upward === -1) return;
+
+      api
+        .setParentCard(cards[selected].cardNo, cards[upward].cardNo)
+        .then(() => {
+          cards[selected].depth = cards[selected].depth + 1;
+          cards[selected].parentCardNo = cards[upward].cardNo;
+
+          const child = getChildCards(selected);
+          child.forEach((i) => (cards[i].depth = cards[i].depth + 1));
+
           setCards((p) => {
-            cards[selected].parentCardNo = cards[parent].parentCardNo;
-            cards[selected].depth = cards[selected].depth - 1;
-            child.forEach((c) => (cards[c].depth = cards[c].depth - 1));
+            const x = p.slice(0, selected);
+            x.push(...p.slice(selected, selected + child.length + 1));
+            x.push(...p.slice(selected + child.length + 1));
 
-            const x = cards.slice(0, selected); // 기존 것
-            x.push(
-              ...p.slice(
-                selected + child.length + 1,
-                selected + siblings.length - child.length
-              )
-            ); // 위로 이동
-            x.push(...p.slice(selected, selected + child.length + 1)); // 아래로 이동
-            x.push(...p.slice(selected + siblings.length)); // 나머지
-
-            setSelected((p) => parent + siblings.length - child.length);
             return x;
           });
         })
         .catch((e) => app.toast(e.message, "error"));
-      return;
     }
 
-    await api
-      .rerankCard(cards[selected].cardNo, cards[nextSibling].cardNo)
-      .then((r) => {
-        const siblings = findSiblings(selected);
+    useHotkeys(["meta+ctrl+left", "meta+ctrl+["], moveLeft);
+    function moveLeft() {
+      if (selected === 0) return;
+      if (cards[selected].depth === 0) return;
 
-        cards[selected].parentCardNo = cards[nextSibling].parentCardNo;
-        cards[selected].depth = cards[selected].depth - 1;
-        child.forEach((c) => (cards[c].depth = cards[c].depth - 1));
+      const parent = cards.findIndex(
+        (c) => c.cardNo === cards[selected].parentCardNo
+      );
 
-        setCards((p) => {
-          const x = p.slice(0, selected); // 유지될 것d
-          x.push(
-            ...p.slice(
-              selected + child.length + 1,
-              selected + child.length + siblings.length + 1
-            )
-          ); // 위로 올라갈 것: child + siblings
-          x.push(...p.slice(selected, selected + child.length + 1)); // 내려갈 것
-          x.push(...p.slice(selected + child.length + siblings.length + 1)); // 나머지 유지할 것
+      const child = getChildCards(selected);
 
-          return x;
-        });
-        setSelected((p) => p + siblings.length);
-      })
-      .catch((e) => app.toast(e.message, "error"));
-  }
+      // parent의 next sibling으로 rank 조정
+      const nextSibling = findFirstSiblingDownward(parent);
+      console.log(nextSibling);
+      if (nextSibling === -1) {
+        // parent의 nextSilbing이 없으면 parent의 마지막 아이템으로 변경
+        api
+          .setParentCard(cards[selected].cardNo, cards[parent].parentCardNo!)
+          .then((r) => {
+            const siblings = getChildCards(parent);
+            setCards((p) => {
+              cards[selected].parentCardNo = cards[parent].parentCardNo;
+              cards[selected].depth = cards[selected].depth - 1;
+              child.forEach((c) => (cards[c].depth = cards[c].depth - 1));
 
-  function findFirstSiblingUpward(index: number): number {
-    for (let i = index - 1; i > -1; i--) {
-      if (cards[index].parentCardNo === cards[i].parentCardNo) return i;
+              const x = cards.slice(0, selected); // 기존 것
+              x.push(
+                ...p.slice(
+                  selected + child.length + 1,
+                  selected + siblings.length - child.length
+                )
+              ); // 위로 이동
+              x.push(...p.slice(selected, selected + child.length + 1)); // 아래로 이동
+              x.push(...p.slice(selected + siblings.length)); // 나머지
+
+              setSelected((p) => parent + siblings.length - child.length);
+              return x;
+            });
+          })
+          .catch((e) => app.toast(e.message, "error"));
+        return;
+      }
+
+      api
+        .rerankCard(cards[selected].cardNo, cards[nextSibling].cardNo)
+        .then((r) => {
+          const siblings = findSiblings(selected);
+
+          cards[selected].parentCardNo = cards[nextSibling].parentCardNo;
+          cards[selected].depth = cards[selected].depth - 1;
+          child.forEach((c) => (cards[c].depth = cards[c].depth - 1));
+
+          setCards((p) => {
+            const x = p.slice(0, selected); // 유지될 것d
+            x.push(
+              ...p.slice(
+                selected + child.length + 1,
+                selected + child.length + siblings.length + 1
+              )
+            ); // 위로 올라갈 것: child + siblings
+            x.push(...p.slice(selected, selected + child.length + 1)); // 내려갈 것
+            x.push(...p.slice(selected + child.length + siblings.length + 1)); // 나머지 유지할 것
+
+            return x;
+          });
+          setSelected((p) => p + siblings.length);
+        })
+        .catch((e) => app.toast(e.message, "error"));
     }
 
-    return -1;
-  }
+    function findFirstSiblingUpward(index: number): number {
+      for (let i = index - 1; i > -1; i--) {
+        if (cards[index].parentCardNo === cards[i].parentCardNo) return i;
+      }
 
-  useHotkeys("meta+ctrl+up", moveUp);
-  async function moveUp() {
-    const upwardIndex = findFirstSiblingUpward(selected);
-    if (upwardIndex === -1) return;
-
-    const selCard = cards[selected];
-    const destCard = cards[upwardIndex];
-    const child = getChildCards(selected);
-
-    await api
-      .rerankCard(selCard.cardNo, destCard.cardNo)
-      .then(() => {
-        setCards((p) => {
-          const x = p.slice(0, upwardIndex); // 유지할 것
-          x.push(...p.slice(selected, selected + child.length + 1)); // 위로 올라갈 것
-          x.push(...p.slice(upwardIndex, selected)); // 밑으로 내려갈 것
-          x.push(...p.slice(selected + child.length + 1)); // 나머지 유지할 것
-          return x;
-        });
-        setSelected((p) => upwardIndex);
-      })
-      .catch((e: any) => app.toast(e.message, "error"));
-  }
-
-  function findFirstSiblingDownward(index: number): number {
-    for (let i = index + 1; i < cards.length; i++) {
-      if (cards[index].parentCardNo === cards[i].parentCardNo) return i;
+      return -1;
     }
 
-    return -1;
-  }
+    useHotkeys("meta+ctrl+up", moveUp);
+    function moveUp() {
+      const upwardIndex = findFirstSiblingUpward(selected);
+      if (upwardIndex === -1) return;
 
-  function findSiblings(index: number): number[] {
-    const r: number[] = [];
-    for (let i = index + 1; i < cards.length; i++) {
-      if (cards[index].parentCardNo === cards[i].parentCardNo) {
-        r.push(i);
-        r.push(...getChildCards(i));
+      const selCard = cards[selected];
+      const destCard = cards[upwardIndex];
+      const child = getChildCards(selected);
+
+      api
+        .rerankCard(selCard.cardNo, destCard.cardNo)
+        .then(() => {
+          setCards((p) => {
+            const x = p.slice(0, upwardIndex); // 유지할 것
+            x.push(...p.slice(selected, selected + child.length + 1)); // 위로 올라갈 것
+            x.push(...p.slice(upwardIndex, selected)); // 밑으로 내려갈 것
+            x.push(...p.slice(selected + child.length + 1)); // 나머지 유지할 것
+            return x;
+          });
+          setSelected((p) => upwardIndex);
+        })
+        .catch((e) => app.toast(e.message, "error"));
+    }
+
+    function findFirstSiblingDownward(index: number): number {
+      for (let i = index + 1; i < cards.length; i++) {
+        if (cards[index].parentCardNo === cards[i].parentCardNo) return i;
+      }
+
+      return -1;
+    }
+
+    function findSiblings(index: number): number[] {
+      const r: number[] = [];
+      for (let i = index + 1; i < cards.length; i++) {
+        if (cards[index].parentCardNo === cards[i].parentCardNo) {
+          r.push(i);
+          r.push(...getChildCards(i));
+        }
+      }
+
+      return r;
+    }
+
+    useHotkeys("meta+ctrl+down", moveDown);
+    function moveDown() {
+      let downwardIndex = findFirstSiblingDownward(selected);
+      if (downwardIndex === -1) return;
+
+      const selCard = cards[selected];
+      let destCard = cards[downwardIndex];
+      const child = getChildCards(selected);
+      const destChild = getChildCards(downwardIndex);
+
+      // 마지막 아이템은 마지막 것을 끌어올린다.
+      if (
+        downwardIndex === cards.length - 1 ||
+        cards[downwardIndex + 1].parentCardNo !== cards[selected].parentCardNo
+      ) {
+        api
+          .rerankCard(destCard.cardNo, selCard.cardNo)
+          .then((r) => {
+            setCards((p) => {
+              const x = p.slice(0, selected); // 유지할 것
+              x.push(
+                ...p.slice(
+                  selected + child.length + 1,
+                  selected + child.length + 1 + destChild.length + 1
+                )
+              ); // 위로 올라갈 것
+              x.push(...p.slice(selected, selected + child.length + 1)); // 밑으로 내려갈 것
+              x.push(
+                ...p.slice(selected + child.length + 1 + destChild.length + 1)
+              ); // 나머지
+              return x;
+            });
+
+            setSelected((p) => p + destChild.length + 1);
+          })
+          .catch((e) => app.toast(e.message, "error"));
+        return;
+      }
+
+      downwardIndex = findFirstSiblingDownward(downwardIndex);
+      destCard = cards[downwardIndex];
+      api
+        .rerankCard(selCard.cardNo, destCard.cardNo)
+        .then(() => {
+          setCards((p) => {
+            const x = p.slice(0, selected); // 유지할 것
+            x.push(p[downwardIndex - 1]); // 위로 올라갈 것
+            x.push(...p.slice(selected, selected + child.length + 1)); // 밑으로 내려갈 것
+            x.push(...p.slice(downwardIndex)); // 마지막에 유지할 것
+            return x;
+          });
+          setSelected((p) => p + 1);
+        })
+        .catch((e) => app.toast(e.message, "error"));
+    }
+
+    useHotkeys(Key.Enter, () => {
+      if (selected === -1) return;
+      refs.current[selected].edit();
+    });
+
+    const refs = useRef<IInlineEdit[]>([]);
+
+    function handleCardAction(index: number, action: CardAction) {
+      switch (action) {
+        case CardAction.COMPLETE:
+          setCompleted(index, true);
+          break;
+        case CardAction.INPROGRESS:
+          setCompleted(index, false);
+          break;
+        case CardAction.DELETE:
+          deleteCard(index);
+          break;
+        default:
+          app.toast(`unknown action: ${action}`, "error");
       }
     }
 
-    return r;
-  }
+    function setCompleted(index: number, complete: boolean) {
+      const card = cards[index];
+      if (!card) {
+        app.toast(`invalid card`, "error");
+        return;
+      }
 
-  useHotkeys("meta+ctrl+down", moveDown);
-  async function moveDown() {
-    let downwardIndex = findFirstSiblingDownward(selected);
-    if (downwardIndex === -1) return;
-
-    const selCard = cards[selected];
-    let destCard = cards[downwardIndex];
-    const child = getChildCards(selected);
-    const destChild = getChildCards(downwardIndex);
-
-    // 마지막 아이템은 마지막 것을 끌어올린다.
-    if (
-      downwardIndex === cards.length - 1 ||
-      cards[downwardIndex + 1].parentCardNo !== cards[selected].parentCardNo
-    ) {
-      await api
-        .rerankCard(destCard.cardNo, selCard.cardNo)
-        .then((r) => {
-          setCards((p) => {
-            const x = p.slice(0, selected); // 유지할 것
-            x.push(
-              ...p.slice(
-                selected + child.length + 1,
-                selected + child.length + 1 + destChild.length + 1
-              )
-            ); // 위로 올라갈 것
-            x.push(...p.slice(selected, selected + child.length + 1)); // 밑으로 내려갈 것
-            x.push(
-              ...p.slice(selected + child.length + 1 + destChild.length + 1)
-            ); // 나머지
-            return x;
-          });
-
-          setSelected((p) => p + destChild.length + 1);
-        })
-        .catch((e) => app.toast(e.message, "error"));
-      return;
-    }
-
-    downwardIndex = findFirstSiblingDownward(downwardIndex);
-    destCard = cards[downwardIndex];
-    await api
-      .rerankCard(selCard.cardNo, destCard.cardNo)
-      .then(() => {
-        setCards((p) => {
-          const x = p.slice(0, selected); // 유지할 것
-          x.push(p[downwardIndex - 1]); // 위로 올라갈 것
-          x.push(...p.slice(selected, selected + child.length + 1)); // 밑으로 내려갈 것
-          x.push(...p.slice(downwardIndex)); // 마지막에 유지할 것
-          return x;
-        });
-        setSelected((p) => p + 1);
-      })
-      .catch((e: any) => app.toast(e.message, "error"));
-  }
-
-  useHotkeys(Key.Enter, () => {
-    if (selected === -1) return;
-    refs.current[selected].edit();
-  });
-
-  const refs = useRef<IInlineEdit[]>([]);
-
-  function handleCardAction(index: number, action: CardAction) {
-    const card = cards[index];
-
-    switch (action) {
-      case CardAction.COMPLETE:
-        setCompleted(card.cardNo, true);
-        break;
-      case CardAction.INPROGRESS:
-        setCompleted(card.cardNo, false);
-        break;
-      case CardAction.DELETE:
-        deleteCard(card.cardNo);
-        break;
-      default:
-        app.toast(`unknown action: ${action}`, "error");
-    }
-  }
-
-  function setCompleted(cardNo: number, complete: boolean) {
-    if (!cardNo) {
-      app.toast(`invalid cardNo: ${cardNo}`, "error");
-      return;
-    }
-
-    (async () => {
-      await api
-        .completeCard(cardNo, complete)
+      api
+        .completeCard(card.cardNo, complete)
         .then((r) =>
-          setCards((p) => p.map((c) => (c.cardNo === cardNo ? r : c)))
+          setCards((p) => p.map((c) => (c.cardNo === card.cardNo ? r : c)))
         )
+        .then(() => {
+          complete
+            ? app.toast(`completed: ${card.subject}`)
+            : app.toast(`in progress: ${card.subject}`);
+        })
         .catch((e) => app.toast(e.message));
-    })();
-  }
+    }
 
-  const [deletingCard, setDeletingCard] = useState(false);
+    const [deletingCard, setDeletingCard] = useState(false);
 
-  function deleteCard(cardNo: number) {
-    if (deletingCard) return;
+    function deleteCard(index: number) {
+      if (deletingCard) return;
 
-    setDeletingCard(true);
-    console.log(`deleting ${cardNo}`);
+      setDeletingCard(true);
+      const card = cards[index];
 
-    (async () => {
-      await api
-        .deleteCard(cardNo)
-        .then((r) => setCards((p) => p.filter((c) => c.cardNo !== cardNo)))
-        .catch((e) => app.toast(e, "error"))
+      api
+        .deleteCard(card.cardNo)
+        .then(() => setCards((p) => p.filter((c) => c.cardNo !== card.cardNo)))
+        .then(() => app.toast(`card deleted: ${card.subject}`))
+        .catch((e) => app.toast(e.message, "error"))
         .finally(() => setDeletingCard(false));
-    })();
-  }
+    }
 
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <Box
-        component="div"
-        onDoubleClick={() => onDoubleClick && onDoubleClick()}
-      >
-        {cards.map((item, i) => (
-          <CardItem
-            ref={(ref) => (refs.current[i] = ref!)}
-            key={item.cardNo}
-            index={i}
-            card={item}
-            selected={selected === i}
-            showCardNo={showCardNo}
-            onClick={(index) => handleCardClick(index)}
-            onChange={(v) => handleChange(i, v)}
-            onActionClick={handleCardAction}
-            onDragOver={(dragIndex, hoverIndex) =>
-              onDragOver && onDragOver(dragIndex, hoverIndex)
-            }
-            onCanDrop={handleCanDrop}
-            onDragDrop={(dragIndex, dropIndex) =>
-              onDragDrop && onDragDrop(dragIndex, dropIndex)
-            }
-            hasChild={hasChild}
-          />
-        ))}
-      </Box>
-    </DndProvider>
-  );
-}
+    return (
+      <DndProvider backend={HTML5Backend}>
+        <Box
+          component="div"
+          onDoubleClick={() => onDoubleClick && onDoubleClick()}
+        >
+          {cards.map((item, i) => (
+            <CardItem
+              ref={(ref) => (refs.current[i] = ref!)}
+              key={item.cardNo}
+              index={i}
+              card={item}
+              selected={selected === i}
+              showCardNo={showCardNo}
+              onClick={(index) => handleCardClick(index)}
+              onChange={(v) => handleChange(i, v)}
+              onActionClick={handleCardAction}
+              onDragOver={handleDragOver}
+              onCanDrop={handleCanDrop}
+              onDragDrop={handleDragDrop}
+              hasChild={hasChild}
+            />
+          ))}
+        </Box>
+      </DndProvider>
+    );
+  }
+);
 
 interface DragItem {
   index: number;

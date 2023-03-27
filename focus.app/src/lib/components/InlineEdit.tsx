@@ -19,6 +19,7 @@ interface InlineEditProp {
 
 export interface IInlineEdit {
   edit: () => void;
+  scrollIntoView: (options?: ScrollIntoViewOptions) => void;
 }
 
 // Ref: https://www.emgoto.com/react-inline-edit/
@@ -29,13 +30,17 @@ export const InlineEdit = forwardRef(
   ) => {
     useImperativeHandle(ref, () => ({
       edit() {
-        if (!textField.current) return;
+        if (!inputRef.current) return;
         setEditing(true);
-        textField.current.focus();
+        inputRef.current.focus();
+      },
+      scrollIntoView(options?: ScrollIntoViewOptions) {
+        textFieldRef.current && textFieldRef.current.scrollIntoView(options);
       },
     }));
 
-    const textField = useRef<HTMLInputElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const textFieldRef = useRef<HTMLDivElement>(null);
 
     const [prevValue, setPrevValue] = useState(value);
     const [editingValue, setEditingValue] = useState(value);
@@ -49,7 +54,7 @@ export const InlineEdit = forwardRef(
       if (!editing) return;
 
       setPrevValue(editingValue);
-    }, [editing]);
+    }, [editing, editingValue]);
 
     function handleClick() {
       if (!editing) setEditing(true);
@@ -85,7 +90,8 @@ export const InlineEdit = forwardRef(
 
     return (
       <TextField
-        inputRef={textField}
+        ref={textFieldRef}
+        inputRef={inputRef}
         size="small"
         variant="standard"
         value={editingValue}

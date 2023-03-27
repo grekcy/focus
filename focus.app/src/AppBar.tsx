@@ -67,7 +67,7 @@ export function AppBar({ open }: AppBarProps) {
             setQucikAddSubject("");
             return r;
           })
-          .catch((e: any) => app.toast(e.message, "error"))
+          .catch((e) => app.toast(e.message, "error"))
           .finally(() => setAdding(false));
       })();
     }

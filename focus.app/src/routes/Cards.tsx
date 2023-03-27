@@ -15,15 +15,13 @@ export function CardPage() {
 
   useEffect(() => {
     const cardNoAsNumber = parseInt(cardNo!, 10);
-    (async () => {
-      setLoading(true);
-      await api
-        .getCard(cardNoAsNumber)
-        .then((r) => setCard(r))
-        .catch((e) => app.toast(e.message, "error"))
-        .finally(() => setLoading(false));
-    })();
-  }, []);
+    setLoading(true);
+    api
+      .getCard(cardNoAsNumber)
+      .then((r) => setCard(r))
+      .catch((e) => app.toast(e.message, "error"))
+      .finally(() => setLoading(false));
+  }, [app, api, cardNo]);
 
   function renderCard() {
     if (!card) return;

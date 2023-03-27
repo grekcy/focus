@@ -8,10 +8,6 @@ export function ChallengePage() {
     cardBarRef.current && cardBarRef.current.toggle();
   }
 
-  function onCardDoubleClick(cardNo: number) {
-    cardBarRef.current && cardBarRef.current.setCardNo(cardNo);
-  }
-
   return (
     <>
       <Box display="flex">

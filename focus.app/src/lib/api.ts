@@ -28,15 +28,15 @@ export class FocusAPI {
     this.listeners = {};
   }
 
-  version = async () => {
-    return await this.s.version(new Empty(), null).then((r) => r.toObject());
+  version = () => {
+    return this.s.version(new Empty(), null).then((r) => r.toObject());
   };
 
-  quickAddCard = async (subject: string) => {
+  quickAddCard = (subject: string) => {
     const s = new StringValue();
     s.setValue(subject);
 
-    return await this.s
+    return this.s
       .quickAddCard(s, null)
       .then((r) => r.toObject())
       .then((r) => {
@@ -45,30 +45,29 @@ export class FocusAPI {
       });
   };
 
-  listCards = async (excludeCompleted = true, excludeChallenges = true) => {
+  listCards = (excludeCompleted = true, excludeChallenges = true) => {
     const req = new ListCardReq();
     req.setExcludeCompleted(excludeCompleted);
     req.setExcludeChallenges(excludeChallenges);
-    return await this.s
+    return this.s
       .listCards(req, null)
       .then((r) => r.toObject())
       .then((r) => r.itemsList);
   };
 
-  getCard = async (cardNo: number) => {
-    const resp = await this.getCards(cardNo);
-    return resp[cardNo];
+  getCard = (cardNo: number) => {
+    return this.getCards(cardNo).then((r) => r[cardNo]);
   };
 
-  getCards = async (...cardNo: number[]) => {
+  getCards = (...cardNo: number[]) => {
     const req = new GetCardReq();
     req.setCardNosList(cardNo);
-    return await this.s
+    return this.s
       .getCards(req, null)
       .then((r) => Object.fromEntries(r.toObject().itemsMap));
   };
 
-  completeCard = async (cardNo: number, complete: boolean) => {
+  completeCard = (cardNo: number, complete: boolean) => {
     const card = new Card();
     card.setCardNo(cardNo);
     if (complete) card.setCompletedAt(Timestamp.fromDate(new Date()));
@@ -78,34 +77,34 @@ export class FocusAPI {
     req.addFields(CardField.COMPLETED_AT);
     req.setCard(card);
 
-    return await this.s.patchCard(req, null).then((r) => r.toObject());
+    return this.s.patchCard(req, null).then((r) => r.toObject());
   };
 
-  updateCardSubject = async (cardNo: number, subject: string) => {
+  updateCardSubject = (cardNo: number, subject: string) => {
     const card = new Card();
     card.setCardNo(cardNo);
     card.setSubject(subject);
 
-    return await this.patchCard(card.toObject(), CardField.SUBJECT);
+    return this.patchCard(card.toObject(), CardField.SUBJECT);
   };
 
-  updateCardContent = async (cardNo: number, content: string) => {
+  updateCardContent = (cardNo: number, content: string) => {
     const card = new Card();
     card.setCardNo(cardNo);
     card.setContent(content);
 
-    return await this.patchCard(card.toObject(), CardField.CONTENT);
+    return this.patchCard(card.toObject(), CardField.CONTENT);
   };
 
-  setParentCard = async (cardNo: number, parent: number) => {
+  setParentCard = (cardNo: number, parent: number) => {
     const card = new Card();
     card.setCardNo(cardNo);
     card.setParentCardNo(parent);
 
-    return await this.patchCard(card.toObject(), CardField.PARENT);
+    return this.patchCard(card.toObject(), CardField.PARENT);
   };
 
-  patchCard = async (card: Card.AsObject, ...fields: CardField[]) => {
+  patchCard = (card: Card.AsObject, ...fields: CardField[]) => {
     const req = new PatchCardReq();
     const c = new Card();
     c.setCardNo(card.cardNo);
@@ -129,23 +128,23 @@ export class FocusAPI {
     req.setCard(c);
     req.setFieldsList(fields);
 
-    return await this.s.patchCard(req, null).then((r) => {
+    return this.s.patchCard(req, null).then((r) => {
       this.notify(r, "card.updated", card.cardNo);
       return r;
     });
   };
 
-  rerankCard = async (cardNo: number, targetCardNo: number) => {
+  rerankCard = (cardNo: number, targetCardNo: number) => {
     const req = new RankCardReq();
     req.setCardNo(cardNo);
     req.setTargetCardNo(targetCardNo);
-    return await this.s.rerankCard(req, null);
+    return this.s.rerankCard(req, null);
   };
 
-  deleteCard = async (cardNo: number) => {
+  deleteCard = (cardNo: number) => {
     const no = new UInt64Value();
     no.setValue(cardNo);
-    await this.s.deleteCard(no, null);
+    return this.s.deleteCard(no, null);
   };
 
   addEventListener = (event: Event, handler: EventListener) => {

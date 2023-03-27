@@ -46,6 +46,7 @@ function App() {
               <AppBar open={openSideBar} />
               <SideBar open={openSideBar} />
               <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+                {/* FIXME 여기에 이렇게 DrawerHeader를 두는건 좀... */}
                 <DrawerHeader />
                 <Routes>
                   <Route

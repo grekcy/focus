@@ -46,13 +46,11 @@ export const CardBar = forwardRef(
         return;
       }
 
-      (async () => {
-        await api
-          .getCard(cardNo)
-          .then((r) => setCard(r))
-          .catch((e) => app.toast(e.message, "error"));
-      })();
-    }, [cardNo]);
+      api
+        .getCard(cardNo)
+        .then((r) => setCard(r))
+        .catch((e) => app.toast(e.message, "error"));
+    }, [api, app, cardNo]);
 
     function handleSubjectChanged(subject: string) {
       if (!card) return;
@@ -62,10 +60,10 @@ export const CardBar = forwardRef(
         .catch((e) => app.toast(e.message, "error"));
     }
 
-    async function handleDescriptionChanged(content: string) {
+    function handleDescriptionChanged(content: string) {
       if (!card) return;
 
-      await api
+      api
         .updateCardContent(card.cardNo, content)
         .then(() => (card.content = content))
         .catch((e) => app.toast(e.message, "error"));
