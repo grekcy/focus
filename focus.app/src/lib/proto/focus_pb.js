@@ -1832,7 +1832,8 @@ proto.PatchCardReq.prototype.hasCard = function() {
 proto.CardField = {
   SUBJECT: 0,
   COMPLETED_AT: 1,
-  CONTENT: 2
+  CONTENT: 2,
+  PARENT: 3
 };
 
 goog.object.extend(exports, proto);

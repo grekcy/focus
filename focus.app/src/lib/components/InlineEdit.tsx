@@ -58,8 +58,6 @@ export const InlineEdit = forwardRef(
     function handleBlur(e: FocusEvent) {
       setEditing(false);
       if (prevValue !== editingValue && onSubmit) {
-        console.log(`submit: ${prevValue}`);
-        console.log(`submit: ${editingValue}`);
         onSubmit(e.currentTarget, editingValue);
       }
     }
@@ -77,7 +75,6 @@ export const InlineEdit = forwardRef(
           }, 0);
           break;
         case "Escape":
-          console.log(`revert to previous: ${prevValue}`);
           setEditingValue(prevValue);
           setTimeout(() => {
             (e.nativeEvent.target! as HTMLInputElement).blur();

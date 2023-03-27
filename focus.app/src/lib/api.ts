@@ -97,6 +97,14 @@ export class FocusAPI {
     return await this.patchCard(card.toObject(), CardField.CONTENT);
   };
 
+  setParentCard = async (cardNo: number, parent: number) => {
+    const card = new Card();
+    card.setCardNo(cardNo);
+    card.setParentCardNo(parent);
+
+    return await this.patchCard(card.toObject(), CardField.PARENT);
+  };
+
   patchCard = async (card: Card.AsObject, ...fields: CardField[]) => {
     const req = new PatchCardReq();
     const c = new Card();
@@ -108,6 +116,11 @@ export class FocusAPI {
           break;
         case CardField.CONTENT:
           c.setContent(card.content);
+          break;
+        case CardField.PARENT:
+          card.parentCardNo
+            ? c.setParentCardNo(card.parentCardNo)
+            : c.clearParentCardNo();
           break;
         default:
           throw new Error(`not supported: ${field.toString()}`);

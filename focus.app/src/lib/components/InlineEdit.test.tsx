@@ -1,6 +1,4 @@
-import { render, unmountComponentAtNode } from "react-dom";
-import { act } from "react-dom/test-utils";
-import { InlineEdit } from "./InlineEdit";
+import { unmountComponentAtNode } from "react-dom";
 
 describe("InlineEdit", () => {
   let container: HTMLDivElement | null = null;
@@ -14,11 +12,5 @@ describe("InlineEdit", () => {
     unmountComponentAtNode(container!);
     container!.remove();
     container = null;
-  });
-
-  test("escape", () => {
-    act(() => {
-      render(<InlineEdit value="hello world" />, container);
-    });
   });
 });

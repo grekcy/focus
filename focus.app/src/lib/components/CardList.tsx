@@ -6,7 +6,6 @@ import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import TripOriginIcon from "@mui/icons-material/TripOrigin";
 import { Box, IconButton } from "@mui/material";
 import type { Identifier, XYCoord } from "dnd-core";
-import update from "immutability-helper";
 import { Ref, forwardRef, useEffect, useRef, useState } from "react";
 import {
   DndProvider,
@@ -16,9 +15,10 @@ import {
   useDrop,
 } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useHotkeys } from "react-hotkeys-hook";
 import { Link } from "react-router-dom";
 import { Key } from "ts-key-enum";
-import { useFocusApp } from "../../FocusProvider";
+import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { Card } from "../proto/focus_pb";
 import { EmptyIcon } from "./Icons";
 import { IInlineEdit, InlineEdit } from "./InlineEdit";
@@ -36,7 +36,6 @@ interface CardListViewProp {
   onDoubleClick?: () => void;
   onSelect?: (index: number) => void;
   onChange?: (index: number, value: string) => void;
-  onActionClick?: (index: number, action: CardAction) => void;
   onDragOver?: (dragIndex: number, hoverIndex: number) => void;
   onDragDrop?: (dragIndex: number, dropIndex: number) => void;
 }
@@ -47,10 +46,12 @@ export function CardListView({
   onDoubleClick,
   onSelect,
   onChange,
-  onActionClick,
   onDragOver,
   onDragDrop,
 }: CardListViewProp) {
+  const app = useFocusApp();
+  const api = useFocusClient();
+
   const [cards, setCards] = useState(items);
   useEffect(() => {
     setCards(items);
@@ -58,6 +59,23 @@ export function CardListView({
 
   function hasChild(cardNo: number): boolean {
     return cards.findIndex((item) => item.parentCardNo === cardNo) !== -1;
+  }
+
+  function getChildCards(index: number): number[] {
+    const r: number[] = [];
+    cards.forEach((c, i) => isParent(index, i) && r.push(i));
+    return r;
+  }
+
+  // return true if items[i] is parent of items[j]
+  function isParent(i: number, j: number): boolean {
+    if (cards[i].cardNo === cards[j].parentCardNo) return true;
+
+    if (cards[j].parentCardNo === 0) return false;
+    const p = cards.findIndex((c) => c.cardNo === cards[j].parentCardNo);
+    if (p === -1) return false;
+
+    return isParent(i, p);
   }
 
   function handleChange(index: number, subject: string) {
@@ -75,15 +93,280 @@ export function CardListView({
     return !isParent(dragIndex, hoverIndex);
   }
 
-  // return true if items[i] is parent of items[j]
-  function isParent(i: number, j: number): boolean {
-    if (items[i].cardNo === items[j].parentCardNo) return true;
+  useHotkeys(Key.ArrowUp, () => {
+    if (selected === 0 || selected === -1) return;
+    setSelected((p) => p - 1);
+  });
 
-    if (items[j].parentCardNo === 0) return false;
-    const p = cards.findIndex((c) => c.cardNo === items[j].parentCardNo);
-    if (p === -1) return false;
+  useHotkeys(Key.ArrowDown, () => {
+    if (selected === cards.length - 1) return;
+    setSelected((p) => p + 1);
+  });
 
-    return isParent(i, p);
+  // TODO parent를 변경하면 이슈가 있음..
+  // parent를 변경 -> card.updated event가 발생
+  // -> 해당 카드를 가져옴 -> Inbox에서 데이터 변경
+  // -> Cards가 변경됨...
+  // 이런 경로를 거쳐서 다시 데이터가 변경되는 현상이 발생함.
+  useHotkeys("meta+ctrl+right, meta+ctrl+]", moveRight);
+  async function moveRight() {
+    const upward = findFirstSiblingUpward(selected);
+    if (upward === -1) return;
+
+    await api
+      .setParentCard(cards[selected].cardNo, cards[upward].cardNo)
+      .then(() => {
+        cards[selected].depth = cards[selected].depth + 1;
+        cards[selected].parentCardNo = cards[upward].cardNo;
+
+        const child = getChildCards(selected);
+        child.forEach((i) => (cards[i].depth = cards[i].depth + 1));
+
+        setCards((p) => {
+          const x = p.slice(0, selected);
+          x.push(...p.slice(selected, selected + child.length + 1));
+          x.push(...p.slice(selected + child.length + 1));
+
+          return x;
+        });
+      })
+      .catch((e) => app.toast(e.message, "error"));
+  }
+
+  useHotkeys("meta+ctrl+left, meta+ctrl+[", moveLeft);
+  async function moveLeft() {
+    if (selected === 0) return;
+    if (cards[selected].depth === 0) return;
+
+    const parent = cards.findIndex(
+      (c) => c.cardNo === cards[selected].parentCardNo
+    );
+
+    const child = getChildCards(selected);
+
+    // parent의 next sibling으로 rank 조정
+    const nextSibling = findFirstSiblingDownward(parent);
+    console.log(nextSibling);
+    if (nextSibling === -1) {
+      // parent의 nextSilbing이 없으면 parent의 마지막 아이템으로 변경
+      await api
+        .setParentCard(cards[selected].cardNo, cards[parent].parentCardNo!)
+        .then((r) => {
+          const siblings = getChildCards(parent);
+          setCards((p) => {
+            cards[selected].parentCardNo = cards[parent].parentCardNo;
+            cards[selected].depth = cards[selected].depth - 1;
+            child.forEach((c) => (cards[c].depth = cards[c].depth - 1));
+
+            const x = cards.slice(0, selected); // 기존 것
+            x.push(
+              ...p.slice(
+                selected + child.length + 1,
+                selected + siblings.length - child.length
+              )
+            ); // 위로 이동
+            x.push(...p.slice(selected, selected + child.length + 1)); // 아래로 이동
+            x.push(...p.slice(selected + siblings.length)); // 나머지
+
+            setSelected((p) => parent + siblings.length - child.length);
+            return x;
+          });
+        })
+        .catch((e) => app.toast(e.message, "error"));
+      return;
+    }
+
+    await api
+      .rerankCard(cards[selected].cardNo, cards[nextSibling].cardNo)
+      .then((r) => {
+        const siblings = findSiblings(selected);
+
+        cards[selected].parentCardNo = cards[nextSibling].parentCardNo;
+        cards[selected].depth = cards[selected].depth - 1;
+        child.forEach((c) => (cards[c].depth = cards[c].depth - 1));
+
+        setCards((p) => {
+          const x = p.slice(0, selected); // 유지될 것d
+          x.push(
+            ...p.slice(
+              selected + child.length + 1,
+              selected + child.length + siblings.length + 1
+            )
+          ); // 위로 올라갈 것: child + siblings
+          x.push(...p.slice(selected, selected + child.length + 1)); // 내려갈 것
+          x.push(...p.slice(selected + child.length + siblings.length + 1)); // 나머지 유지할 것
+
+          return x;
+        });
+        setSelected((p) => p + siblings.length);
+      })
+      .catch((e) => app.toast(e.message, "error"));
+  }
+
+  function findFirstSiblingUpward(index: number): number {
+    for (let i = index - 1; i > -1; i--) {
+      if (cards[index].parentCardNo === cards[i].parentCardNo) return i;
+    }
+
+    return -1;
+  }
+
+  useHotkeys("meta+ctrl+up", moveUp);
+  async function moveUp() {
+    const upwardIndex = findFirstSiblingUpward(selected);
+    if (upwardIndex === -1) return;
+
+    const selCard = cards[selected];
+    const destCard = cards[upwardIndex];
+    const child = getChildCards(selected);
+
+    await api
+      .rerankCard(selCard.cardNo, destCard.cardNo)
+      .then(() => {
+        setCards((p) => {
+          const x = p.slice(0, upwardIndex); // 유지할 것
+          x.push(...p.slice(selected, selected + child.length + 1)); // 위로 올라갈 것
+          x.push(...p.slice(upwardIndex, selected)); // 밑으로 내려갈 것
+          x.push(...p.slice(selected + child.length + 1)); // 나머지 유지할 것
+          return x;
+        });
+        setSelected((p) => upwardIndex);
+      })
+      .catch((e: any) => app.toast(e.message, "error"));
+  }
+
+  function findFirstSiblingDownward(index: number): number {
+    for (let i = index + 1; i < cards.length; i++) {
+      if (cards[index].parentCardNo === cards[i].parentCardNo) return i;
+    }
+
+    return -1;
+  }
+
+  function findSiblings(index: number): number[] {
+    const r: number[] = [];
+    for (let i = index + 1; i < cards.length; i++) {
+      if (cards[index].parentCardNo === cards[i].parentCardNo) {
+        r.push(i);
+        r.push(...getChildCards(i));
+      }
+    }
+
+    return r;
+  }
+
+  useHotkeys("meta+ctrl+down", moveDown);
+  async function moveDown() {
+    let downwardIndex = findFirstSiblingDownward(selected);
+    if (downwardIndex === -1) return;
+
+    const selCard = cards[selected];
+    let destCard = cards[downwardIndex];
+    const child = getChildCards(selected);
+    const destChild = getChildCards(downwardIndex);
+
+    // 마지막 아이템은 마지막 것을 끌어올린다.
+    if (
+      downwardIndex === cards.length - 1 ||
+      cards[downwardIndex + 1].parentCardNo !== cards[selected].parentCardNo
+    ) {
+      await api
+        .rerankCard(destCard.cardNo, selCard.cardNo)
+        .then((r) => {
+          setCards((p) => {
+            const x = p.slice(0, selected); // 유지할 것
+            x.push(
+              ...p.slice(
+                selected + child.length + 1,
+                selected + child.length + 1 + destChild.length + 1
+              )
+            ); // 위로 올라갈 것
+            x.push(...p.slice(selected, selected + child.length + 1)); // 밑으로 내려갈 것
+            x.push(
+              ...p.slice(selected + child.length + 1 + destChild.length + 1)
+            ); // 나머지
+            return x;
+          });
+
+          setSelected((p) => p + destChild.length + 1);
+        })
+        .catch((e) => app.toast(e.message, "error"));
+      return;
+    }
+
+    downwardIndex = findFirstSiblingDownward(downwardIndex);
+    destCard = cards[downwardIndex];
+    await api
+      .rerankCard(selCard.cardNo, destCard.cardNo)
+      .then(() => {
+        setCards((p) => {
+          const x = p.slice(0, selected); // 유지할 것
+          x.push(p[downwardIndex - 1]); // 위로 올라갈 것
+          x.push(...p.slice(selected, selected + child.length + 1)); // 밑으로 내려갈 것
+          x.push(...p.slice(downwardIndex)); // 마지막에 유지할 것
+          return x;
+        });
+        setSelected((p) => p + 1);
+      })
+      .catch((e: any) => app.toast(e.message, "error"));
+  }
+
+  useHotkeys(Key.Enter, () => {
+    if (selected === -1) return;
+    refs.current[selected].edit();
+  });
+
+  const refs = useRef<IInlineEdit[]>([]);
+
+  function handleCardAction(index: number, action: CardAction) {
+    const card = cards[index];
+
+    switch (action) {
+      case CardAction.COMPLETE:
+        setCompleted(card.cardNo, true);
+        break;
+      case CardAction.INPROGRESS:
+        setCompleted(card.cardNo, false);
+        break;
+      case CardAction.DELETE:
+        deleteCard(card.cardNo);
+        break;
+      default:
+        app.toast(`unknown action: ${action}`, "error");
+    }
+  }
+
+  function setCompleted(cardNo: number, complete: boolean) {
+    if (!cardNo) {
+      app.toast(`invalid cardNo: ${cardNo}`, "error");
+      return;
+    }
+
+    (async () => {
+      await api
+        .completeCard(cardNo, complete)
+        .then((r) =>
+          setCards((p) => p.map((c) => (c.cardNo === cardNo ? r : c)))
+        )
+        .catch((e) => app.toast(e.message));
+    })();
+  }
+
+  const [deletingCard, setDeletingCard] = useState(false);
+
+  function deleteCard(cardNo: number) {
+    if (deletingCard) return;
+
+    setDeletingCard(true);
+    console.log(`deleting ${cardNo}`);
+
+    (async () => {
+      await api
+        .deleteCard(cardNo)
+        .then((r) => setCards((p) => p.filter((c) => c.cardNo !== cardNo)))
+        .catch((e) => app.toast(e, "error"))
+        .finally(() => setDeletingCard(false));
+    })();
   }
 
   return (
@@ -102,7 +385,7 @@ export function CardListView({
             showCardNo={showCardNo}
             onClick={(index) => handleCardClick(index)}
             onChange={(v) => handleChange(i, v)}
-            onActionClick={onActionClick}
+            onActionClick={handleCardAction}
             onDragOver={(dragIndex, hoverIndex) =>
               onDragOver && onDragOver(dragIndex, hoverIndex)
             }
@@ -277,7 +560,10 @@ const CardItem = forwardRef(
         {card.depth > 0 && (
           <Box sx={{ flexGrow: 0, width: card.depth * 20 }}></Box>
         )}
-        <IconButton size="small" onClick={() => app.toast("not implemented")}>
+        <IconButton
+          size="small"
+          onClick={() => app.toast("collapse: not implemented", "warning")}
+        >
           {hasChild && hasChild(card.cardNo) ? (
             <ArrowDropDownIcon fontSize="small" />
           ) : (
@@ -291,6 +577,7 @@ const CardItem = forwardRef(
             </Box>
           </>
         )}
+        {/* {card.parentCardNo}&nbsp; */}
         <Box sx={{ flexGrow: 1 }}>
           <InlineEdit
             ref={ref}

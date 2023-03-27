@@ -83,7 +83,6 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 			return status.Errorf(codes.Internal, "fail to get rank")
 		}
 
-		log.Debugf("@@@@ create card: %+v", newCard.Card)
 		if tx := s.db.Save(newCard.Card); tx.Error != nil {
 			return status.Errorf(codes.Internal, "fail to save card")
 		}
@@ -97,7 +96,7 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 }
 
 func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCardReq) (*emptypb.Empty, error) {
-	log.Debugf("rerankCard: card=%v, target=%v", req.CardNo, req.TargetCardNo)
+	log.Debugf("RerankCard(): card=%v, target=%v", req.CardNo, req.TargetCardNo)
 
 	card, err := s.getCard(ctx, uint(req.CardNo))
 	if err != nil {
@@ -226,6 +225,8 @@ func cardToProto(in *CardWithDepth) *proto.Card {
 }
 
 func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCardReq) (*proto.ListCardResp, error) {
+	log.Debugf("ListCards(), req=%+v", req)
+
 	r, err := s.listCards(ctx, nil, ListOpt{excludeCompleted: req.ExcludeCompleted})
 	if err != nil {
 		return nil, err
@@ -267,8 +268,6 @@ SELECT * FROM cte
 ORDER BY ordercol
 */
 func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card, opt ListOpt) ([]*CardWithDepth, error) {
-	log.Debugf("listCards(): where=%+v", where)
-
 	// non recursive query는 시작할 카드를 지정함
 	nonRecursiveQuery := s.db.ToSQL(func(tx *gorm.DB) *gorm.DB {
 		tx = tx.Model(&models.Card{}).
@@ -331,6 +330,8 @@ SEARCH DEPTH FIRST BY rank SET ordercol
 }
 
 func (s *v1alpha1ServiceImpl) GetCard(ctx context.Context, cardNo *wrapperspb.UInt64Value) (*proto.Card, error) {
+	log.Debugf("GetCard(): card=%v", cardNo.Value)
+
 	if err := validate.Struct(&struct {
 		CardNo uint64 `validate:"required"`
 	}{
@@ -394,6 +395,8 @@ func (s *v1alpha1ServiceImpl) getCard(ctx context.Context, cardNo uint) (*CardWi
 }
 
 func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCardReq) (*proto.Card, error) {
+	log.Debugf("PatchCard: req=%+v", req)
+
 	card, err := s.getCard(ctx, uint(req.Card.CardNo))
 	if err != nil {
 		return nil, err
@@ -418,6 +421,26 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 				}
 				updates["completed_at"] = req.Card.CompletedAt.AsTime()
 			}
+		case proto.CardField_PARENT:
+			tx := s.db
+			if req.Card.ParentCardNo == nil {
+				updates["parent_card_no"] = gorm.Expr("NULL")
+				tx = tx.Where("parent_card_no IS NULL")
+			} else {
+				updates["parent_card_no"] = req.Card.ParentCardNo
+				tx = tx.Where("parent_card_no = ?", req.Card.ParentCardNo)
+			}
+
+			// get new rank
+			rank := uint(0)
+			if err := tx.Model(&models.Card{}).Unscoped().
+				Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
+				Select("COALESCE(MAX(rank), 0, MAX(rank)) + 1").Row().Scan(&rank); err != nil {
+				return nil, status.Errorf(codes.Internal, "fail to get new rank")
+			}
+			log.Debugf("new rank: %v", rank)
+			updates["rank"] = rank
+
 		default:
 			log.Warnf("unknown field: %v", field)
 		}

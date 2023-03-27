@@ -3,7 +3,7 @@ import update from "immutability-helper";
 import { useEffect, useRef, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
-import { CardAction, CardListView } from "../lib/components/CardList";
+import { CardListView } from "../lib/components/CardList";
 import { Card } from "../lib/proto/focus_pb";
 
 export function InboxPage() {
@@ -23,6 +23,9 @@ export function InboxPage() {
     const handler2 = api.addEventListener(
       "card.updated",
       async (cardNo: number) => {
+        // FIXME 여기서 업데이트하면 Inbox.card가 업데이트 되면서
+        // CardView의 state를 망가트림.. 일단 제거함
+        return;
         await api
           .getCard(cardNo)
           .then((r) =>
@@ -48,39 +51,6 @@ export function InboxPage() {
     })();
   }, []);
 
-  function setCompleted(cardNo: number, complete: boolean) {
-    if (!cardNo) {
-      app.toast(`invalid cardNo: ${cardNo}`, "error");
-      return;
-    }
-
-    (async () => {
-      await api
-        .completeCard(cardNo, complete)
-        .then((r) =>
-          setCards((p) => p.map((c) => (c.cardNo === cardNo ? r : c)))
-        )
-        .catch((e) => app.toast(e.message));
-    })();
-  }
-
-  const [deletingCard, setDeletingCard] = useState(false);
-
-  function deleteCard(cardNo: number) {
-    if (deletingCard) return;
-
-    setDeletingCard(true);
-    console.log(`deleting ${cardNo}`);
-
-    (async () => {
-      await api
-        .deleteCard(cardNo)
-        .then((r) => setCards((p) => p.filter((c) => c.cardNo !== cardNo)))
-        .catch((e) => app.toast(e, "error"))
-        .finally(() => setDeletingCard(false));
-    })();
-  }
-
   function handleCardChange(index: number, subject: string) {
     (async () => {
       const card = cards[index];
@@ -95,23 +65,6 @@ export function InboxPage() {
         })
         .catch((e) => app.toast(e.message, "error"));
     })();
-  }
-
-  function handleCardAction(index: number, action: CardAction) {
-    const card = cards[index];
-    switch (action) {
-      case CardAction.COMPLETE:
-        setCompleted(card.cardNo, true);
-        break;
-      case CardAction.INPROGRESS:
-        setCompleted(card.cardNo, false);
-        break;
-      case CardAction.DELETE:
-        deleteCard(card.cardNo);
-        break;
-      default:
-        app.toast(`unknown action: ${action}`, "error");
-    }
   }
 
   const cardBarRef = useRef<ICardBar>(null);
@@ -190,7 +143,7 @@ export function InboxPage() {
       const depthBegin = destCard.depth;
 
       // child depth 조정
-      travel(dragStartCard!.cardNo, (depth: number, card: Card.AsObject) => {
+      walk(dragStartCard!.cardNo, (depth: number, card: Card.AsObject) => {
         card.depth = depthBegin + depth;
       });
 
@@ -203,20 +156,20 @@ export function InboxPage() {
       .catch((e) => app.toast(e.message, "error"));
   }
 
-  function travel(
+  function walk(
     cardNo: number,
     callback: (depth: number, card: Card.AsObject) => void
   ) {
-    function travel_(depth: number, cardNo: number) {
+    function walk_(depth: number, cardNo: number) {
       cards
         .filter((c) => c.parentCardNo === cardNo)
         .forEach((c) => {
           callback(depth, c);
-          travel_(depth + 1, c.cardNo);
+          walk_(depth + 1, c.cardNo);
         });
     }
 
-    travel_(1, cardNo);
+    walk_(1, cardNo);
   }
 
   return (
@@ -237,7 +190,6 @@ export function InboxPage() {
           cardBarRef.current.setCardNo(cards[index].cardNo)
         }
         onChange={handleCardChange}
-        onActionClick={handleCardAction}
         onDragOver={onDragOver}
         onDragDrop={onDragDrop}
       />

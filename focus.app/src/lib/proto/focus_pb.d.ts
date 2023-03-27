@@ -231,4 +231,5 @@ export enum CardField {
   SUBJECT = 0,
   COMPLETED_AT = 1,
   CONTENT = 2,
+  PARENT = 3,
 }
