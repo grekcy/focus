@@ -3,6 +3,7 @@ package models
 import (
 	"time"
 
+	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -55,10 +56,19 @@ type Card struct {
 
 	Creator   *User      `gorm:"foreignKey:CreatorID"`
 	Workspace *Workspace `gorm:"foreignKey:WorkspaceID"`
-	Laebels   []*Labels  `gorm:"many2many:card_labels"`
+
+	//
+	// alter table cards add labels bigint[];
+	// create index idx_cards_labels ON cards using gin(labels)
+	// LIMIT: 각 element에 대한 fk는 되지 않음
+	//
+	// update cards set labels = '{1,4,6}' where card_no = 5;
+	// SELECT card_no, subject, labels FROM cards WHERE ARRAY[1,6]::bigint[] <@ labels
+	//
+	Labels pq.Int64Array `gorm:"type:bigint[];index:,type:gin"`
 }
 
-type Labels struct {
+type Label struct {
 	*gorm.Model
 
 	WorkspaceID uint   `gorm:"not null"`
