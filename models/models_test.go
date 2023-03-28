@@ -7,7 +7,7 @@ import (
 	"github.com/whitekid/gormx"
 )
 
-func TestModel(t *testing.T) {
+func TestMigrate(t *testing.T) {
 	db, err := gormx.Open("pgsql://focus:focus-pass@localhost/focus_dev")
 	require.NoError(t, err)
 
