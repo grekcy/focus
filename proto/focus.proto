@@ -22,6 +22,8 @@ service V1Alpha1 {
 
   rpc listLabels(google.protobuf.Empty) returns (ListLabelsResp) {}
   rpc updateLabel(Label) returns (Label) {}
+  rpc deleteLabel(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {
+  }
 }
 
 message User {

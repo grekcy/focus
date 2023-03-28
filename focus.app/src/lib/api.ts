@@ -9,6 +9,7 @@ import {
   Card,
   CardField,
   GetCardReq,
+  Label,
   ListCardReq,
   PatchCardReq,
   RankCardReq,
@@ -176,6 +177,21 @@ export class FocusAPI {
     return this.s
       .listLabels(new Empty(), null)
       .then((r) => r.toObject().labelsList);
+  };
+
+  updateLabel = (label: Label.AsObject) => {
+    const req = new Label();
+    req.setId(label.id);
+    req.setLabel(label.label);
+    req.setDescription(label.description);
+    req.setColor(label.color);
+    return this.s.updateLabel(req, null).then((r) => r.toObject());
+  };
+
+  deleteLabel = (id: number) => {
+    const req = new UInt64Value();
+    req.setValue(id);
+    return this.s.deleteLabel(req, null).then((r) => r.toObject());
   };
 }
 

@@ -32,6 +32,7 @@ const (
 	V1Alpha1_DeleteCard_FullMethodName   = "/V1Alpha1/deleteCard"
 	V1Alpha1_ListLabels_FullMethodName   = "/V1Alpha1/listLabels"
 	V1Alpha1_UpdateLabel_FullMethodName  = "/V1Alpha1/updateLabel"
+	V1Alpha1_DeleteLabel_FullMethodName  = "/V1Alpha1/deleteLabel"
 )
 
 // V1Alpha1Client is the client API for V1Alpha1 service.
@@ -49,6 +50,7 @@ type V1Alpha1Client interface {
 	DeleteCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListLabels(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListLabelsResp, error)
 	UpdateLabel(ctx context.Context, in *Label, opts ...grpc.CallOption) (*Label, error)
+	DeleteLabel(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type v1Alpha1Client struct {
@@ -158,6 +160,15 @@ func (c *v1Alpha1Client) UpdateLabel(ctx context.Context, in *Label, opts ...grp
 	return out, nil
 }
 
+func (c *v1Alpha1Client) DeleteLabel(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, V1Alpha1_DeleteLabel_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // V1Alpha1Server is the server API for V1Alpha1 service.
 // All implementations must embed UnimplementedV1Alpha1Server
 // for forward compatibility
@@ -173,6 +184,7 @@ type V1Alpha1Server interface {
 	DeleteCard(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error)
 	ListLabels(context.Context, *emptypb.Empty) (*ListLabelsResp, error)
 	UpdateLabel(context.Context, *Label) (*Label, error)
+	DeleteLabel(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error)
 	mustEmbedUnimplementedV1Alpha1Server()
 }
 
@@ -212,6 +224,9 @@ func (UnimplementedV1Alpha1Server) ListLabels(context.Context, *emptypb.Empty) (
 }
 func (UnimplementedV1Alpha1Server) UpdateLabel(context.Context, *Label) (*Label, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateLabel not implemented")
+}
+func (UnimplementedV1Alpha1Server) DeleteLabel(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteLabel not implemented")
 }
 func (UnimplementedV1Alpha1Server) mustEmbedUnimplementedV1Alpha1Server() {}
 
@@ -424,6 +439,24 @@ func _V1Alpha1_UpdateLabel_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _V1Alpha1_DeleteLabel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(wrapperspb.UInt64Value)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(V1Alpha1Server).DeleteLabel(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: V1Alpha1_DeleteLabel_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(V1Alpha1Server).DeleteLabel(ctx, req.(*wrapperspb.UInt64Value))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // V1Alpha1_ServiceDesc is the grpc.ServiceDesc for V1Alpha1 service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -474,6 +507,10 @@ var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "updateLabel",
 			Handler:    _V1Alpha1_UpdateLabel_Handler,
+		},
+		{
+			MethodName: "deleteLabel",
+			Handler:    _V1Alpha1_DeleteLabel_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

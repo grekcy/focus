@@ -35,7 +35,7 @@ export function LabelsPage() {
     })();
   }, []);
 
-  const colors = [
+  const colors: string[] = [
     "primary.light",
     "secondary.light",
     "error.light",
@@ -56,7 +56,9 @@ export function LabelsPage() {
     "success.dark",
   ];
 
-  const textColors: { [key: string]: string } = {};
+  const textColors: { [key: string]: string } = {
+    "": "black",
+  };
 
   const [editingItem, setEditingItem] = useState<{ [key: number]: boolean }>(
     {}
@@ -84,6 +86,37 @@ export function LabelsPage() {
     x.description = e.currentTarget.value;
 
     setLabels((p) => p.slice());
+  }
+
+  function handleOkClick(index: number) {
+    const label = labels[index];
+    api
+      .updateLabel(label)
+      .then((r) => {
+        setLabels((p) =>
+          update(p, {
+            $splice: [
+              [index, 1],
+              [index, 0, r],
+            ],
+          })
+        );
+        setEditingItem((p) => update(p, { [index]: { $set: false } }));
+      })
+      .catch((e) => app.toast(e.message, "error"));
+  }
+
+  function handleDeleteClick(index: number) {
+    if (!window.confirm(`delete label? ${labels[index].label}`)) return;
+
+    api
+      .deleteLabel(labels[index].id)
+      .then(() => {
+        setLabels((p) => update(p, { $splice: [[index, 1]] }));
+        setEditingItem((p) => update(p, { [index]: { $set: false } }));
+        setDeletingItem(index);
+      })
+      .catch((e) => app.toast(e.message, "error"));
   }
 
   return (
@@ -142,14 +175,7 @@ export function LabelsPage() {
                     >
                       <EditIcon />
                     </IconButton>
-                    <IconButton
-                      onClick={() => {
-                        setEditingItem((p) =>
-                          update(p, { [i]: { $set: false } })
-                        );
-                        setDeletingItem(i);
-                      }}
-                    >
+                    <IconButton onClick={() => handleDeleteClick(i)}>
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
@@ -202,15 +228,7 @@ export function LabelsPage() {
                     </Stack>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      onClick={() =>
-                        setEditingItem((p) =>
-                          update(p, { [i]: { $set: false } })
-                        )
-                      }
-                    >
-                      OK
-                    </Button>
+                    <Button onClick={() => handleOkClick(i)}>OK</Button>
                     <Button
                       onClick={() => {
                         const x = labels[i];

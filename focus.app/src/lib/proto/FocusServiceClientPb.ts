@@ -514,5 +514,48 @@ export class V1Alpha1Client {
     this.methodDescriptorupdateLabel);
   }
 
+  methodDescriptordeleteLabel = new grpcWeb.MethodDescriptor(
+    '/V1Alpha1/deleteLabel',
+    grpcWeb.MethodType.UNARY,
+    google_protobuf_wrappers_pb.UInt64Value,
+    google_protobuf_empty_pb.Empty,
+    (request: google_protobuf_wrappers_pb.UInt64Value) => {
+      return request.serializeBinary();
+    },
+    google_protobuf_empty_pb.Empty.deserializeBinary
+  );
+
+  deleteLabel(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null): Promise<google_protobuf_empty_pb.Empty>;
+
+  deleteLabel(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  deleteLabel(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/V1Alpha1/deleteLabel',
+        request,
+        metadata || {},
+        this.methodDescriptordeleteLabel,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/V1Alpha1/deleteLabel',
+    request,
+    metadata || {},
+    this.methodDescriptordeleteLabel);
+  }
+
 }
 
