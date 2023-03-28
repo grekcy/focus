@@ -27,7 +27,7 @@ export function CardPage() {
     if (!card) return;
     return (
       <>
-        <Typography variant="h5">Card #{cardNo}</Typography>
+        <Typography variant="h5">CARD-#{cardNo}</Typography>
         <InlineEdit value={card.subject} />
         <InlineEdit value={card.content} multiline />
         <Divider textAlign="left">Date</Divider>

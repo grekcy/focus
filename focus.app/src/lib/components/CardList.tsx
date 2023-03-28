@@ -65,7 +65,7 @@ export const CardListView = forwardRef(
     const [cards, setCards] = useState<Card.AsObject[]>([]);
     useEffect(() => {
       queryCardList().then((r) => setCards(r));
-    }, [queryCardList]);
+    }, []);
 
     useImperativeHandle(ref, () => ({
       addCard(card: Card.AsObject) {
@@ -471,10 +471,11 @@ export const CardListView = forwardRef(
 
       api
         .completeCard(card.cardNo, complete)
+        .then((r) => setCards((p) => update(p, { [index]: { $set: r } })))
         .then(() => {
           complete
-            ? app.toast(`completed: ${card.subject}`)
-            : app.toast(`in progress: ${card.subject}`);
+            ? app.toast(`card completed: ${card.subject}`)
+            : app.toast(`card set to in progress: ${card.subject}`);
         })
         .catch((e) => app.toast(e.message));
     }

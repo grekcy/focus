@@ -113,7 +113,7 @@ export const CardBar = forwardRef(
             <RefreshIcon fontSize="small" />
           </IconButton>
           <Typography>
-            <Link to={`/cards/${cardNo}`}>CARD-{cardNo}</Link>
+            <Link to={`/cards/${cardNo}`}>CARD-#{cardNo}</Link>
           </Typography>
           <IconButton key="x" onClick={() => setOpen((p) => !p)}>
             <ChevronRightIcon />
