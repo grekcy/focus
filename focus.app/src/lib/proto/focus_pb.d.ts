@@ -67,6 +67,11 @@ export class Card extends jspb.Message {
   getContent(): string;
   setContent(value: string): Card;
 
+  getLabelsList(): Array<number>;
+  setLabelsList(value: Array<number>): Card;
+  clearLabelsList(): Card;
+  addLabels(value: number, index?: number): Card;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Card.AsObject;
   static toObject(includeInstance: boolean, msg: Card): Card.AsObject;
@@ -86,6 +91,7 @@ export namespace Card {
     creatorId: number,
     subject: string,
     content: string,
+    labelsList: Array<number>,
   }
 
   export enum ParentCardNoCase { 
@@ -224,6 +230,66 @@ export namespace PatchCardReq {
   export type AsObject = {
     fieldsList: Array<CardField>,
     card?: Card.AsObject,
+  }
+}
+
+export class Label extends jspb.Message {
+  getId(): number;
+  setId(value: number): Label;
+
+  getWorkspaceId(): number;
+  setWorkspaceId(value: number): Label;
+
+  getLabel(): string;
+  setLabel(value: string): Label;
+
+  getDescription(): string;
+  setDescription(value: string): Label;
+
+  getColor(): string;
+  setColor(value: string): Label;
+
+  getCreatedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setCreatedAt(value?: google_protobuf_timestamp_pb.Timestamp): Label;
+  hasCreatedAt(): boolean;
+  clearCreatedAt(): Label;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Label.AsObject;
+  static toObject(includeInstance: boolean, msg: Label): Label.AsObject;
+  static serializeBinaryToWriter(message: Label, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Label;
+  static deserializeBinaryFromReader(message: Label, reader: jspb.BinaryReader): Label;
+}
+
+export namespace Label {
+  export type AsObject = {
+    id: number,
+    workspaceId: number,
+    label: string,
+    description: string,
+    color: string,
+    createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+  }
+}
+
+export class ListLabelsResp extends jspb.Message {
+  getLabelsList(): Array<Label>;
+  setLabelsList(value: Array<Label>): ListLabelsResp;
+  clearLabelsList(): ListLabelsResp;
+  addLabels(value?: Label, index?: number): Label;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListLabelsResp.AsObject;
+  static toObject(includeInstance: boolean, msg: ListLabelsResp): ListLabelsResp.AsObject;
+  static serializeBinaryToWriter(message: ListLabelsResp, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListLabelsResp;
+  static deserializeBinaryFromReader(message: ListLabelsResp, reader: jspb.BinaryReader): ListLabelsResp;
+}
+
+export namespace ListLabelsResp {
+  export type AsObject = {
+    labelsList: Array<Label.AsObject>,
   }
 }
 

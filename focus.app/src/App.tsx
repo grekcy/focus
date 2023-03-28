@@ -14,6 +14,7 @@ import { ChallengePage } from "./routes/Challenge";
 import { ErrorPage } from "./routes/ErrorPage";
 import { ForecastPage } from "./routes/Forecast";
 import { InboxPage } from "./routes/Inbox";
+import { LabelsPage } from "./routes/LabelsPage";
 import { PerformancePage } from "./routes/Performance";
 import { PlanningPage } from "./routes/Planning";
 import { Root } from "./routes/Root";
@@ -64,6 +65,7 @@ function App() {
                   />
                   <Route path="/planning" element={<PlanningPage />} />
                   <Route path="/performance" element={<PerformancePage />} />
+                  <Route path="/labels" element={<LabelsPage />} />
                   <Route path="/demo/" element={<DemoPage />} />
                   <Route
                     path="/demo/dnd-sortable"

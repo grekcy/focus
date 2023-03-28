@@ -28,10 +28,38 @@ export class FocusAPI {
     this.listeners = {};
   }
 
+  //
+  // listeners
+  //
+  addEventListener = (event: Event, handler: EventListener) => {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(handler);
+    return handler;
+  };
+
+  removeEventListener = (listener: EventListener) => {
+    this.listeners = Object.fromEntries(
+      Object.entries(this.listeners).map(([k, v]) => {
+        return [k, v.filter((h) => h !== listener)];
+      })
+    );
+  };
+
+  notify = (r: any, event: Event, cardNo: number) => {
+    const listeners = this.listeners[event];
+    if (listeners) listeners.forEach((h) => h(cardNo));
+    return r;
+  };
+
   version = () => {
     return this.s.version(new Empty(), null).then((r) => r.toObject());
   };
 
+  //
+  // FocusAPI
+  //
   quickAddCard = (subject: string) => {
     const s = new StringValue();
     s.setValue(subject);
@@ -49,10 +77,7 @@ export class FocusAPI {
     const req = new ListCardReq();
     req.setExcludeCompleted(excludeCompleted);
     req.setExcludeChallenges(excludeChallenges);
-    return this.s
-      .listCards(req, null)
-      .then((r) => r.toObject())
-      .then((r) => r.itemsList);
+    return this.s.listCards(req, null).then((r) => r.toObject().itemsList);
   };
 
   getCard = (cardNo: number) => {
@@ -147,26 +172,10 @@ export class FocusAPI {
     return this.s.deleteCard(no, null);
   };
 
-  addEventListener = (event: Event, handler: EventListener) => {
-    if (!this.listeners[event]) {
-      this.listeners[event] = [];
-    }
-    this.listeners[event].push(handler);
-    return handler;
-  };
-
-  removeEventListener = (listener: EventListener) => {
-    this.listeners = Object.fromEntries(
-      Object.entries(this.listeners).map(([k, v]) => {
-        return [k, v.filter((h) => h !== listener)];
-      })
-    );
-  };
-
-  notify = (r: any, event: Event, cardNo: number) => {
-    const listeners = this.listeners[event];
-    if (listeners) listeners.forEach((h) => h(cardNo));
-    return r;
+  listLabels = () => {
+    return this.s
+      .listLabels(new Empty(), null)
+      .then((r) => r.toObject().labelsList);
   };
 }
 

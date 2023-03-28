@@ -4,7 +4,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import TripOriginIcon from "@mui/icons-material/TripOrigin";
-import { Box, IconButton } from "@mui/material";
+import { Box, Chip, IconButton, Stack } from "@mui/material";
 import type { Identifier, XYCoord } from "dnd-core";
 import update from "immutability-helper";
 import {
@@ -27,7 +27,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { Link } from "react-router-dom";
 import { Key } from "ts-key-enum";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
-import { Card } from "../proto/focus_pb";
+import { Card, Label } from "../proto/focus_pb";
 import { EmptyIcon } from "./Icons";
 import { IInlineEdit, InlineEdit } from "./InlineEdit";
 
@@ -63,8 +63,20 @@ export const CardListView = forwardRef(
     const api = useFocusClient();
 
     const [cards, setCards] = useState<Card.AsObject[]>([]);
+    const [labels, setLabels] = useState<{ [key: number]: Label.AsObject }>({});
     useEffect(() => {
-      queryCardList().then((r) => setCards(r));
+      queryCardList()
+        .then((r) => setCards(r))
+        .catch((e) => app.toast(e.message, "error"));
+
+      api
+        .listLabels()
+        .then((r) => {
+          const x: { [key: number]: Label.AsObject } = {};
+          r.forEach((r) => (x[r.id] = r));
+          setLabels(x);
+        })
+        .catch((e) => app.toast(e.message, "error"));
     }, []);
 
     useImperativeHandle(ref, () => ({
@@ -502,23 +514,43 @@ export const CardListView = forwardRef(
           component="div"
           onDoubleClick={() => onDoubleClick && onDoubleClick()}
         >
-          {cards.map((item, i) => (
-            <CardItem
-              ref={(ref) => (refs.current[i] = ref!)}
-              key={item.cardNo}
-              index={i}
-              card={item}
-              selected={selected === i}
-              showCardNo={showCardNo}
-              onClick={(index) => handleCardClick(index)}
-              onSubmit={(v) => handleSubmit(i, v)}
-              onActionClick={handleCardAction}
-              onDragOver={handleDragOver}
-              onCanDrop={handleCanDrop}
-              onDragDrop={handleDragDrop}
-              hasChild={hasChild}
-            />
-          ))}
+          {cards.map((item, i) => {
+            let endAdornment = item.labelsList.map((i) => (
+              <Chip
+                label={labels[i]?.label}
+                sx={{ color: "white", backgroundColor: "primary.main" }}
+                clickable
+              />
+            ));
+            if (endAdornment) {
+              endAdornment = [
+                <Stack direction="row" spacing="2px">
+                  {endAdornment}
+                </Stack>,
+              ];
+            }
+
+            return (
+              <>
+                <CardItem
+                  ref={(ref) => (refs.current[i] = ref!)}
+                  key={item.cardNo}
+                  index={i}
+                  card={item}
+                  selected={selected === i}
+                  showCardNo={showCardNo}
+                  endAdornment={endAdornment}
+                  onClick={(index) => handleCardClick(index)}
+                  onSubmit={(v) => handleSubmit(i, v)}
+                  onActionClick={handleCardAction}
+                  onDragOver={handleDragOver}
+                  onCanDrop={handleCanDrop}
+                  onDragDrop={handleDragDrop}
+                  hasChild={hasChild}
+                />
+              </>
+            );
+          })}
         </Box>
       </DndProvider>
     );
@@ -541,6 +573,7 @@ interface ItemProp {
   selected?: boolean;
   visible?: boolean;
   showCardNo?: boolean;
+  endAdornment?: React.ReactNode;
   hasChild?: (cardNo: number) => boolean;
   onClick?: (index: number) => void;
   onSubmit?: (value: string) => void;
@@ -558,6 +591,7 @@ const CardItem = forwardRef(
       selected = false,
       visible = true,
       showCardNo = true,
+      endAdornment,
       hasChild,
       onClick,
       onSubmit,
@@ -706,6 +740,7 @@ const CardItem = forwardRef(
           <InlineEdit
             ref={ref}
             value={card.subject}
+            endAdornment={endAdornment}
             onSubmit={(e, value) => onSubmit && onSubmit(value)}
           />
         </Box>

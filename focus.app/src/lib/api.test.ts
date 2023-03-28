@@ -56,4 +56,13 @@ describe("focus API", () => {
       })
       .catch((e) => expect(e.message).toMatch("already completed"));
   });
+
+  test("labels: list", async () => {
+    const got = await service.listLabels();
+    expect(got.length).not.toEqual(0);
+    got.forEach((e) => {
+      expect(e.id).not.toEqual(0);
+      expect(e.label).not.toEqual("");
+    });
+  });
 });

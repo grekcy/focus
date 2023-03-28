@@ -428,5 +428,91 @@ export class V1Alpha1Client {
     this.methodDescriptordeleteCard);
   }
 
+  methodDescriptorlistLabels = new grpcWeb.MethodDescriptor(
+    '/V1Alpha1/listLabels',
+    grpcWeb.MethodType.UNARY,
+    google_protobuf_empty_pb.Empty,
+    focus_pb.ListLabelsResp,
+    (request: google_protobuf_empty_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    focus_pb.ListLabelsResp.deserializeBinary
+  );
+
+  listLabels(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null): Promise<focus_pb.ListLabelsResp>;
+
+  listLabels(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: focus_pb.ListLabelsResp) => void): grpcWeb.ClientReadableStream<focus_pb.ListLabelsResp>;
+
+  listLabels(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: focus_pb.ListLabelsResp) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/V1Alpha1/listLabels',
+        request,
+        metadata || {},
+        this.methodDescriptorlistLabels,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/V1Alpha1/listLabels',
+    request,
+    metadata || {},
+    this.methodDescriptorlistLabels);
+  }
+
+  methodDescriptorupdateLabel = new grpcWeb.MethodDescriptor(
+    '/V1Alpha1/updateLabel',
+    grpcWeb.MethodType.UNARY,
+    focus_pb.Label,
+    focus_pb.Label,
+    (request: focus_pb.Label) => {
+      return request.serializeBinary();
+    },
+    focus_pb.Label.deserializeBinary
+  );
+
+  updateLabel(
+    request: focus_pb.Label,
+    metadata: grpcWeb.Metadata | null): Promise<focus_pb.Label>;
+
+  updateLabel(
+    request: focus_pb.Label,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: focus_pb.Label) => void): grpcWeb.ClientReadableStream<focus_pb.Label>;
+
+  updateLabel(
+    request: focus_pb.Label,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: focus_pb.Label) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/V1Alpha1/updateLabel',
+        request,
+        metadata || {},
+        this.methodDescriptorupdateLabel,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/V1Alpha1/updateLabel',
+    request,
+    metadata || {},
+    this.methodDescriptorupdateLabel);
+  }
+
 }
 

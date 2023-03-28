@@ -14,6 +14,7 @@ import {
 interface InlineEditProp {
   value?: string;
   multiline?: boolean;
+  endAdornment?: React.ReactNode;
   onSubmit?: (target: Element, value: string) => void;
 }
 
@@ -25,7 +26,7 @@ export interface IInlineEdit {
 // Ref: https://www.emgoto.com/react-inline-edit/
 export const InlineEdit = forwardRef(
   (
-    { value = "", multiline = false, onSubmit }: InlineEditProp,
+    { value = "", multiline = false, endAdornment, onSubmit }: InlineEditProp,
     ref: Ref<IInlineEdit>
   ) => {
     useImperativeHandle(ref, () => ({
@@ -99,7 +100,11 @@ export const InlineEdit = forwardRef(
         onClick={handleClick}
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
-        InputProps={{ disableUnderline: !editing, readOnly: !editing }}
+        InputProps={{
+          disableUnderline: !editing,
+          readOnly: !editing,
+          endAdornment: endAdornment,
+        }}
         fullWidth
         multiline={multiline}
         focused={true}

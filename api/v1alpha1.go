@@ -92,7 +92,7 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 		return nil, err
 	}
 
-	return cardToProto(newCard), nil
+	return cardModelToProto(newCard), nil
 }
 
 func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCardReq) (*emptypb.Empty, error) {
@@ -207,7 +207,7 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 	return helper.Empty(), nil
 }
 
-func cardToProto(in *CardWithDepth) *proto.Card {
+func cardModelToProto(in *CardWithDepth) *proto.Card {
 	return &proto.Card{
 		CardNo:       uint64(in.CardNo),
 		ParentCardNo: helper.PP(in.ParentCardNo),
@@ -221,6 +221,7 @@ func cardToProto(in *CardWithDepth) *proto.Card {
 		CreatorId: uint64(in.CreatorID),
 		Subject:   in.Subject,
 		Content:   in.Content,
+		Labels:    fx.Map(in.Labels, func(x int64) uint64 { return uint64(x) }),
 	}
 }
 
@@ -233,7 +234,7 @@ func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCard
 	}
 
 	return &proto.ListCardResp{
-		Items: fx.Map(r, func(c *CardWithDepth) *proto.Card { return cardToProto(c) }),
+		Items: fx.Map(r, func(c *CardWithDepth) *proto.Card { return cardModelToProto(c) }),
 	}, nil
 }
 
@@ -345,7 +346,7 @@ func (s *v1alpha1ServiceImpl) GetCard(ctx context.Context, cardNo *wrapperspb.UI
 		return nil, err
 	}
 
-	return cardToProto(card), nil
+	return cardModelToProto(card), nil
 }
 
 func (s *v1alpha1ServiceImpl) GetCards(ctx context.Context, req *proto.GetCardReq) (*proto.GetCardResp, error) {
@@ -372,7 +373,7 @@ func (s *v1alpha1ServiceImpl) GetCards(ctx context.Context, req *proto.GetCardRe
 	}
 
 	fx.Each(r, func(_ int, c *CardWithDepth) {
-		resp.Items[uint64(c.CardNo)] = cardToProto(c)
+		resp.Items[uint64(c.CardNo)] = cardModelToProto(c)
 	})
 
 	return resp, nil
@@ -466,5 +467,73 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 		return nil, err
 	}
 
-	return cardToProto(card), nil
+	return cardModelToProto(card), nil
+}
+
+func (s *v1alpha1ServiceImpl) listLabels(ctx context.Context, where *models.Label) ([]*models.Label, error) {
+	labels := []*models.Label{}
+	if tx := s.db.Where(where).Order("label").Find(&labels); tx.Error != nil {
+		return nil, status.Errorf(codes.Internal, "fail to list tags: %+v", tx.Error)
+	}
+
+	return labels, nil
+}
+
+func labelModelToProto(in *models.Label) *proto.Label {
+	return &proto.Label{
+		Id:          uint64(in.ID),
+		WorkspaceId: uint64(in.WorkspaceID),
+		Label:       in.Label,
+		Description: in.Description,
+		Color:       in.Color,
+		CreatedAt:   timestamppb.New(in.CreatedAt),
+	}
+}
+
+func (s *v1alpha1ServiceImpl) ListLabels(ctx context.Context, _ *emptypb.Empty) (*proto.ListLabelsResp, error) {
+	log.Debugf("ListLabel()")
+
+	r, err := s.listLabels(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &proto.ListLabelsResp{
+		Labels: fx.Map(r, func(label *models.Label) *proto.Label { return labelModelToProto(label) }),
+	}, nil
+}
+
+func (s *v1alpha1ServiceImpl) getLabel(ctx context.Context, id uint) (*models.Label, error) {
+	r, err := s.listLabels(ctx, &models.Label{Model: &gorm.Model{ID: id}})
+	if err != nil {
+		return nil, err
+	}
+
+	switch len(r) {
+	case 0:
+		return nil, status.Errorf(codes.NotFound, "label not found: %v", id)
+	case 1:
+		return r[0], nil
+	default:
+		return nil, status.Errorf(codes.Internal, "multiple label found: %v, count=%d", id, len(r))
+	}
+}
+
+func (s *v1alpha1ServiceImpl) UpdateLabel(ctx context.Context, req *proto.Label) (*proto.Label, error) {
+	log.Debugf("UpdateLabel(): req=%+v", req)
+
+	label, err := s.getLabel(ctx, uint(req.Id))
+	if err != nil {
+		return nil, err
+	}
+
+	label.Label = req.Label
+	label.Description = req.Description
+	label.Color = req.Color
+
+	s.db.Transaction(func(tx *gorm.DB) error {
+		return tx.Save(label).Error
+	})
+
+	return labelModelToProto(label), nil
 }

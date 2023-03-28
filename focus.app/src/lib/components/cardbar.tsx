@@ -79,6 +79,7 @@ export const CardBar = forwardRef(
             value={card?.subject}
             onSubmit={(target, value) => handleSubjectChanged(value)}
           />
+          <Typography variant="h6">Labels: {card?.labelsList}</Typography>
           <Typography variant="h6">Description:</Typography>
           <InlineEdit
             multiline
