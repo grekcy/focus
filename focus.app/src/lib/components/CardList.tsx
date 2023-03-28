@@ -111,7 +111,7 @@ export const CardListView = forwardRef(
       return isParent(i, p);
     }
 
-    function handleChange(index: number, subject: string) {
+    function handleSubmit(index: number, subject: string) {
       const card = cards[index];
       api
         .updateCardSubject(card.cardNo, subject)
@@ -471,9 +471,6 @@ export const CardListView = forwardRef(
 
       api
         .completeCard(card.cardNo, complete)
-        .then((r) =>
-          setCards((p) => p.map((c) => (c.cardNo === card.cardNo ? r : c)))
-        )
         .then(() => {
           complete
             ? app.toast(`completed: ${card.subject}`)
@@ -513,7 +510,7 @@ export const CardListView = forwardRef(
               selected={selected === i}
               showCardNo={showCardNo}
               onClick={(index) => handleCardClick(index)}
-              onChange={(v) => handleChange(i, v)}
+              onSubmit={(v) => handleSubmit(i, v)}
               onActionClick={handleCardAction}
               onDragOver={handleDragOver}
               onCanDrop={handleCanDrop}
@@ -545,7 +542,7 @@ interface ItemProp {
   showCardNo?: boolean;
   hasChild?: (cardNo: number) => boolean;
   onClick?: (index: number) => void;
-  onChange?: (value: string) => void;
+  onSubmit?: (value: string) => void;
   onActionClick?: (index: number, action: CardAction) => void;
   onDragOver: (dragIndex: number, hoverIndex: number) => void;
   onCanDrop: (dragIndex: number, hoverIndex: number) => boolean;
@@ -562,7 +559,7 @@ const CardItem = forwardRef(
       showCardNo = true,
       hasChild,
       onClick,
-      onChange,
+      onSubmit,
       onActionClick,
       onDragOver,
       onCanDrop,
@@ -708,7 +705,7 @@ const CardItem = forwardRef(
           <InlineEdit
             ref={ref}
             value={card.subject}
-            onSubmit={(e, value) => onChange && onChange(value)}
+            onSubmit={(e, value) => onSubmit && onSubmit(value)}
           />
         </Box>
         <Box sx={{ flexGrow: 0, color: "grey", height: 0 }}>

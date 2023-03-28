@@ -51,10 +51,10 @@ export const InlineEdit = forwardRef(
     }, [value]);
 
     useEffect(() => {
-      if (!editing) return;
-
-      setPrevValue(editingValue);
-    }, [editing, editingValue]);
+      if (editing) {
+        setPrevValue(editingValue);
+      }
+    }, [editing]);
 
     function handleClick() {
       if (!editing) setEditing(true);
