@@ -1,4 +1,5 @@
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { Box, Divider, Drawer, IconButton, Typography } from "@mui/material";
 import {
   Ref,
@@ -7,6 +8,7 @@ import {
   useImperativeHandle,
   useState,
 } from "react";
+import { Link } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { DrawerHeader } from "../../SideBar";
 import { Card } from "../proto/focus_pb";
@@ -99,25 +101,33 @@ export const CardBar = forwardRef(
     }
 
     return (
-      <>
-        <Drawer open={open} anchor="right" variant="persistent">
-          <DrawerHeader />
-          <DrawerHeader>
-            <Typography>Card-{cardNo}</Typography>
-            <IconButton key="x" onClick={() => setOpen((p) => !p)}>
-              <ChevronRightIcon />
-            </IconButton>
-          </DrawerHeader>
-          <Divider />
-          <Box sx={{ p: 1, width: 400 }}>
-            {cardNo ? (
-              <CardPanel />
-            ) : (
-              <Typography>Please select card!</Typography>
-            )}
-          </Box>
-        </Drawer>
-      </>
+      <Drawer open={open} anchor="right" variant="persistent">
+        {/* FIXME 이렇게 DrawerHeader를 2개 넣어서 간격 맞추는 건 좋지 않음 */}
+        <DrawerHeader />
+        <DrawerHeader>
+          <IconButton
+            onClick={() =>
+              app.toast("refresh card: not implemented", "warning")
+            }
+          >
+            <RefreshIcon fontSize="small" />
+          </IconButton>
+          <Typography>
+            <Link to={`/cards/${cardNo}`}>CARD-{cardNo}</Link>
+          </Typography>
+          <IconButton key="x" onClick={() => setOpen((p) => !p)}>
+            <ChevronRightIcon />
+          </IconButton>
+        </DrawerHeader>
+        <Divider />
+        <Box sx={{ p: 1, width: 400 }}>
+          {cardNo ? (
+            <CardPanel />
+          ) : (
+            <Typography>Please select card!</Typography>
+          )}
+        </Box>
+      </Drawer>
     );
   }
 );

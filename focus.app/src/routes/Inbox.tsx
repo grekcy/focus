@@ -19,6 +19,7 @@ export function InboxPage() {
   }, [api, app]);
 
   function queryCardList() {
+    console.log(`INBOX: queryCardList()`);
     return api.listCards();
   }
 
