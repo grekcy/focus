@@ -4,7 +4,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import TripOriginIcon from "@mui/icons-material/TripOrigin";
-import { Box, Chip, IconButton, Stack } from "@mui/material";
+import { Box, IconButton, Stack } from "@mui/material";
 import type { Identifier, XYCoord } from "dnd-core";
 import update from "immutability-helper";
 import {
@@ -30,6 +30,7 @@ import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { Card, Label } from "../proto/focus_pb";
 import { EmptyIcon } from "./Icons";
 import { IInlineEdit, InlineEdit } from "./InlineEdit";
+import { LabelChip } from "./Labels";
 
 export enum CardAction {
   COMPLETE,
@@ -515,13 +516,11 @@ export const CardListView = forwardRef(
           onDoubleClick={() => onDoubleClick && onDoubleClick()}
         >
           {cards.map((item, i) => {
-            let endAdornment = item.labelsList.map((i) => (
-              <Chip
-                label={labels[i]?.label}
-                sx={{ color: "white", backgroundColor: "primary.main" }}
-                clickable
-              />
-            ));
+            let endAdornment = item.labelsList
+              .filter((i) => labels[i])
+              .map((i) => (
+                <LabelChip label={labels[i]?.label} color={labels[i].color} />
+              ));
             if (endAdornment) {
               endAdornment = [
                 <Stack direction="row" spacing="2px">

@@ -6,9 +6,9 @@ import "./App.css";
 import { AppBar } from "./AppBar";
 import { FocusClientProvider, FocusProvider, IFocusApp } from "./FocusProvider";
 import { DrawerHeader, SideBar } from "./SideBar";
-import { DemoPage } from "./demo/DemoPage";
-import { DragAndDropCancel } from "./demo/dndCancel";
-import { DragAndDropSortable } from "./demo/dndSotrable";
+import { PlaygroundPage } from "./playground/PlaygroundPage";
+import { DragAndDropCancel } from "./playground/dndCancel";
+import { DragAndDropSortable } from "./playground/dndSotrable";
 import { CardPage } from "./routes/Cards";
 import { ChallengePage } from "./routes/Challenge";
 import { ErrorPage } from "./routes/ErrorPage";
@@ -66,13 +66,13 @@ function App() {
                   <Route path="/planning" element={<PlanningPage />} />
                   <Route path="/performance" element={<PerformancePage />} />
                   <Route path="/labels" element={<LabelsPage />} />
-                  <Route path="/demo/" element={<DemoPage />} />
+                  <Route path="/playground/" element={<PlaygroundPage />} />
                   <Route
-                    path="/demo/dnd-sortable"
+                    path="/playground/dnd-sortable"
                     element={<DragAndDropSortable />}
                   />
                   <Route
-                    path="/demo/dnd-cancel"
+                    path="/playground/dnd-cancel"
                     element={<DragAndDropCancel />}
                   />
                   <Route path="*" element={<ErrorPage />} />

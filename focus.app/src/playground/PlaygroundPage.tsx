@@ -6,7 +6,7 @@ import { DragAndDropCancel } from "./dndCancel";
 import { DragAndDropSortable } from "./dndSotrable";
 import { DragAndDropTesting } from "./dndTesting";
 
-const demos = [
+const plays = [
   {
     label: "Drag: Testing",
     children: <DragAndDropTesting />,
@@ -25,7 +25,7 @@ const demos = [
   },
 ];
 
-export function DemoPage() {
+export function PlaygroundPage() {
   const [value, setValue] = useState(0);
 
   const handleChange = (event: any, newValue: any) => {
@@ -36,17 +36,17 @@ export function DemoPage() {
 
   return (
     <>
-      <Typography variant="h5">Demo</Typography>
+      <Typography variant="h5">Playground</Typography>
 
       <Tabs value={value} onChange={handleChange}>
-        {demos.map((demo, i) => (
-          <Tab label={demo.label} {...a11yProps(i)} />
+        {plays.map((play, i) => (
+          <Tab label={play.label} {...a11yProps(i)} />
         ))}
       </Tabs>
 
-      {demos.map((demo, i) => (
+      {plays.map((play, i) => (
         <TabPanel value={value} index={i}>
-          {demo.children}
+          {play.children}
         </TabPanel>
       ))}
     </>

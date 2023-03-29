@@ -139,10 +139,10 @@ if (process.env.REACT_APP_ENV === "development") {
   pages.push(
     { title: "-" },
     {
-      href: "/demo/",
-      title: "Demo",
+      href: "/playground/",
+      title: "Playground",
       icon: MovieIcon,
-      tooltip: "Demo",
+      tooltip: "Playground",
     }
   );
 }
