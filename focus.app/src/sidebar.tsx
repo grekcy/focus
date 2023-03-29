@@ -134,6 +134,13 @@ const pages = [
     icon: InsightsIcon,
     tooltip: "performance",
   },
+  { title: "-" },
+  {
+    href: "/labels",
+    title: "Labels",
+    icon: LabelIcon,
+    tooltip: "Labels",
+  },
 ];
 
 if (process.env.REACT_APP_ENV === "development") {
