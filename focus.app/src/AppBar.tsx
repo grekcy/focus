@@ -105,6 +105,7 @@ export function AppBar({ open }: AppBarProps) {
                 </InputAdornment>
               ),
             }}
+            sx={{ width: { md: 300 } }}
           />
         </Box>
         <Box sx={{ flexGrow: 0 }}>

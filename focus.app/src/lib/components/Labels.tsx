@@ -1,5 +1,19 @@
-import { Chip } from "@mui/material";
-import { SyntheticEvent } from "react";
+import {
+  Autocomplete,
+  AutocompleteRenderInputParams,
+  Box,
+  Chip,
+  TextField,
+} from "@mui/material";
+import update from "immutability-helper";
+import {
+  KeyboardEvent,
+  ReactNode,
+  SyntheticEvent,
+  useEffect,
+  useState,
+} from "react";
+import { Key } from "ts-key-enum";
 
 export const LabelColors: string[] = [
   // mui theme colors
@@ -58,9 +72,19 @@ interface LabelChipProp {
   label: string;
   color: string;
   onClick?: (e: SyntheticEvent<HTMLDivElement, MouseEvent>) => void;
+  onDelete?: (e: SyntheticEvent<HTMLDivElement, MouseEvent>) => void;
 }
 
-export function LabelChip({ id, label, color, onClick }: LabelChipProp) {
+export function LabelChip({
+  id,
+  label,
+  color,
+  onClick,
+  onDelete,
+}: LabelChipProp) {
+  const params: any = {};
+  if (onDelete) params.onDelete = onDelete;
+
   return (
     <Chip
       id={id}
@@ -69,9 +93,79 @@ export function LabelChip({ id, label, color, onClick }: LabelChipProp) {
         color: LabelTextColorFor(color),
         backgroundColor: color,
       }}
-      onClick={(e) => onClick && onClick(e)}
+      onClick={(e: any) => onClick && onClick(e)}
       clickable={!!onClick}
       variant="outlined"
+      // size="small"
+      {...params}
+    />
+  );
+}
+
+interface LabelOption {
+  id: number;
+  label: string;
+  color: string;
+}
+
+interface LabelSelectorProps {
+  labels: LabelOption[];
+}
+
+export function LabelSelector({ labels }: LabelSelectorProps) {
+  const [options, setOptions] = useState<LabelOption[]>(labels);
+  const [selected, setSelected] = useState<LabelOption[]>([]);
+  const [value, setValue] = useState("");
+
+  useEffect(() => {
+    const x = labels.filter(
+      (o) => selected.findIndex((s) => s.id === o.id) === -1
+    );
+
+    setOptions(
+      labels.filter((o) => selected.findIndex((s) => s.id === o.id) === -1)
+    );
+  }, [labels, selected]);
+
+  function deleteLabel(index: number) {
+    setSelected((p) => update(p, { $splice: [[index, 1]] }));
+  }
+
+  return (
+    <Autocomplete
+      size="small"
+      autoHighlight
+      clearOnBlur
+      clearOnEscape
+      openOnFocus
+      renderInput={function (params: AutocompleteRenderInputParams): ReactNode {
+        params.inputProps.value = value;
+        params.InputProps.startAdornment = selected.map((label, i) => (
+          <LabelChip
+            label={label.label}
+            color={label.color}
+            onDelete={() => deleteLabel(i)}
+          />
+        ));
+
+        return <TextField {...params} />;
+      }}
+      renderOption={(props, option) => (
+        <Box component="li" {...props}>
+          <LabelChip label={option.label} color={option.color} />
+        </Box>
+      )}
+      options={options}
+      onChange={(e: any, newValue: LabelOption | null) => {
+        if (!newValue) return;
+        setSelected((p) => update(p, { $push: [newValue] }));
+        setValue("");
+      }}
+      onInputChange={(e: any, value: string) => setValue(value)}
+      onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
+        if (e.key === Key.Backspace && value === "" && selected.length > 0)
+          deleteLabel(selected.length - 1);
+      }}
     />
   );
 }

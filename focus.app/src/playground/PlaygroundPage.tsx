@@ -1,79 +1,64 @@
-import { Box, Tab, Tabs, Typography } from "@mui/material";
-import { useState } from "react";
-import { useFocusClient } from "../FocusProvider";
+import { Typography } from "@mui/material";
+import { Link, useParams } from "react-router-dom";
 import { Cursors } from "./Cursors";
+import { PlayLabel } from "./Label";
+import { PlayTextField } from "./PlayTextField";
 import { DragAndDropCancel } from "./dndCancel";
 import { DragAndDropSortable } from "./dndSotrable";
 import { DragAndDropTesting } from "./dndTesting";
 
 const plays = [
   {
+    id: "label",
+    label: "label",
+    children: <PlayLabel />,
+  },
+  {
+    id: "textfield",
+    label: "TextField",
+    children: <PlayTextField />,
+  },
+  {
+    id: "dnd-testing",
     label: "Drag: Testing",
     children: <DragAndDropTesting />,
   },
   {
+    id: "dnd-sortable",
     label: "Drag: Sortable",
     children: <DragAndDropSortable />,
   },
   {
+    id: "drag-cancel",
     label: "Drag: Cancel",
     children: <DragAndDropCancel />,
   },
   {
+    id: "drag-cursors",
     label: "Drag: Cursors",
     children: <Cursors />,
   },
 ];
 
 export function PlaygroundPage() {
-  const [value, setValue] = useState(0);
+  const { playId } = useParams();
 
-  const [playId, setPlayId] = useState(window.location.hash.replace(/^#/, ""));
-
-  const handleChange = (event: any, newValue: any) => {
-    setValue(newValue);
-  };
-
-  const api = useFocusClient();
+  const play = plays.find((p) => p.id === playId);
 
   return (
     <>
       <Typography variant="h5">Playground{playId && `: ${playId}`}</Typography>
 
-      <Tabs value={value} onChange={handleChange}>
-        {plays.map((play, i) => (
-          <Tab label={play.label} {...a11yProps(i)} />
-        ))}
-      </Tabs>
-
-      {plays.map((play, i) => (
-        <TabPanel value={value} index={i}>
-          {play.children}
-        </TabPanel>
-      ))}
+      {play && play.children}
+      {!play && (
+        <ul>
+          {plays.map((p) => (
+            <li key={p.id}>
+              <Link to={p.id}>{p.label}</Link>
+            </li>
+          ))}
+        </ul>
+      )}
     </>
   );
-}
-
-function TabPanel(props: any) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`full-width-tabpanel-${index}`}
-      aria-labelledby={`full-width-tab-${index}`}
-      {...other}
-    >
-      {value === index && <Box sx={{ p: 1 }}> {children}</Box>}
-    </div>
-  );
-}
-
-function a11yProps(index: number) {
-  return {
-    id: `full-width-tab-${index}`,
-    "aria-controls": `full-width-tabpanel-${index}`,
-  };
 }
