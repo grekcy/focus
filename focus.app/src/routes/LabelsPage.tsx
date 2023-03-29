@@ -3,9 +3,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import {
   Box,
   Button,
-  Chip,
   IconButton,
   InputLabel,
+  Popover,
   Stack,
   Table,
   TableBody,
@@ -19,6 +19,7 @@ import {
 import update from "immutability-helper";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
+import { LabelChip, LabelColors } from "../lib/components/Labels";
 import { Label } from "../lib/proto/focus_pb";
 
 export function LabelsPage() {
@@ -35,37 +36,12 @@ export function LabelsPage() {
     })();
   }, []);
 
-  const colors: string[] = [
-    "primary.light",
-    "secondary.light",
-    "error.light",
-    "warning.light",
-    "info.light",
-    "success.light",
-    "primary.main",
-    "secondary.main",
-    "error.main",
-    "warning.main",
-    "info.main",
-    "success.main",
-    "primary.dark",
-    "secondary.dark",
-    "error.dark",
-    "warning.dark",
-    "info.dark",
-    "success.dark",
-  ];
-
-  const textColors: { [key: string]: string } = {
-    "": "black",
-  };
-
-  const [editingItem, setEditingItem] = useState<{ [key: number]: boolean }>(
-    {}
-  );
+  const [editing, setEditing] = useState<{ [key: number]: boolean }>({});
   const [prevValue, setPreValue] = useState<{
     [key: number]: { label: string; desc: string; color: string };
   }>({});
+  const [colorOpen, setColorOpen] = useState(false);
+  const [colorAnchor, setColorAnchor] = useState<Element | null>(null);
   const [deletingItem, setDeletingItem] = useState(-1);
 
   function handleLabelChange(
@@ -101,9 +77,20 @@ export function LabelsPage() {
             ],
           })
         );
-        setEditingItem((p) => update(p, { [index]: { $set: false } }));
+        setEditing((p) => update(p, { [index]: { $set: false } }));
       })
       .catch((e) => app.toast(e.message, "error"));
+  }
+
+  function handleEditCancelClick(i: number) {
+    const x = labels[i];
+    x.label = prevValue[i].label;
+    x.description = prevValue[i].desc;
+    x.color = prevValue[i].color;
+
+    setLabels((p) => p.slice());
+
+    setEditing((p) => update(p, { [i]: { $set: false } }));
   }
 
   function handleDeleteClick(index: number) {
@@ -113,7 +100,7 @@ export function LabelsPage() {
       .deleteLabel(labels[index].id)
       .then(() => {
         setLabels((p) => update(p, { $splice: [[index, 1]] }));
-        setEditingItem((p) => update(p, { [index]: { $set: false } }));
+        setEditing((p) => update(p, { [index]: { $set: false } }));
         setDeletingItem(index);
       })
       .catch((e) => app.toast(e.message, "error"));
@@ -140,20 +127,12 @@ export function LabelsPage() {
                 <TableRow key={label.id}>
                   <TableCell>{label.workspaceId}</TableCell>
                   <TableCell>
-                    <Chip
-                      label={label.label}
-                      sx={{
-                        color: textColors[label.color]
-                          ? textColors[label.color]
-                          : "white",
-                        backgroundColor: label.color,
-                      }}
-                    />
+                    <LabelChip label={label.label} color={label.color} />
                   </TableCell>
                   <TableCell>{label.description}</TableCell>
                   <TableCell align="right">
                     <IconButton
-                      sx={{ display: !!editingItem[i] ? "none" : "" }}
+                      sx={{ display: !!editing[i] ? "none" : "" }}
                       onClick={() => {
                         setPreValue((p) =>
                           update(p, {
@@ -167,9 +146,7 @@ export function LabelsPage() {
                           })
                         );
 
-                        setEditingItem((p) =>
-                          update(p, { [i]: { $set: true } })
-                        );
+                        setEditing((p) => update(p, { [i]: { $set: true } }));
                         setDeletingItem(-1);
                       }}
                     >
@@ -182,7 +159,7 @@ export function LabelsPage() {
                 </TableRow>
                 <TableRow
                   sx={{
-                    display: editingItem[i] ? "" : "none",
+                    display: editing[i] ? "" : "none",
                   }}
                 >
                   <TableCell>&nbsp; </TableCell>
@@ -212,37 +189,22 @@ export function LabelsPage() {
                         />
                       </Box>
                       <Box>
-                        <InputLabel htmlFor={`edit_color_${i}`}>
-                          Color
-                        </InputLabel>
-                        <Chip
-                          id={`edit_color_${i}`}
-                          sx={{
-                            color: label.color,
-                            backgroundColor: label.color,
-                          }}
+                        <InputLabel>Color</InputLabel>
+                        <LabelChip
+                          id={`color_choose_${i}`}
+                          color={label.color}
                           label="Please select a color"
-                          clickable
+                          onClick={(e) => {
+                            setColorAnchor(e.currentTarget);
+                            setColorOpen(true);
+                          }}
                         />
                       </Box>
                     </Stack>
                   </TableCell>
                   <TableCell>
                     <Button onClick={() => handleOkClick(i)}>OK</Button>
-                    <Button
-                      onClick={() => {
-                        const x = labels[i];
-                        x.label = prevValue[i].label;
-                        x.description = prevValue[i].desc;
-                        x.color = prevValue[i].color;
-
-                        setLabels((p) => p.slice());
-
-                        setEditingItem((p) =>
-                          update(p, { [i]: { $set: false } })
-                        );
-                      }}
-                    >
+                    <Button onClick={() => handleEditCancelClick}>
                       Cancel
                     </Button>
                   </TableCell>
@@ -252,6 +214,33 @@ export function LabelsPage() {
           </TableBody>
         </Table>
       </TableContainer>
+      <Popover
+        open={colorOpen}
+        anchorEl={colorAnchor}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        onClose={() => {
+          setColorOpen(false);
+          setColorAnchor(null);
+        }}
+      >
+        <Box sx={{ display: "flex", flexWrap: "wrap", p: 1, width: "180px" }}>
+          {LabelColors.map((c) => (
+            <Box
+              sx={{
+                backgroundColor: c,
+                width: "50px",
+                m: "1px",
+                cursor: "crosshair",
+              }}
+            >
+              &nbsp;
+            </Box>
+          ))}
+        </Box>
+      </Popover>
     </>
   );
 }
