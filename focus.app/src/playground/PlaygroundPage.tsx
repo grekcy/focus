@@ -28,6 +28,8 @@ const plays = [
 export function PlaygroundPage() {
   const [value, setValue] = useState(0);
 
+  const [playId, setPlayId] = useState(window.location.hash.replace(/^#/, ""));
+
   const handleChange = (event: any, newValue: any) => {
     setValue(newValue);
   };
@@ -36,7 +38,7 @@ export function PlaygroundPage() {
 
   return (
     <>
-      <Typography variant="h5">Playground</Typography>
+      <Typography variant="h5">Playground{playId && `: ${playId}`}</Typography>
 
       <Tabs value={value} onChange={handleChange}>
         {plays.map((play, i) => (

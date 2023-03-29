@@ -4,7 +4,8 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import FlagIcon from "@mui/icons-material/Flag";
 import InboxIcon from "@mui/icons-material/Inbox";
 import InsightsIcon from "@mui/icons-material/Insights";
-import MovieIcon from "@mui/icons-material/Movie";
+import LabelIcon from "@mui/icons-material/Label";
+import MicrowaveIcon from "@mui/icons-material/Microwave";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import {
   Box,
@@ -141,7 +142,7 @@ if (process.env.REACT_APP_ENV === "development") {
     {
       href: "/playground/",
       title: "Playground",
-      icon: MovieIcon,
+      icon: MicrowaveIcon,
       tooltip: "Playground",
     }
   );
