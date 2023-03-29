@@ -89,7 +89,6 @@ export function LabelsPage() {
     x.color = prevValue[i].color;
 
     setLabels((p) => p.slice());
-
     setEditing((p) => update(p, { [i]: { $set: false } }));
   }
 
@@ -104,6 +103,19 @@ export function LabelsPage() {
         setDeletingItem(index);
       })
       .catch((e) => app.toast(e.message, "error"));
+  }
+
+  const [choosingColorItem, setChoosingColorItem] = useState(-1);
+  function openColorChooser(index: number, target: HTMLElement) {
+    setChoosingColorItem(index);
+    setColorAnchor(target);
+    setColorOpen(true);
+  }
+
+  function closeColorChooser() {
+    setColorOpen(false);
+    setColorAnchor(null);
+    setChoosingColorItem(-1);
   }
 
   return (
@@ -193,18 +205,15 @@ export function LabelsPage() {
                         <LabelChip
                           id={`color_choose_${i}`}
                           color={label.color}
-                          label="Please select a color"
-                          onClick={(e) => {
-                            setColorAnchor(e.currentTarget);
-                            setColorOpen(true);
-                          }}
+                          label="Click to choose a color"
+                          onClick={(e) => openColorChooser(i, e.currentTarget)}
                         />
                       </Box>
                     </Stack>
                   </TableCell>
                   <TableCell>
                     <Button onClick={() => handleOkClick(i)}>OK</Button>
-                    <Button onClick={() => handleEditCancelClick}>
+                    <Button onClick={() => handleEditCancelClick(i)}>
                       Cancel
                     </Button>
                   </TableCell>
@@ -221,18 +230,24 @@ export function LabelsPage() {
           vertical: "bottom",
           horizontal: "left",
         }}
-        onClose={() => {
-          setColorOpen(false);
-          setColorAnchor(null);
-        }}
+        onClose={closeColorChooser}
       >
-        <Box sx={{ display: "flex", flexWrap: "wrap", p: 1, width: "180px" }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", p: 1, width: "167px" }}>
           {LabelColors.map((c) => (
             <Box
+              onClick={() => {
+                if (choosingColorItem !== -1) {
+                  const x = labels[choosingColorItem];
+                  x.color = c;
+
+                  setLabels((p) => p.slice());
+                }
+                closeColorChooser();
+              }}
               sx={{
+                border: "0.1px solid #000000",
                 backgroundColor: c,
                 width: "50px",
-                m: "1px",
                 cursor: "crosshair",
               }}
             >

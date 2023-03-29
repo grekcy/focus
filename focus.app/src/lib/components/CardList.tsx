@@ -12,6 +12,7 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -64,21 +65,20 @@ export const CardListView = forwardRef(
     const api = useFocusClient();
 
     const [cards, setCards] = useState<Card.AsObject[]>([]);
-    const [labels, setLabels] = useState<{ [key: number]: Label.AsObject }>({});
     useEffect(() => {
       queryCardList()
         .then((r) => setCards(r))
         .catch((e) => app.toast(e.message, "error"));
+    }, []);
 
+    const labels = useMemo(() => {
+      const x: { [key: number]: Label.AsObject } = {};
       api
         .listLabels()
-        .then((r) => {
-          const x: { [key: number]: Label.AsObject } = {};
-          r.forEach((r) => (x[r.id] = r));
-          setLabels(x);
-        })
+        .then((r) => r.forEach((r) => (x[r.id] = r)))
         .catch((e) => app.toast(e.message, "error"));
-    }, []);
+      return x;
+    }, [api]);
 
     useImperativeHandle(ref, () => ({
       addCard(card: Card.AsObject) {
