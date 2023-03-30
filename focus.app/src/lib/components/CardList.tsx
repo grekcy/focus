@@ -8,6 +8,7 @@ import { Box, IconButton, Stack } from "@mui/material";
 import type { Identifier, XYCoord } from "dnd-core";
 import update from "immutability-helper";
 import React, {
+  MouseEvent,
   Ref,
   forwardRef,
   useEffect,
@@ -46,6 +47,7 @@ interface CardListViewProp {
   showCardNo?: boolean;
   onDoubleClick?: () => void;
   onSelect?: (cardNo: number) => void;
+  onContextMenu?: (e: MouseEvent) => void;
 }
 
 export interface ICardListView {
@@ -59,6 +61,7 @@ export const CardListView = forwardRef(
       showCardNo = true,
       onDoubleClick,
       onSelect,
+      onContextMenu,
     }: CardListViewProp,
     ref: Ref<ICardListView>
   ) => {
@@ -521,11 +524,16 @@ export const CardListView = forwardRef(
         .finally(() => setDeletingCard(false));
     }
 
+    function handleContextMenu(e: MouseEvent) {
+      onContextMenu && onContextMenu(e);
+    }
+
     return (
       <DndProvider backend={HTML5Backend}>
         <Box
           component="div"
           onDoubleClick={() => onDoubleClick && onDoubleClick()}
+          onContextMenu={handleContextMenu}
         >
           {cards.map((item, i) => {
             let endAdornment = item.labelsList

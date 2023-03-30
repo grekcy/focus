@@ -4,6 +4,7 @@ import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { Event } from "../lib/api";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView, ICardListView } from "../lib/components/CardList";
+import { ContextMenu, IContextMenu } from "../lib/components/ContextMenu";
 import { LabelOption, LabelSelector } from "../lib/components/LabelSelector";
 import { Card, Label } from "../lib/proto/focus_pb";
 
@@ -51,6 +52,8 @@ export function InboxPage() {
   }, [selectedLabels]);
 
   const cardListRef = useRef<ICardListView>(null);
+  const contextMenuRef = useRef<IContextMenu>(null);
+
   return (
     <>
       <Box display="flex">
@@ -73,6 +76,22 @@ export function InboxPage() {
         showCardNo={false}
         onDoubleClick={() => cardBarRef.current && cardBarRef.current.toggle()}
         onSelect={handleSelectCard}
+        onContextMenu={(e) => {
+          contextMenuRef.current && contextMenuRef.current.popup(e);
+        }}
+      />
+      <ContextMenu
+        ref={contextMenuRef}
+        items={[
+          {
+            label: "Challenge this",
+            hotkey: "⌘C",
+            onClick: () => app.toast("not implemented"),
+          },
+          { label: "-" },
+          { label: "defer...", onClick: () => app.toast("not implemented") },
+          { label: "due to...", onClick: () => app.toast("not implemented") },
+        ]}
       />
       <CardBar ref={cardBarRef} />
     </>
