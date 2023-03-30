@@ -238,7 +238,11 @@ func cardModelToProto(in *CardWithDepth) *proto.Card {
 func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCardReq) (*proto.ListCardResp, error) {
 	log.Debugf("ListCards(), req=%+v", req)
 
-	r, err := s.listCards(ctx, nil, ListOpt{excludeCompleted: req.ExcludeCompleted})
+	where := &models.Card{
+		Labels: helper.ToArray(req.Card.Labels),
+	}
+
+	r, err := s.listCards(ctx, where, ListOpt{excludeCompleted: req.ExcludeCompleted})
 	if err != nil {
 		return nil, err
 	}
@@ -307,6 +311,10 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card,
 		if where != nil {
 			if where.CardNo != 0 {
 				tx = tx.Where("card_no = ?", where.CardNo)
+			}
+
+			if len(where.Labels) > 0 {
+				tx = tx.Where("? <@ labels", where.Labels)
 			}
 		}
 

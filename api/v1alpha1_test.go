@@ -15,6 +15,7 @@ import (
 	"focus/config"
 	"focus/databases"
 	"focus/helper"
+	"focus/models"
 	"focus/proto"
 )
 
@@ -75,18 +76,22 @@ func TestListCards(t *testing.T) {
 	ctx, service := newTestClient(ctx, t)
 
 	type args struct {
-		opts ListOpt
+		where *models.Card
+		opts  ListOpt
 	}
 	tests := [...]struct {
 		name    string
 		args    args
 		wantErr bool
 	}{
-		{`exclude_completed`, args{ListOpt{excludeCompleted: true}}, false},
+		{`exclude_completed`, args{where: nil, opts: ListOpt{excludeCompleted: true}}, false},
+		{`with label`, args{
+			where: &models.Card{Labels: helper.ToArray(fx.Of(1))},
+			opts:  ListOpt{excludeCompleted: true}}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := service.listCards(ctx, nil, tt.args.opts)
+			got, err := service.listCards(ctx, tt.args.where, tt.args.opts)
 			require.Truef(t, (err != nil) == tt.wantErr, `listCards() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
 			if tt.wantErr {
 				return
@@ -97,9 +102,16 @@ func TestListCards(t *testing.T) {
 			if tt.args.opts.excludeCompleted {
 				fx.Each(got, func(_ int, c *CardWithDepth) { require.Nil(t, c.CompletedAt) })
 			}
+
+			if tt.args.where != nil && len(tt.args.where.Labels) > 0 {
+				fx.Each(got, func(_ int, c *CardWithDepth) {
+					for _, label := range tt.args.where.Labels {
+						require.Contains(t, c.Labels, label)
+					}
+				})
+			}
 		})
 	}
-
 }
 
 func TestGetCard(t *testing.T) {

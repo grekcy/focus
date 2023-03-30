@@ -3,8 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView, ICardListView } from "../lib/components/CardList";
-import { LabelSelector } from "../lib/components/LabelSelector";
-import { Label } from "../lib/proto/focus_pb";
+import { LabelOption, LabelSelector } from "../lib/components/LabelSelector";
+import { Card, Label } from "../lib/proto/focus_pb";
 
 export function InboxPage() {
   const app = useFocusApp();
@@ -28,15 +28,23 @@ export function InboxPage() {
       .catch((e) => app.toast(e.message, "error"));
   }, []);
 
-  function queryCardList() {
-    console.log(`INBOX: queryCardList()`);
-    return api.listCards();
-  }
-
   const cardBarRef = useRef<ICardBar>(null);
   function handleSelectCard(cardNo: number) {
     cardBarRef.current && cardBarRef.current.setCardNo(cardNo);
   }
+
+  const [selectedLabels, setSelectedLabels] = useState<number[]>([]);
+  function handleLabelChange(labels: LabelOption[]) {
+    setSelectedLabels(labels.map((x) => x.id));
+  }
+
+  const [cards, setCards] = useState<Card.AsObject[]>([]);
+  useEffect(() => {
+    api
+      .listCards({ labels: selectedLabels })
+      .then((r) => setCards(r))
+      .catch((e) => app.toast(e.message, "error"));
+  }, [selectedLabels]);
 
   const cardListRef = useRef<ICardListView>(null);
   return (
@@ -46,13 +54,18 @@ export function InboxPage() {
           Inbox cards
         </Typography>
         <Box flexGrow={0}>
-          <LabelSelector labels={labels} sx={{ minWidth: { md: "300px" } }} />
+          <LabelSelector
+            labels={labels}
+            selection={selectedLabels}
+            sx={{ minWidth: { md: "300px" } }}
+            onChange={handleLabelChange}
+          />
         </Box>
       </Box>
 
       <CardListView
         ref={cardListRef}
-        queryCardList={queryCardList}
+        cards={cards}
         showCardNo={false}
         onDoubleClick={() => cardBarRef.current && cardBarRef.current.toggle()}
         onSelect={handleSelectCard}

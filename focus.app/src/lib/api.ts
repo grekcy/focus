@@ -74,10 +74,19 @@ export class FocusAPI {
       });
   };
 
-  listCards = (excludeCompleted = true, excludeChallenges = true) => {
+  listCards = ({
+    excludeCompleted = true,
+    excludeChallenges = true,
+    labels = [],
+  }: listCardsParams = {}) => {
     const req = new ListCardReq();
     req.setExcludeCompleted(excludeCompleted);
     req.setExcludeChallenges(excludeChallenges);
+
+    const card = new Card();
+    labels && card.setLabelsList(labels);
+    req.setCard(card);
+
     return this.s.listCards(req, null).then((r) => r.toObject().itemsList);
   };
 
@@ -229,3 +238,9 @@ class AuthInterceptor {
 export type Event = "card.created" | "card.updated";
 
 type EventListener = (resId: number) => void;
+
+interface listCardsParams {
+  excludeCompleted?: boolean;
+  excludeChallenges?: boolean;
+  labels?: number[];
+}

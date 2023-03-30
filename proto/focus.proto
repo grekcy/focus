@@ -46,8 +46,9 @@ message Card {
 }
 
 message ListCardReq {
-  bool exclude_completed = 1;
-  bool exclude_challenges = 2;
+  Card card = 1;
+  bool exclude_completed = 2;
+  bool exclude_challenges = 3;
 }
 
 message ListCardResp { repeated Card items = 1; }

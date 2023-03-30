@@ -41,7 +41,7 @@ export enum CardAction {
 }
 
 interface CardListViewProp {
-  queryCardList: () => Promise<Card.AsObject[]>;
+  cards: Card.AsObject[];
   showCardNo?: boolean;
   onDoubleClick?: () => void;
   onSelect?: (cardNo: number) => void;
@@ -54,7 +54,7 @@ export interface ICardListView {
 export const CardListView = forwardRef(
   (
     {
-      queryCardList,
+      cards: inCards,
       showCardNo = true,
       onDoubleClick,
       onSelect,
@@ -65,11 +65,7 @@ export const CardListView = forwardRef(
     const api = useFocusClient();
 
     const [cards, setCards] = useState<Card.AsObject[]>([]);
-    useEffect(() => {
-      queryCardList()
-        .then((r) => setCards(r))
-        .catch((e) => app.toast(e.message, "error"));
-    }, []);
+    useEffect(() => setCards(inCards), [inCards]);
 
     const labelsMap = useMemo(() => {
       const x: { [key: number]: Label.AsObject } = {};
@@ -102,7 +98,7 @@ export const CardListView = forwardRef(
       return () => {
         api.removeEventListener(handler);
       };
-    }, [api, app, cards]);
+    }, [api, app]);
 
     function hasChild(cardNo: number): boolean {
       return cards.findIndex((item) => item.parentCardNo === cardNo) !== -1;

@@ -106,6 +106,11 @@ export namespace Card {
 }
 
 export class ListCardReq extends jspb.Message {
+  getCard(): Card | undefined;
+  setCard(value?: Card): ListCardReq;
+  hasCard(): boolean;
+  clearCard(): ListCardReq;
+
   getExcludeCompleted(): boolean;
   setExcludeCompleted(value: boolean): ListCardReq;
 
@@ -122,6 +127,7 @@ export class ListCardReq extends jspb.Message {
 
 export namespace ListCardReq {
   export type AsObject = {
+    card?: Card.AsObject,
     excludeCompleted: boolean,
     excludeChallenges: boolean,
   }
