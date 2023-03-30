@@ -28,6 +28,7 @@ import { useHotkeys } from "react-hotkeys-hook";
 import { Link } from "react-router-dom";
 import { Key } from "ts-key-enum";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
+import { Event } from "../api";
 import { Card, Label } from "../proto/focus_pb";
 import { EmptyIcon } from "./Icons";
 import { IInlineEdit, InlineEdit } from "./InlineEdit";
@@ -75,7 +76,7 @@ export const CardListView = forwardRef(
         app.toast(e.message, "error");
       }
       return x;
-    }, [api]);
+    }, []);
 
     useImperativeHandle(ref, () => ({
       addCard(card: Card.AsObject) {
@@ -84,21 +85,30 @@ export const CardListView = forwardRef(
     }));
 
     useEffect(() => {
-      const handler = api.addEventListener("card.updated", (cardNo: number) => {
-        const index = cards.findIndex((c) => c.cardNo === cardNo);
-        console.log(`card updated: ${cardNo}, ${index} ${cards.length}`);
-        if (index === -1) return;
+      const handler = api.addEventListener(
+        Event.CARD_UPDATED,
+        (cardNo: number) => {
+          const index = cards.findIndex((c) => c.cardNo === cardNo);
+          if (index === -1) return;
 
-        api
-          .getCard(cardNo)
-          .then((r) => setCards((p) => update(p, { [index]: { $set: r } })))
-          .catch((e) => app.toast(e.message, "error"));
-      });
+          api
+            .getCard(cardNo)
+            .then((r) =>
+              setCards((p) =>
+                update(p, {
+                  $splice: [
+                    [index, 1],
+                    [index, 0, r],
+                  ],
+                })
+              )
+            )
+            .catch((e) => app.toast(e.message, "error"));
+        }
+      );
 
-      return () => {
-        api.removeEventListener(handler);
-      };
-    }, [api, app]);
+      return () => api.removeEventListener(handler);
+    }, [cards]);
 
     function hasChild(cardNo: number): boolean {
       return cards.findIndex((item) => item.parentCardNo === cardNo) !== -1;
@@ -453,6 +463,11 @@ export const CardListView = forwardRef(
       if (selected === -1) return;
       refs.current[selected].edit();
     });
+
+    useHotkeys("meta+Enter", insertAfter);
+    function insertAfter() {
+      app.toast("insert after");
+    }
 
     const refs = useRef<IInlineEdit[]>([]);
 

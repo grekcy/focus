@@ -69,7 +69,7 @@ export class FocusAPI {
       .quickAddCard(s, null)
       .then((r) => r.toObject())
       .then((r) => {
-        this.notify(r, "card.created", r.cardNo);
+        this.notify(r, Event.CARD_CREATED, r.cardNo);
         return r;
       });
   };
@@ -120,7 +120,9 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setSubject(subject);
 
-    return this.patchCard(card.toObject(), CardField.SUBJECT);
+    return this.patchCard(card.toObject(), CardField.SUBJECT).then((r) =>
+      r.toObject()
+    );
   };
 
   updateCardContent = (cardNo: number, content: string) => {
@@ -128,7 +130,9 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setContent(content);
 
-    return this.patchCard(card.toObject(), CardField.CONTENT);
+    return this.patchCard(card.toObject(), CardField.CONTENT).then((r) =>
+      r.toObject()
+    );
   };
 
   setParentCard = (cardNo: number, parent: number) => {
@@ -136,15 +140,19 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setParentCardNo(parent);
 
-    return this.patchCard(card.toObject(), CardField.PARENT_CARD);
+    return this.patchCard(card.toObject(), CardField.PARENT_CARD).then((r) =>
+      r.toObject()
+    );
   };
 
-  setCardLabels = (cardNo: number, labels: number[]) => {
+  updateCardLabel = (cardNo: number, labels: number[]) => {
     const card = new Card();
     card.setCardNo(cardNo);
     card.setLabelsList(labels);
 
-    return this.patchCard(card.toObject(), CardField.LABEL);
+    return this.patchCard(card.toObject(), CardField.LABEL).then((r) =>
+      r.toObject()
+    );
   };
 
   patchCard = (card: Card.AsObject, ...fields: CardField[]) => {
@@ -175,7 +183,7 @@ export class FocusAPI {
     req.setFieldsList(fields);
 
     return this.s.patchCard(req, null).then((r) => {
-      this.notify(r, "card.updated", card.cardNo);
+      this.notify(r, Event.CARD_UPDATED, card.cardNo);
       return r;
     });
   };
@@ -235,7 +243,10 @@ class AuthInterceptor {
   };
 }
 
-export type Event = "card.created" | "card.updated";
+export enum Event {
+  CARD_CREATED,
+  CARD_UPDATED,
+}
 
 type EventListener = (resId: number) => void;
 

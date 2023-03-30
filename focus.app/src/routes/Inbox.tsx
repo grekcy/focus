@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
+import { Event } from "../lib/api";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView, ICardListView } from "../lib/components/CardList";
 import { LabelOption, LabelSelector } from "../lib/components/LabelSelector";
@@ -11,14 +12,17 @@ export function InboxPage() {
   const api = useFocusClient();
 
   useEffect(() => {
-    const handler = api.addEventListener("card.created", (cardNo: number) => {
-      api
-        .getCard(cardNo)
-        .then((r) => cardListRef.current && cardListRef.current.addCard(r))
-        .catch((e) => app.toast(e.message, "error"));
-    });
+    const handler = api.addEventListener(
+      Event.CARD_CREATED,
+      (cardNo: number) => {
+        api
+          .getCard(cardNo)
+          .then((r) => cardListRef.current && cardListRef.current.addCard(r))
+          .catch((e) => app.toast(e.message, "error"));
+      }
+    );
     return () => api.removeEventListener(handler);
-  }, [api, app]);
+  }, []);
 
   const [labels, setLabels] = useState<Label.AsObject[]>([]);
   useEffect(() => {

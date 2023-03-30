@@ -21,7 +21,7 @@ export function CardPage() {
       .then((r) => setCard(r))
       .catch((e) => app.toast(e.message, "error"))
       .finally(() => setLoading(false));
-  }, [app, api, cardNo]);
+  }, [cardNo]);
 
   function renderCard() {
     if (!card) return;

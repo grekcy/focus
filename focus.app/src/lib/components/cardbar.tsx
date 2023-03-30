@@ -7,11 +7,13 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { Link } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { DrawerHeader } from "../../SideBar";
+import { arrayContentEquals } from "../lib";
 import { Card, Label } from "../proto/focus_pb";
 import { InlineEdit } from "./InlineEdit";
 import { LabelOption, LabelSelector } from "./LabelSelector";
@@ -54,13 +56,14 @@ export const CardBar = forwardRef(
         .getCard(cardNo)
         .then((r) => setCard(r))
         .catch((e) => app.toast(e.message, "error"));
-    }, [api, app, cardNo]);
+    }, [cardNo]);
 
     function handleSubjectChanged(subject: string) {
       if (!card) return;
+
       api
         .updateCardSubject(card.cardNo, subject)
-        .then((r) => (card.subject = subject))
+        .then((r) => setCard(r))
         .catch((e) => app.toast(e.message, "error"));
     }
 
@@ -69,7 +72,7 @@ export const CardBar = forwardRef(
 
       api
         .updateCardContent(card.cardNo, content)
-        .then(() => (card.content = content))
+        .then((r) => setCard(r))
         .catch((e) => app.toast(e.message, "error"));
     }
 
@@ -81,34 +84,33 @@ export const CardBar = forwardRef(
         app.toast(e.message, "error");
       }
       return x;
-    }, [api]);
+    }, []);
 
-    const [editingLabels, setEditingLabels] = useState<number[]>([]);
+    const [editingLabel, setEditingLabel] = useState<number[]>([]);
     useEffect(() => {
-      setEditingLabels(card ? card.labelsList.map((x) => x) : []);
+      setEditingLabel(card ? card.labelsList : []);
     }, [card]);
 
     function handleLabelChange(selection: LabelOption[]) {
       if (!card) return;
-      if (
-        selection
-          .map((x) => x.id)
-          .sort()
-          .toString() !== card.labelsList.sort().toString()
-      ) {
-        api
-          .setCardLabels(
-            card.cardNo,
-            selection.map((x) => x.id)
-          )
-          .then((r) => {
-            const labels = selection.map((x) => x.id);
-            setEditingLabels(labels);
-            card.labelsList = labels;
-          })
-          .catch((e) => app.toast(e.message, "error"));
-      }
+
+      const updated = selection.map((x) => x.id);
+      setEditingLabel(updated);
+
+      // NOTE setEditingLabel()하면서 입력 포커스를 잃어버리네...
+      setTimeout(() => {
+        labelSelectorRef.current && labelSelectorRef.current.focus();
+      }, 100);
+
+      if (arrayContentEquals(updated, card.labelsList)) return;
+
+      api
+        .updateCardLabel(card.cardNo, updated)
+        .then((r) => setCard(r))
+        .catch((e) => app.toast(e.message, "error"));
     }
+
+    const labelSelectorRef = useRef<HTMLDivElement>(null);
 
     function CardPanel() {
       return (
@@ -121,8 +123,9 @@ export const CardBar = forwardRef(
 
           <Typography variant="h6">Labels:</Typography>
           <LabelSelector
+            ref={labelSelectorRef}
             labels={labels}
-            selection={editingLabels}
+            selection={editingLabel}
             onChange={handleLabelChange}
           />
 
