@@ -7,7 +7,7 @@ import TripOriginIcon from "@mui/icons-material/TripOrigin";
 import { Box, IconButton, Stack } from "@mui/material";
 import type { Identifier, XYCoord } from "dnd-core";
 import update from "immutability-helper";
-import {
+import React, {
   Ref,
   forwardRef,
   useEffect,
@@ -31,7 +31,7 @@ import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { Card, Label } from "../proto/focus_pb";
 import { EmptyIcon } from "./Icons";
 import { IInlineEdit, InlineEdit } from "./InlineEdit";
-import { LabelChip } from "./Labels";
+import { LabelChip } from "./LabelChip";
 
 export enum CardAction {
   COMPLETE,
@@ -71,12 +71,13 @@ export const CardListView = forwardRef(
         .catch((e) => app.toast(e.message, "error"));
     }, []);
 
-    const labels = useMemo(() => {
+    const labelsMap = useMemo(() => {
       const x: { [key: number]: Label.AsObject } = {};
-      api
-        .listLabels()
-        .then((r) => r.forEach((r) => (x[r.id] = r)))
-        .catch((e) => app.toast(e.message, "error"));
+      try {
+        api.listLabels().then((r) => r.forEach((e) => (x[e.id] = e)));
+      } catch (e: any) {
+        app.toast(e.message, "error");
+      }
       return x;
     }, [api]);
 
@@ -517,37 +518,39 @@ export const CardListView = forwardRef(
         >
           {cards.map((item, i) => {
             let endAdornment = item.labelsList
-              .filter((i) => labels[i])
+              .filter((i) => labelsMap[i])
               .map((i) => (
-                <LabelChip label={labels[i]?.label} color={labels[i].color} />
+                <LabelChip
+                  id={i}
+                  label={labelsMap[i]?.label}
+                  color={labelsMap[i].color}
+                />
               ));
             if (endAdornment) {
               endAdornment = [
-                <Stack direction="row" spacing="2px">
+                <Stack direction="row" spacing="1px">
                   {endAdornment}
                 </Stack>,
               ];
             }
 
             return (
-              <>
-                <CardItem
-                  ref={(ref) => (refs.current[i] = ref!)}
-                  key={item.cardNo}
-                  index={i}
-                  card={item}
-                  selected={selected === i}
-                  showCardNo={showCardNo}
-                  endAdornment={endAdornment}
-                  onClick={(index) => handleCardClick(index)}
-                  onSubmit={(v) => handleSubmit(i, v)}
-                  onActionClick={handleCardAction}
-                  onDragOver={handleDragOver}
-                  onCanDrop={handleCanDrop}
-                  onDragDrop={handleDragDrop}
-                  hasChild={hasChild}
-                />
-              </>
+              <CardItem
+                ref={(ref) => (refs.current[i] = ref!)}
+                key={item.cardNo}
+                index={i}
+                card={item}
+                selected={selected === i}
+                showCardNo={showCardNo}
+                endAdornment={endAdornment}
+                onClick={(index) => handleCardClick(index)}
+                onSubmit={(v) => handleSubmit(i, v)}
+                onActionClick={handleCardAction}
+                onDragOver={handleDragOver}
+                onCanDrop={handleCanDrop}
+                onDragDrop={handleDragDrop}
+                hasChild={hasChild}
+              />
             );
           })}
         </Box>
@@ -567,6 +570,7 @@ export const ItemTypes = {
 };
 
 interface ItemProp {
+  key?: React.Key;
   card: Card.AsObject;
   index: number; // index of items, used in dnd
   selected?: boolean;
@@ -585,6 +589,7 @@ interface ItemProp {
 const CardItem = forwardRef(
   (
     {
+      key,
       card,
       index,
       selected = false,
@@ -691,6 +696,7 @@ const CardItem = forwardRef(
 
     return (
       <Box
+        key={key}
         component="div"
         ref={containerRef}
         visibility={visible ? "inherit" : "hidden"}

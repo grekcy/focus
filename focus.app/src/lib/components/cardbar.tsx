@@ -6,13 +6,15 @@ import {
   forwardRef,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useState,
 } from "react";
 import { Link } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { DrawerHeader } from "../../SideBar";
-import { Card } from "../proto/focus_pb";
+import { Card, Label } from "../proto/focus_pb";
 import { InlineEdit } from "./InlineEdit";
+import { LabelOption, LabelSelector } from "./LabelSelector";
 
 export interface ICardBar {
   toggle: () => void;
@@ -71,6 +73,43 @@ export const CardBar = forwardRef(
         .catch((e) => app.toast(e.message, "error"));
     }
 
+    const labels = useMemo(() => {
+      const x: Label.AsObject[] = [];
+      try {
+        api.listLabels().then((r) => x.push(...r));
+      } catch (e: any) {
+        app.toast(e.message, "error");
+      }
+      return x;
+    }, [api]);
+
+    const [editingLabels, setEditingLabels] = useState<number[]>([]);
+    useEffect(() => {
+      setEditingLabels(card ? card.labelsList.map((x) => x) : []);
+    }, [card]);
+
+    function handleLabelChange(selection: LabelOption[]) {
+      if (!card) return;
+      if (
+        selection
+          .map((x) => x.id)
+          .sort()
+          .toString() !== card.labelsList.sort().toString()
+      ) {
+        api
+          .setCardLabels(
+            card.cardNo,
+            selection.map((x) => x.id)
+          )
+          .then((r) => {
+            const labels = selection.map((x) => x.id);
+            setEditingLabels(labels);
+            card.labelsList = labels;
+          })
+          .catch((e) => app.toast(e.message, "error"));
+      }
+    }
+
     function CardPanel() {
       return (
         <>
@@ -79,7 +118,14 @@ export const CardBar = forwardRef(
             value={card?.subject}
             onSubmit={(target, value) => handleSubjectChanged(value)}
           />
-          <Typography variant="h6">Labels: {card?.labelsList}</Typography>
+
+          <Typography variant="h6">Labels:</Typography>
+          <LabelSelector
+            labels={labels}
+            selection={editingLabels}
+            onChange={handleLabelChange}
+          />
+
           <Typography variant="h6">Description:</Typography>
           <InlineEdit
             multiline
@@ -116,7 +162,7 @@ export const CardBar = forwardRef(
           <Typography>
             <Link to={`/cards/${cardNo}`}>CARD-#{cardNo}</Link>
           </Typography>
-          <IconButton key="x" onClick={() => setOpen((p) => !p)}>
+          <IconButton onClick={() => setOpen((p) => !p)}>
             <ChevronRightIcon />
           </IconButton>
         </DrawerHeader>

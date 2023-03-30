@@ -127,7 +127,15 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setParentCardNo(parent);
 
-    return this.patchCard(card.toObject(), CardField.PARENT);
+    return this.patchCard(card.toObject(), CardField.PARENT_CARD);
+  };
+
+  setCardLabels = (cardNo: number, labels: number[]) => {
+    const card = new Card();
+    card.setCardNo(cardNo);
+    card.setLabelsList(labels);
+
+    return this.patchCard(card.toObject(), CardField.LABEL);
   };
 
   patchCard = (card: Card.AsObject, ...fields: CardField[]) => {
@@ -142,13 +150,16 @@ export class FocusAPI {
         case CardField.CONTENT:
           c.setContent(card.content);
           break;
-        case CardField.PARENT:
+        case CardField.PARENT_CARD:
           card.parentCardNo
             ? c.setParentCardNo(card.parentCardNo)
             : c.clearParentCardNo();
           break;
+        case CardField.LABEL:
+          c.setLabelsList(card.labelsList);
+          break;
         default:
-          throw new Error(`not supported: ${field.toString()}`);
+          throw new Error(`not implemented patch: ${field}`);
       }
     });
     req.setCard(c);

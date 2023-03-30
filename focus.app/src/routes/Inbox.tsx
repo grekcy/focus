@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView, ICardListView } from "../lib/components/CardList";
-import { LabelSelector } from "../lib/components/Labels";
+import { LabelSelector } from "../lib/components/LabelSelector";
 import { Label } from "../lib/proto/focus_pb";
 
 export function InboxPage() {
@@ -46,7 +46,7 @@ export function InboxPage() {
           Inbox cards
         </Typography>
         <Box flexGrow={0}>
-          <LabelSelector labels={labels} />
+          <LabelSelector labels={labels} sx={{ minWidth: { md: "300px" } }} />
         </Box>
       </Box>
 

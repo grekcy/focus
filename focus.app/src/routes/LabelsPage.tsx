@@ -19,7 +19,7 @@ import {
 import update from "immutability-helper";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
-import { LabelChip, LabelColors } from "../lib/components/Labels";
+import { LabelChip, LabelColors } from "../lib/components/LabelChip";
 import { Label } from "../lib/proto/focus_pb";
 
 export function LabelsPage() {
@@ -203,7 +203,7 @@ export function LabelsPage() {
                       <Box>
                         <InputLabel>Color</InputLabel>
                         <LabelChip
-                          id={`color_choose_${i}`}
+                          id={label.id}
                           color={label.color}
                           label="Click to choose a color"
                           onClick={(e) => openColorChooser(i, e.currentTarget)}

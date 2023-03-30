@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/whitekid/goxp"
 	"github.com/whitekid/goxp/fx"
@@ -207,7 +208,7 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 		if tx.RowsAffected != 1 {
 			log.Warnf("delete exactly id=%v, but deleted %d", req.Value, tx.RowsAffected)
 		}
-		
+
 		return nil
 	}); err != nil {
 		return helper.Empty(), status.Errorf(codes.Internal, "delete failed: %v", err.Error())
@@ -417,8 +418,10 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 		switch field {
 		case proto.CardField_SUBJECT:
 			updates["subject"] = req.Card.Subject
+
 		case proto.CardField_CONTENT:
 			updates["content"] = req.Card.Content
+
 		case proto.CardField_COMPLETED_AT:
 			if req.Card.CompletedAt == nil {
 				if card.CompletedAt == nil {
@@ -431,7 +434,8 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 				}
 				updates["completed_at"] = req.Card.CompletedAt.AsTime()
 			}
-		case proto.CardField_PARENT:
+
+		case proto.CardField_PARENT_CARD:
 			tx := s.db
 			if req.Card.ParentCardNo == nil {
 				updates["parent_card_no"] = gorm.Expr("NULL")
@@ -450,6 +454,9 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 			}
 			log.Debugf("new rank: %v", rank)
 			updates["rank"] = rank
+
+		case proto.CardField_LABEL:
+			updates["labels"] = pq.Int64Array(fx.Map(req.Card.Labels, func(x uint64) int64 { return int64(x) }))
 
 		default:
 			log.Warnf("unknown field: %v", field)

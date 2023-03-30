@@ -1,7 +1,8 @@
 import { Typography } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import { Cursors } from "./Cursors";
-import { PlayLabel } from "./Label";
+import { PlayAutocomplete } from "./PlayAutocomplete";
+import { PlayLabelSelector } from "./PlayLabelSelector";
 import { PlayTextField } from "./PlayTextField";
 import { DragAndDropCancel } from "./dndCancel";
 import { DragAndDropSortable } from "./dndSotrable";
@@ -9,9 +10,14 @@ import { DragAndDropTesting } from "./dndTesting";
 
 const plays = [
   {
-    id: "label",
-    label: "label",
-    children: <PlayLabel />,
+    id: "label-selector",
+    label: "label selector",
+    children: <PlayLabelSelector />,
+  },
+  {
+    id: "autocomplete",
+    label: "Autocomplete ",
+    children: <PlayAutocomplete />,
   },
   {
     id: "textfield",

@@ -10,23 +10,23 @@ import update from "immutability-helper";
 import { KeyboardEvent, ReactNode, useEffect, useState } from "react";
 import { Key } from "ts-key-enum";
 
-
-export function PlayLabel() {
+export function PlayAutocomplete() {
   return (
     <>
-      <Typography>Label selector</Typography>
-      <LabelSelector />
+      <Typography>Autocomplete</Typography>
+      <PlayAutocomplete1 />
     </>
   );
 }
 
 interface LabelOption {
-    id: number;
-    label: string;
-    color: string;
-  }
+  id: number;
   
-function LabelSelector() {
+  label: string;
+  color: string;
+}
+
+function PlayAutocomplete1() {
   const initialOptions: LabelOption[] = [
     { id: 1, label: "bug", color: "primary" },
     { id: 2, label: "enhancement", color: "secondary" },
