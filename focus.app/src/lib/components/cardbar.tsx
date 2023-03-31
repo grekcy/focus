@@ -16,7 +16,7 @@ import { DrawerHeader } from "../../SideBar";
 import { arrayContentEquals } from "../lib";
 import { Card, Label } from "../proto/focus_pb";
 import { InlineEdit } from "./InlineEdit";
-import { LabelOption, LabelSelector } from "./LabelSelector";
+import { LabelSelector } from "./LabelSelector";
 
 export interface ICardBar {
   toggle: () => void;
@@ -91,21 +91,19 @@ export const CardBar = forwardRef(
       setEditingLabel(card ? card.labelsList : []);
     }, [card]);
 
-    function handleLabelChange(selection: LabelOption[]) {
+    function handleLabelChange(selected: number[]) {
       if (!card) return;
 
-      const updated = selection.map((x) => x.id);
-      setEditingLabel(updated);
+      setEditingLabel(selected);
 
-      // NOTE setEditingLabel()하면서 입력 포커스를 잃어버리네...
       setTimeout(() => {
         labelSelectorRef.current && labelSelectorRef.current.focus();
       }, 100);
 
-      if (arrayContentEquals(updated, card.labelsList)) return;
+      if (arrayContentEquals(selected, card.labelsList)) return;
 
       api
-        .updateCardLabel(card.cardNo, updated)
+        .updateCardLabel(card.cardNo, selected)
         .then((r) => setCard(r))
         .catch((e) => app.toast(e.message, "error"));
     }
@@ -125,8 +123,8 @@ export const CardBar = forwardRef(
           <LabelSelector
             ref={labelSelectorRef}
             labels={labels}
-            selection={editingLabel}
-            onChange={handleLabelChange}
+            selected={editingLabel}
+            onSelectionChange={handleLabelChange}
           />
 
           <Typography variant="h6">Description:</Typography>

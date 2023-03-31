@@ -17,6 +17,7 @@ import {
   useState,
 } from "react";
 import { Key } from "ts-key-enum";
+import { arrayContentEquals } from "../lib";
 import { LabelChip } from "./LabelChip";
 
 export interface LabelOption {
@@ -27,36 +28,42 @@ export interface LabelOption {
 
 interface LabelSelectorProps {
   labels: LabelOption[];
-  selection?: number[]; // id of labels
+  selected?: number[]; // id of labels
   sx?: SxProps<Theme>;
-  onChange?: (selection: LabelOption[]) => void;
+  onSelectionChange?: (selected: number[]) => void; // id of labels
 }
 
 interface ILabelSelector {}
 
 export const LabelSelector = forwardRef(
   (
-    { labels, selection = [], sx, onChange }: LabelSelectorProps,
+    {
+      labels,
+      selected: inSelected = [],
+      sx,
+      onSelectionChange,
+    }: LabelSelectorProps,
     ref: Ref<HTMLDivElement>
   ) => {
     const [options, setOptions] = useState<LabelOption[]>(labels);
-    const [selected, setSelected] = useState<LabelOption[]>(
-      selection
-        .filter((x) => labels.findIndex((label) => label.id === x) !== -1)
-        .map((x) => labels.find((label) => label.id === x)!)
-    );
+    const [selected, setSelected] = useState<number[]>(inSelected);
     const [value, setValue] = useState("");
 
     useEffect(() => {
+      if (!arrayContentEquals(selected, inSelected)) setSelected(inSelected);
+    }, [inSelected]);
+
+    useEffect(() => {
       setOptions(
-        labels.filter((o) => selected.findIndex((s) => s.id === o.id) === -1)
+        labels.filter((o) => selected.findIndex((s) => s === o.id) === -1)
       );
     }, [labels, selected]);
 
-    function deleteLabel(index: number) {
+    function deleteLabel(id: number) {
+      const index = selected.indexOf(id);
       const updated = update(selected, { $splice: [[index, 1]] });
       setSelected(updated);
-      onChange && onChange(updated);
+      onSelectionChange && onSelectionChange(updated);
     }
 
     function handleChange(
@@ -65,17 +72,16 @@ export const LabelSelector = forwardRef(
     ) {
       if (!newValue) return;
 
-      const updated = update(selected, { $push: [newValue] });
+      const updated = update(selected, { $push: [newValue.id] });
       setSelected(updated);
 
       setValue("");
 
-      onChange && onChange(updated);
+      onSelectionChange && onSelectionChange(updated);
     }
 
     return (
       <Autocomplete
-        // ref={ref}
         size="small"
         sx={sx}
         autoHighlight
@@ -87,14 +93,17 @@ export const LabelSelector = forwardRef(
         ): ReactNode {
           params.size = "small";
           params.inputProps.value = value;
-          params.InputProps.startAdornment = selected.map((label, i) => (
-            <LabelChip
-              key={label.id.toString()}
-              label={label.label}
-              color={label.color}
-              onDelete={() => deleteLabel(i)}
-            />
-          ));
+          params.InputProps.startAdornment = selected.map((id) => {
+            const label = labels.find((e) => e.id === id)!;
+            return (
+              <LabelChip
+                key={label.id}
+                label={label.label}
+                color={label.color}
+                onDelete={() => deleteLabel(id)}
+              />
+            );
+          });
 
           return <TextField {...params} inputRef={ref} />;
         }}

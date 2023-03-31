@@ -1,4 +1,5 @@
 import { Box, Typography } from "@mui/material";
+import update from "immutability-helper";
 import { useEffect, useRef, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { Event } from "../lib/api";
@@ -9,7 +10,7 @@ import {
   IContextMenu,
   PopupContextMenu,
 } from "../lib/components/ContextMenu";
-import { LabelOption, LabelSelector } from "../lib/components/LabelSelector";
+import { LabelSelector } from "../lib/components/LabelSelector";
 import { Card, Label } from "../lib/proto/focus_pb";
 
 export function InboxPage() {
@@ -37,14 +38,23 @@ export function InboxPage() {
       .catch((e) => app.toast(e.message, "error"));
   }, []);
 
+  const [labelsMap, setlabelsMap] = useState<{ [key: number]: Label.AsObject }>(
+    {}
+  );
+  useEffect(() => {
+    const x: { [key: number]: Label.AsObject } = {};
+    labels.forEach((e) => (x[e.id] = e));
+    setlabelsMap(x);
+  }, [labels]);
+
   const cardBarRef = useRef<ICardBar>(null);
   function handleSelectCard(cardNo: number) {
     cardBarRef.current && cardBarRef.current.setCardNo(cardNo);
   }
 
   const [selectedLabels, setSelectedLabels] = useState<number[]>([]);
-  function handleLabelChange(labels: LabelOption[]) {
-    setSelectedLabels(labels.map((x) => x.id));
+  function handleLabelChange(labels: number[]) {
+    setSelectedLabels(labels);
   }
 
   const [cards, setCards] = useState<Card.AsObject[]>([]);
@@ -54,6 +64,11 @@ export function InboxPage() {
       .then((r) => setCards(r))
       .catch((e) => app.toast(e.message, "error"));
   }, [selectedLabels]);
+
+  function handleLabelClick(id: number) {
+    if (selectedLabels.indexOf(id) === -1)
+      setSelectedLabels((p) => update(p, { $push: [id] }));
+  }
 
   const cardListRef = useRef<ICardListView>(null);
   const contextMenuRef = useRef<IContextMenu>(null);
@@ -68,9 +83,9 @@ export function InboxPage() {
         <Box flexGrow={0}>
           <LabelSelector
             labels={labels}
-            selection={selectedLabels}
+            selected={selectedLabels}
             sx={{ minWidth: { md: "300px" } }}
-            onChange={handleLabelChange}
+            onSelectionChange={handleLabelChange}
           />
         </Box>
       </Box>
@@ -82,6 +97,7 @@ export function InboxPage() {
         onDoubleClick={() => cardBarRef.current && cardBarRef.current.toggle()}
         onSelect={handleSelectCard}
         onContextMenu={(e) => PopupContextMenu(e, contextMenuRef)}
+        onLabelClick={handleLabelClick}
       />
       <ContextMenu
         ref={contextMenuRef}

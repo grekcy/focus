@@ -48,6 +48,7 @@ interface CardListViewProp {
   onDoubleClick?: () => void;
   onSelect?: (cardNo: number) => void;
   onContextMenu?: (e: MouseEvent) => void;
+  onLabelClick?: (index: number) => void;
 }
 
 export interface ICardListView {
@@ -62,6 +63,7 @@ export const CardListView = forwardRef(
       onDoubleClick,
       onSelect,
       onContextMenu,
+      onLabelClick,
     }: CardListViewProp,
     ref: Ref<ICardListView>
   ) => {
@@ -543,6 +545,7 @@ export const CardListView = forwardRef(
                   id={i}
                   label={labelsMap[i]?.label}
                   color={labelsMap[i].color}
+                  onClick={() => onLabelClick && onLabelClick(i)}
                 />
               ));
             if (endAdornment) {
@@ -562,13 +565,13 @@ export const CardListView = forwardRef(
                 selected={selected === i}
                 showCardNo={showCardNo}
                 endAdornment={endAdornment}
+                hasChild={hasChild}
                 onClick={(index) => handleCardClick(index)}
                 onSubmit={(v) => handleSubmit(i, v)}
                 onActionClick={handleCardAction}
                 onDragOver={handleDragOver}
                 onCanDrop={handleCanDrop}
                 onDragDrop={handleDragDrop}
-                hasChild={hasChild}
               />
             );
           })}
