@@ -10,11 +10,13 @@ import {
 import {
   MouseEvent,
   Ref,
+  RefObject,
   forwardRef,
   useImperativeHandle,
   useMemo,
   useState,
 } from "react";
+import { EmptyIcon } from "./Icons";
 
 interface MenuItem {
   label: string;
@@ -25,14 +27,19 @@ interface MenuItem {
 
 interface ContextMenuProps {
   items: MenuItem[];
+  dense?: boolean | undefined;
 }
 
 export interface IContextMenu {
   popup: (e: MouseEvent) => void;
 }
 
+export function PopupContextMenu(e: MouseEvent, ref: RefObject<IContextMenu>) {
+  ref.current && ref.current.popup(e);
+}
+
 export const ContextMenu = forwardRef(
-  ({ items }: ContextMenuProps, ref: Ref<IContextMenu>) => {
+  ({ items, dense }: ContextMenuProps, ref: Ref<IContextMenu>) => {
     const [pos, setPos] = useState<{
       mouseX: number;
       mouseY: number;
@@ -74,13 +81,17 @@ export const ContextMenu = forwardRef(
         }
         onClose={handleClose}
       >
-        <MenuList dense>
+        <MenuList dense={dense}>
           {items.map((item) =>
             item.label === "-" ? (
               <Divider />
             ) : (
               <MenuItem onClick={(e) => handleItemClick(e, item.onClick)}>
-                {hasIcon && <ListItemIcon>{item.icon}</ListItemIcon>}
+                {hasIcon && (
+                  <ListItemIcon>
+                    {item.icon ? item.icon : <EmptyIcon fontSize="small" />}
+                  </ListItemIcon>
+                )}
                 <ListItemText>{item.label}</ListItemText>
                 {item.hotkey && (
                   <Typography

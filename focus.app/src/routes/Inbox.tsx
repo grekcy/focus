@@ -4,7 +4,11 @@ import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { Event } from "../lib/api";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView, ICardListView } from "../lib/components/CardList";
-import { ContextMenu, IContextMenu } from "../lib/components/ContextMenu";
+import {
+  ContextMenu,
+  IContextMenu,
+  PopupContextMenu,
+} from "../lib/components/ContextMenu";
 import { LabelOption, LabelSelector } from "../lib/components/LabelSelector";
 import { Card, Label } from "../lib/proto/focus_pb";
 
@@ -53,6 +57,7 @@ export function InboxPage() {
 
   const cardListRef = useRef<ICardListView>(null);
   const contextMenuRef = useRef<IContextMenu>(null);
+  const deferMenuRef = useRef<IContextMenu>(null);
 
   return (
     <>
@@ -76,21 +81,41 @@ export function InboxPage() {
         showCardNo={false}
         onDoubleClick={() => cardBarRef.current && cardBarRef.current.toggle()}
         onSelect={handleSelectCard}
-        onContextMenu={(e) => {
-          contextMenuRef.current && contextMenuRef.current.popup(e);
-        }}
+        onContextMenu={(e) => PopupContextMenu(e, contextMenuRef)}
       />
       <ContextMenu
         ref={contextMenuRef}
         items={[
           {
-            label: "Challenge this",
-            hotkey: "⌘C",
+            label: "Challenge this...",
+            hotkey: "⌘+Ctrl+C",
             onClick: () => app.toast("not implemented"),
           },
           { label: "-" },
-          { label: "defer...", onClick: () => app.toast("not implemented") },
+          {
+            label: "defer until...",
+            onClick: (e) => PopupContextMenu(e, deferMenuRef),
+          },
           { label: "due to...", onClick: () => app.toast("not implemented") },
+        ]}
+      />
+      <ContextMenu
+        ref={deferMenuRef}
+        items={[
+          {
+            label: "defer until Tomorrow",
+            hotkey: "⌘+Ctrl+T",
+            onClick: () => app.toast("not implemented"),
+          },
+          {
+            label: "defer until next Week",
+            hotkey: "⌘+Ctrl+W",
+            onClick: () => app.toast("not implemented"),
+          },
+          {
+            label: "defer until next Month",
+            onClick: () => app.toast("not implemented"),
+          },
         ]}
       />
       <CardBar ref={cardBarRef} />

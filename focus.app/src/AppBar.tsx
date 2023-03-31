@@ -13,7 +13,8 @@ import {
 } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useRef, useState } from "react";
+import { useHotkeys } from "react-hotkeys-hook";
 import { Link } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "./FocusProvider";
 
@@ -60,18 +61,21 @@ export function AppBar({ open }: AppBarProps) {
 
       setAdding(true);
 
-      (async () => {
-        api
-          .quickAddCard(subject)
-          .then((r) => {
-            setQucikAddSubject("");
-            return r;
-          })
-          .catch((e) => app.toast(e.message, "error"))
-          .finally(() => setAdding(false));
-      })();
+      api
+        .quickAddCard(subject)
+        .then((r) => {
+          setQucikAddSubject("");
+          app.toast(`added: ${subject}`, "success");
+          return r;
+        })
+        .catch((e) => app.toast(e.message, "error"))
+        .finally(() => setAdding(false));
     }
   };
+
+  useHotkeys(["meta+ctrl+a"], () => ref.current && ref.current.focus());
+
+  const ref = useRef<HTMLDivElement>(null);
 
   return (
     <MAppBar position="fixed" open={open}>
@@ -92,8 +96,9 @@ export function AppBar({ open }: AppBarProps) {
         <Box sx={{ flexGrow: 1, display: { xs: "flex" } }} />
         <Box sx={{ flexGrow: 0, display: { xs: "flex" } }}>
           <TextField
+            inputRef={ref}
             variant="standard"
-            placeholder="add card to inbox..."
+            placeholder="add card to inbox... ⌘+Ctrl+A"
             value={qucikAddSubject}
             onChange={(e) => setQucikAddSubject(e.target.value)}
             onKeyUp={onQuickAddKeyUp}
