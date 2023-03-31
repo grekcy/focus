@@ -38,15 +38,6 @@ export function InboxPage() {
       .catch((e) => app.toast(e.message, "error"));
   }, []);
 
-  const [labelsMap, setlabelsMap] = useState<{ [key: number]: Label.AsObject }>(
-    {}
-  );
-  useEffect(() => {
-    const x: { [key: number]: Label.AsObject } = {};
-    labels.forEach((e) => (x[e.id] = e));
-    setlabelsMap(x);
-  }, [labels]);
-
   const cardBarRef = useRef<ICardBar>(null);
   function handleSelectCard(cardNo: number) {
     cardBarRef.current && cardBarRef.current.setCardNo(cardNo);

@@ -53,6 +53,11 @@ export class Card extends jspb.Message {
   hasUpdatedAt(): boolean;
   clearUpdatedAt(): Card;
 
+  getDeferUntil(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setDeferUntil(value?: google_protobuf_timestamp_pb.Timestamp): Card;
+  hasDeferUntil(): boolean;
+  clearDeferUntil(): Card;
+
   getCompletedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
   setCompletedAt(value?: google_protobuf_timestamp_pb.Timestamp): Card;
   hasCompletedAt(): boolean;
@@ -87,6 +92,7 @@ export namespace Card {
     depth: number,
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     updatedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    deferUntil?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     creatorId: number,
     subject: string,
@@ -99,9 +105,14 @@ export namespace Card {
     PARENT_CARD_NO = 2,
   }
 
+  export enum DeferUntilCase { 
+    _DEFER_UNTIL_NOT_SET = 0,
+    DEFER_UNTIL = 6,
+  }
+
   export enum CompletedAtCase { 
     _COMPLETED_AT_NOT_SET = 0,
-    COMPLETED_AT = 6,
+    COMPLETED_AT = 7,
   }
 }
 

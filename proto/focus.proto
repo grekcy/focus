@@ -38,11 +38,12 @@ message Card {
   uint32 depth = 3;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
-  optional google.protobuf.Timestamp completed_at = 6;
-  uint64 creator_id = 7;
-  string subject = 8;
-  string content = 9;
-  repeated uint64 labels = 10;
+  optional google.protobuf.Timestamp defer_until = 6;
+  optional google.protobuf.Timestamp completed_at = 7;
+  uint64 creator_id = 8;
+  string subject = 9;
+  string content = 10;
+  repeated uint64 labels = 11;
 }
 
 message ListCardReq {

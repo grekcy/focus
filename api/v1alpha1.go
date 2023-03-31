@@ -7,7 +7,6 @@ import (
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
-	"github.com/whitekid/goxp"
 	"github.com/whitekid/goxp/fx"
 	"github.com/whitekid/goxp/log"
 	"github.com/whitekid/goxp/validate"
@@ -224,14 +223,12 @@ func cardModelToProto(in *CardWithDepth) *proto.Card {
 		Depth:        uint32(in.Depth),
 		CreatedAt:    timestamppb.New(in.CreatedAt),
 		UpdatedAt:    timestamppb.New(in.UpdatedAt),
-		CompletedAt: goxp.TernaryCF(in.CompletedAt == nil,
-			func() *timestamppb.Timestamp { return nil },
-			func() *timestamppb.Timestamp { return timestamppb.New(*in.CompletedAt) },
-		),
-		CreatorId: uint64(in.CreatorID),
-		Subject:   in.Subject,
-		Content:   in.Content,
-		Labels:    fx.Map(in.Labels, func(x int64) uint64 { return uint64(x) }),
+		DeferUntil:   helper.NewTimestamppb(in.DeferUntil),
+		CompletedAt:  helper.NewTimestamppb(in.CompletedAt),
+		CreatorId:    uint64(in.CreatorID),
+		Subject:      in.Subject,
+		Content:      in.Content,
+		Labels:       helper.ArrayToProto(in.Labels),
 	}
 }
 
