@@ -1,12 +1,17 @@
-import { Alert, AlertColor, Box, Snackbar } from "@mui/material";
-import { useState } from "react";
+import { AlertColor, Box } from "@mui/material";
+import { useRef, useState } from "react";
 import { CookiesProvider } from "react-cookie";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { AppBar } from "./AppBar";
-import { FocusClientProvider, FocusProvider, IFocusApp } from "./FocusProvider";
+import {
+  FocusClientProvider,
+  FocusProvider,
+  IFocusApp,
+  IFocusProvider,
+} from "./FocusProvider";
 import { DrawerHeader, SideBar } from "./SideBar";
-import { PlaygroundPage } from "./playground/PlaygroundPage";
+import { PlaygroundIndex } from "./playground/PlaygroundPage";
 import { CardPage } from "./routes/Cards";
 import { ChallengePage } from "./routes/Challenge";
 import { ErrorPage } from "./routes/ErrorPage";
@@ -21,25 +26,21 @@ import { TodayPage } from "./routes/Today";
 function App() {
   const [openSideBar, setOpenSideBar] = useState(false);
 
-  const [openToast, setOpenToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastSeverity, setToastSeverity] = useState<AlertColor>("success");
-
   const impl: IFocusApp = {
     toggleSidebar() {
       setOpenSideBar((p) => !p);
     },
     toast(message: string, severity?: AlertColor) {
-      setToastSeverity(severity ? severity : "info");
-      setToastMessage(message);
-      setOpenToast(true);
+      focusRef.current && focusRef.current.toast(message, severity);
     },
   };
+
+  const focusRef = useRef<IFocusProvider>(null);
 
   return (
     <CookiesProvider>
       <FocusClientProvider>
-        <FocusProvider app={impl}>
+        <FocusProvider app={impl} ref={focusRef}>
           <BrowserRouter>
             <Box sx={{ display: "flex" }}>
               <AppBar open={openSideBar} />
@@ -66,26 +67,13 @@ function App() {
                   <Route path="/labels" element={<LabelsPage />} />
                   <Route
                     path="/playground/:playId?"
-                    element={<PlaygroundPage />}
+                    element={<PlaygroundIndex />}
                   />
                   <Route path="*" element={<ErrorPage />} />
                 </Routes>
               </Box>
             </Box>
           </BrowserRouter>
-          <Snackbar
-            open={openToast}
-            anchorOrigin={{ vertical: "top", horizontal: "center" }}
-            autoHideDuration={6000}
-            onClose={(e, r) => {
-              if (r === "clickaway") return;
-              setOpenToast(false);
-            }}
-          >
-            <Alert severity={toastSeverity} onClose={() => setOpenToast(false)}>
-              {toastMessage}
-            </Alert>
-          </Snackbar>
         </FocusProvider>
       </FocusClientProvider>
     </CookiesProvider>

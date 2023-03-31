@@ -21,6 +21,7 @@ export const LabelColors: string[] = [
   "success.light",
   "success.main",
   "success.dark",
+  
   // other pre-defined colors: adaped from github
   "#B60205",
   "#D93F0B",
@@ -38,6 +39,7 @@ export const LabelColors: string[] = [
   "#C5DEF5",
   "#BFD4F2",
   "#D4C5F9",
+
   // others
   "#FFFFFF",
   "#000000",
@@ -47,6 +49,7 @@ const LabelTextColors: { [key: string]: string } = {
   "": "#000000",
   "#FFFFFF": "#000000",
   "#000000": "#FFFFFF",
+  "#BFD4F2": "#000000",
 };
 
 export function LabelTextColorFor(color: string) {

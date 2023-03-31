@@ -2,6 +2,7 @@ import { Typography } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import { Cursors } from "./Cursors";
 import { PlayAutocomplete } from "./PlayAutocomplete";
+import { PlayFocus } from "./PlayFocus";
 import { PlayLabelSelector } from "./PlayLabelSelector";
 import { PlayTextField } from "./PlayTextField";
 import { DragAndDropCancel } from "./dndCancel";
@@ -9,6 +10,11 @@ import { DragAndDropSortable } from "./dndSotrable";
 import { DragAndDropTesting } from "./dndTesting";
 
 const plays = [
+  {
+    id: "focus",
+    label: "Focus App",
+    children: <PlayFocus />,
+  },
   {
     id: "label-selector",
     label: "label selector",
@@ -46,7 +52,7 @@ const plays = [
   },
 ];
 
-export function PlaygroundPage() {
+export function PlaygroundIndex() {
   const { playId } = useParams();
 
   const play = plays.find((p) => p.id === playId);
