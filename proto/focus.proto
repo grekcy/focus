@@ -38,8 +38,8 @@ message Card {
   uint32 depth = 3;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
-  optional google.protobuf.Timestamp deferred_until = 6;
-  optional google.protobuf.Timestamp due_to = 7;
+  optional google.protobuf.Timestamp defer_until = 6;
+  optional google.protobuf.Timestamp due_date = 7;
   optional google.protobuf.Timestamp completed_at = 8;
   uint64 creator_id = 9;
   string subject = 10;

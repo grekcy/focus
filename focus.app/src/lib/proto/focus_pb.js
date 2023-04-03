@@ -482,8 +482,8 @@ proto.Card.toObject = function(includeInstance, msg) {
     depth: jspb.Message.getFieldWithDefault(msg, 3, 0),
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    deferredUntil: (f = msg.getDeferredUntil()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    dueTo: (f = msg.getDueTo()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    deferUntil: (f = msg.getDeferUntil()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    dueDate: (f = msg.getDueDate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     completedAt: (f = msg.getCompletedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     creatorId: jspb.Message.getFieldWithDefault(msg, 9, 0),
     subject: jspb.Message.getFieldWithDefault(msg, 10, ""),
@@ -550,12 +550,12 @@ proto.Card.deserializeBinaryFromReader = function(msg, reader) {
     case 6:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
-      msg.setDeferredUntil(value);
+      msg.setDeferUntil(value);
       break;
     case 7:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
-      msg.setDueTo(value);
+      msg.setDueDate(value);
       break;
     case 8:
       var value = new google_protobuf_timestamp_pb.Timestamp;
@@ -646,7 +646,7 @@ proto.Card.serializeBinaryToWriter = function(message, writer) {
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
-  f = message.getDeferredUntil();
+  f = message.getDeferUntil();
   if (f != null) {
     writer.writeMessage(
       6,
@@ -654,7 +654,7 @@ proto.Card.serializeBinaryToWriter = function(message, writer) {
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
-  f = message.getDueTo();
+  f = message.getDueDate();
   if (f != null) {
     writer.writeMessage(
       7,
@@ -848,10 +848,10 @@ proto.Card.prototype.hasUpdatedAt = function() {
 
 
 /**
- * optional google.protobuf.Timestamp deferred_until = 6;
+ * optional google.protobuf.Timestamp defer_until = 6;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.Card.prototype.getDeferredUntil = function() {
+proto.Card.prototype.getDeferUntil = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
 };
@@ -861,7 +861,7 @@ proto.Card.prototype.getDeferredUntil = function() {
  * @param {?proto.google.protobuf.Timestamp|undefined} value
  * @return {!proto.Card} returns this
 */
-proto.Card.prototype.setDeferredUntil = function(value) {
+proto.Card.prototype.setDeferUntil = function(value) {
   return jspb.Message.setWrapperField(this, 6, value);
 };
 
@@ -870,8 +870,8 @@ proto.Card.prototype.setDeferredUntil = function(value) {
  * Clears the message field making it undefined.
  * @return {!proto.Card} returns this
  */
-proto.Card.prototype.clearDeferredUntil = function() {
-  return this.setDeferredUntil(undefined);
+proto.Card.prototype.clearDeferUntil = function() {
+  return this.setDeferUntil(undefined);
 };
 
 
@@ -879,16 +879,16 @@ proto.Card.prototype.clearDeferredUntil = function() {
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Card.prototype.hasDeferredUntil = function() {
+proto.Card.prototype.hasDeferUntil = function() {
   return jspb.Message.getField(this, 6) != null;
 };
 
 
 /**
- * optional google.protobuf.Timestamp due_to = 7;
+ * optional google.protobuf.Timestamp due_date = 7;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.Card.prototype.getDueTo = function() {
+proto.Card.prototype.getDueDate = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
 };
@@ -898,7 +898,7 @@ proto.Card.prototype.getDueTo = function() {
  * @param {?proto.google.protobuf.Timestamp|undefined} value
  * @return {!proto.Card} returns this
 */
-proto.Card.prototype.setDueTo = function(value) {
+proto.Card.prototype.setDueDate = function(value) {
   return jspb.Message.setWrapperField(this, 7, value);
 };
 
@@ -907,8 +907,8 @@ proto.Card.prototype.setDueTo = function(value) {
  * Clears the message field making it undefined.
  * @return {!proto.Card} returns this
  */
-proto.Card.prototype.clearDueTo = function() {
-  return this.setDueTo(undefined);
+proto.Card.prototype.clearDueDate = function() {
+  return this.setDueDate(undefined);
 };
 
 
@@ -916,7 +916,7 @@ proto.Card.prototype.clearDueTo = function() {
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Card.prototype.hasDueTo = function() {
+proto.Card.prototype.hasDueDate = function() {
   return jspb.Message.getField(this, 7) != null;
 };
 

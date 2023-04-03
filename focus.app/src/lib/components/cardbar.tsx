@@ -146,14 +146,14 @@ export const CardBar = forwardRef(
           <Stack direction="column">
             <Box>
               Deferred until:
-              {card?.deferredUntil
-                ? new Date(card?.deferredUntil.seconds * 1000).toLocaleString()
+              {card?.deferUntil
+                ? new Date(card?.deferUntil.seconds * 1000).toLocaleString()
                 : "N/A"}
             </Box>
             <Box>
               Due to:
-              {card?.dueTo
-                ? new Date(card?.dueTo.seconds * 1000).toLocaleString()
+              {card?.dueDate
+                ? new Date(card?.dueDate.seconds * 1000).toLocaleString()
                 : "N/A"}
             </Box>
             <Box>

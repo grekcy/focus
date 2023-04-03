@@ -767,28 +767,28 @@ export const CardItem = forwardRef(
               />
             </Box>
           </Box>
-          {(card.deferredUntil || card.dueTo) && (
+          {(card.deferUntil || card.dueDate) && (
             <Box sx={{ display: "flex" }}>
               <Box sx={{ flexGrow: 1 }}></Box>
               <Box
                 sx={{
                   flexGrow: 0,
-                  color: card.deferredUntil ? "gray" : "lightgray",
+                  color: card.deferUntil ? "gray" : "lightgray",
                 }}
               >
-                {card.deferredUntil
-                  ? new Date(card.deferredUntil.seconds * 1000).toLocaleString()
+                {card.deferUntil
+                  ? new Date(card.deferUntil.seconds * 1000).toLocaleString()
                   : "no defered date"}
               </Box>
               <Box
                 sx={{
                   flexGrow: 0,
                   pl: "1rem",
-                  color: card.dueTo ? "gray" : "lightgray",
+                  color: card.dueDate ? "gray" : "lightgray",
                 }}
               >
-                {card.dueTo
-                  ? new Date(card.dueTo.seconds * 1000).toLocaleString()
+                {card.dueDate
+                  ? new Date(card.dueDate.seconds * 1000).toLocaleString()
                   : "no due date"}
               </Box>
             </Box>

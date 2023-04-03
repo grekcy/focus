@@ -157,10 +157,10 @@ export class FocusAPI {
     );
   };
 
-  updateCardDeferredUntil = (cardNo: number, deferredUntil: Date | null) => {
+  updateCardDeferUntil = (cardNo: number, deferUntil: Date | null) => {
     const card = new Card();
     card.setCardNo(cardNo);
-    if (deferredUntil) card.setDeferredUntil(Timestamp.fromDate(deferredUntil));
+    if (deferUntil) card.setDeferUntil(Timestamp.fromDate(deferUntil));
 
     return this.patchCard(card.toObject(), CardField.DEFER_UNTIL).then((r) =>
       r.toObject()
@@ -188,11 +188,11 @@ export class FocusAPI {
           c.setLabelsList(card.labelsList);
           break;
         case CardField.DEFER_UNTIL:
-          if (card.deferredUntil) {
+          if (card.deferUntil) {
             const defer = Timestamp.fromDate(
-              new Date(card.deferredUntil.seconds * 1000)
+              new Date(card.deferUntil.seconds * 1000)
             );
-            c.setDeferredUntil(defer);
+            c.setDeferUntil(defer);
           }
           break;
         default:

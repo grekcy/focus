@@ -218,18 +218,18 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 
 func cardModelToProto(in *CardWithDepth) *proto.Card {
 	return &proto.Card{
-		CardNo:        uint64(in.CardNo),
-		ParentCardNo:  helper.PP(in.ParentCardNo),
-		Depth:         uint32(in.Depth),
-		CreatedAt:     timestamppb.New(in.CreatedAt),
-		UpdatedAt:     timestamppb.New(in.UpdatedAt),
-		DeferredUntil: helper.NewTimestamppb(in.DeferredUntil),
-		DueTo:         helper.NewTimestamppb(in.DueTo),
-		CompletedAt:   helper.NewTimestamppb(in.CompletedAt),
-		CreatorId:     uint64(in.CreatorID),
-		Subject:       in.Subject,
-		Content:       in.Content,
-		Labels:        helper.ArrayToProto(in.Labels),
+		CardNo:       uint64(in.CardNo),
+		ParentCardNo: helper.PP(in.ParentCardNo),
+		Depth:        uint32(in.Depth),
+		CreatedAt:    timestamppb.New(in.CreatedAt),
+		UpdatedAt:    timestamppb.New(in.UpdatedAt),
+		DeferUntil:   helper.NewTimestamppb(in.DeferUntil),
+		DueDate:      helper.NewTimestamppb(in.DueDate),
+		CompletedAt:  helper.NewTimestamppb(in.CompletedAt),
+		CreatorId:    uint64(in.CreatorID),
+		Subject:      in.Subject,
+		Content:      in.Content,
+		Labels:       helper.ArrayToProto(in.Labels),
 	}
 }
 
@@ -313,9 +313,9 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card,
 		}
 
 		if opt.excludeDeferred {
-			tx = tx.Where("deferred_until IS NULL OR deferred_until < now()")
+			tx = tx.Where("defer_until IS NULL OR defer_until < now()")
 		} else {
-			tx = tx.Where("deferred_until IS NULL OR deferred_until > now()")
+			tx = tx.Where("defer_until IS NULL OR defer_until > now()")
 		}
 
 		if where != nil {
@@ -480,10 +480,10 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 			updates["labels"] = pq.Int64Array(fx.Map(req.Card.Labels, func(x uint64) int64 { return int64(x) }))
 
 		case proto.CardField_DEFER_UNTIL:
-			if req.Card.DeferredUntil == nil {
-				updates["deferred_until"] = gorm.Expr("NULL")
+			if req.Card.DeferUntil == nil {
+				updates["defer_until"] = gorm.Expr("NULL")
 			} else {
-				updates["deferred_until"] = req.Card.DeferredUntil.AsTime()
+				updates["defer_until"] = req.Card.DeferUntil.AsTime()
 			}
 
 		default:

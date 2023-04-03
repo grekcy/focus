@@ -53,15 +53,15 @@ export class Card extends jspb.Message {
   hasUpdatedAt(): boolean;
   clearUpdatedAt(): Card;
 
-  getDeferredUntil(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setDeferredUntil(value?: google_protobuf_timestamp_pb.Timestamp): Card;
-  hasDeferredUntil(): boolean;
-  clearDeferredUntil(): Card;
+  getDeferUntil(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setDeferUntil(value?: google_protobuf_timestamp_pb.Timestamp): Card;
+  hasDeferUntil(): boolean;
+  clearDeferUntil(): Card;
 
-  getDueTo(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setDueTo(value?: google_protobuf_timestamp_pb.Timestamp): Card;
-  hasDueTo(): boolean;
-  clearDueTo(): Card;
+  getDueDate(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setDueDate(value?: google_protobuf_timestamp_pb.Timestamp): Card;
+  hasDueDate(): boolean;
+  clearDueDate(): Card;
 
   getCompletedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
   setCompletedAt(value?: google_protobuf_timestamp_pb.Timestamp): Card;
@@ -97,8 +97,8 @@ export namespace Card {
     depth: number,
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     updatedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    deferredUntil?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    dueTo?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    deferUntil?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    dueDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     creatorId: number,
     subject: string,
@@ -111,14 +111,14 @@ export namespace Card {
     PARENT_CARD_NO = 2,
   }
 
-  export enum DeferredUntilCase { 
-    _DEFERRED_UNTIL_NOT_SET = 0,
-    DEFERRED_UNTIL = 6,
+  export enum DeferUntilCase { 
+    _DEFER_UNTIL_NOT_SET = 0,
+    DEFER_UNTIL = 6,
   }
 
-  export enum DueToCase { 
-    _DUE_TO_NOT_SET = 0,
-    DUE_TO = 7,
+  export enum DueDateCase { 
+    _DUE_DATE_NOT_SET = 0,
+    DUE_DATE = 7,
   }
 
   export enum CompletedAtCase { 

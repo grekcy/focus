@@ -61,11 +61,11 @@ func TestListCards(t *testing.T) {
 	ctx, service := newTestClient(ctx, t)
 
 	// set deferred cards
-	deferredCard, err := service.QuickAddCard(ctx, wrapperspb.String("test deferred card"))
+	deferredCard, err := service.QuickAddCard(ctx, wrapperspb.String("test defer card"))
 	require.NoError(t, err)
 	service.PatchCard(ctx, &proto.PatchCardReq{Card: &proto.Card{
-		CardNo:        deferredCard.CardNo,
-		DeferredUntil: timestamppb.New(time.Now().AddDate(0, 0, 1)),
+		CardNo:     deferredCard.CardNo,
+		DeferUntil: timestamppb.New(time.Now().AddDate(0, 0, 1)),
 	}, Fields: []proto.CardField{proto.CardField_DEFER_UNTIL}})
 
 	defer func() {
@@ -107,13 +107,13 @@ func TestListCards(t *testing.T) {
 				require.Contains(t,
 					fx.Map(got, func(e *CardWithDepth) uint64 { return uint64(e.CardNo) }), deferredCard.CardNo)
 				fx.Each(got, func(_ int, c *CardWithDepth) {
-					if c.DeferredUntil != nil {
-						require.True(t, c.DeferredUntil.After(time.Now()))
+					if c.DeferUntil != nil {
+						require.True(t, c.DeferUntil.After(time.Now()))
 					}
 				})
 			} else {
 				fx.Each(got, func(_ int, c *CardWithDepth) {
-					require.Nil(t, c.DeferredUntil)
+					require.Nil(t, c.DeferUntil)
 				})
 			}
 

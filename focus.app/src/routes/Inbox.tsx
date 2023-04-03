@@ -74,7 +74,7 @@ export function InboxPage() {
     if (cardNo === -1) return;
 
     api
-      .updateCardDeferredUntil(cardNo, deferUntil)
+      .updateCardDeferUntil(cardNo, deferUntil)
       .then((r) =>
         deferUntil
           ? app.toast(
