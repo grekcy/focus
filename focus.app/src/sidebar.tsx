@@ -211,9 +211,10 @@ export const SideBar = forwardRef(
                       >
                         {icon}
                       </ListItemIcon>
-                      <ListItemText sx={{ opacity: currentOpen ? 1 : 0 }}>
-                        {page.title}
-                      </ListItemText>
+                      <ListItemText
+                        primary={page.title}
+                        sx={{ opacity: currentOpen ? 1 : 0 }}
+                      />
                     </ListItemButton>
                   </Tooltip>
                 </ListItem>

@@ -1,6 +1,15 @@
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { Box, Divider, Drawer, IconButton, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Drawer,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
   Ref,
   forwardRef,
@@ -112,7 +121,7 @@ export const CardBar = forwardRef(
 
     function CardPanel() {
       return (
-        <>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Typography variant="h6">Subject: </Typography>
           <InlineEdit
             value={card?.subject}
@@ -134,17 +143,19 @@ export const CardBar = forwardRef(
             onSubmit={(target, value) => handleDescriptionChanged(value)}
           />
           <Divider textAlign="left">Dates</Divider>
-          <Box>
-            Created:
-            {card?.createdAt &&
-              new Date(card?.createdAt.seconds * 1000).toLocaleString()}
-          </Box>
-          <Box>
-            Updated:
-            {card?.updatedAt &&
-              new Date(card?.updatedAt.seconds * 1000).toLocaleString()}
-          </Box>
-        </>
+          <Stack direction="column">
+            <Box>
+              Created:
+              {card?.createdAt &&
+                new Date(card?.createdAt.seconds * 1000).toLocaleString()}
+            </Box>
+            <Box>
+              Updated:
+              {card?.updatedAt &&
+                new Date(card?.updatedAt.seconds * 1000).toLocaleString()}
+            </Box>
+          </Stack>
+        </LocalizationProvider>
       );
     }
 

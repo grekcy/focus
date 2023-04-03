@@ -94,7 +94,8 @@ export const LabelSelector = forwardRef(
           params.size = "small";
           params.inputProps.value = value;
           params.InputProps.startAdornment = selected.map((id) => {
-            const label = labels.find((e) => e.id === id)!;
+            const label = labels.find((e) => e.id === id);
+            if (!label) return <></>;
             return (
               <LabelChip
                 key={label.id}

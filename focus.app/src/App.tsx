@@ -11,7 +11,7 @@ import {
   IFocusProvider,
 } from "./FocusProvider";
 import { DrawerHeader, SideBar } from "./SideBar";
-import { PlaygroundIndex } from "./playground/PlaygroundPage";
+import { PlaygroundIndex } from "./playground/PlaygroundIndex";
 import { CardPage } from "./routes/Cards";
 import { ChallengePage } from "./routes/Challenge";
 import { ErrorPage } from "./routes/ErrorPage";

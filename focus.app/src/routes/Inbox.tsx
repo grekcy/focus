@@ -92,36 +92,36 @@ export function InboxPage() {
       />
       <ContextMenu
         ref={contextMenuRef}
-        items={[
+        actions={[
           {
             label: "Challenge this...",
             hotkey: "⌘+Ctrl+C",
-            onClick: () => app.toast("not implemented"),
+            onExecute: () => app.toast("not implemented"),
           },
           { label: "-" },
           {
             label: "defer until...",
-            onClick: (e) => PopupContextMenu(e, deferMenuRef),
+            onExecute: (e) => PopupContextMenu(e, deferMenuRef),
           },
-          { label: "due to...", onClick: () => app.toast("not implemented") },
+          { label: "due to...", onExecute: () => app.toast("not implemented") },
         ]}
       />
       <ContextMenu
         ref={deferMenuRef}
-        items={[
+        actions={[
           {
             label: "defer until Tomorrow",
             hotkey: "⌘+Ctrl+T",
-            onClick: () => app.toast("not implemented"),
+            onExecute: () => app.toast("not implemented"),
           },
           {
             label: "defer until next Week",
             hotkey: "⌘+Ctrl+W",
-            onClick: () => app.toast("not implemented"),
+            onExecute: () => app.toast("not implemented"),
           },
           {
             label: "defer until next Month",
-            onClick: () => app.toast("not implemented"),
+            onExecute: () => app.toast("not implemented"),
           },
         ]}
       />

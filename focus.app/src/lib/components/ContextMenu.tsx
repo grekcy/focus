@@ -18,15 +18,15 @@ import {
 } from "react";
 import { EmptyIcon } from "./Icons";
 
-interface MenuItem {
+export interface Action {
   label: string;
   icon?: JSX.Element;
   hotkey?: string;
-  onClick?: (e: MouseEvent) => void;
+  onExecute?: (e: MouseEvent) => void;
 }
 
 interface ContextMenuProps {
-  items: MenuItem[];
+  actions: Action[];
   dense?: boolean | undefined;
 }
 
@@ -39,7 +39,7 @@ export function PopupContextMenu(e: MouseEvent, ref: RefObject<IContextMenu>) {
 }
 
 export const ContextMenu = forwardRef(
-  ({ items, dense }: ContextMenuProps, ref: Ref<IContextMenu>) => {
+  ({ actions: items, dense }: ContextMenuProps, ref: Ref<IContextMenu>) => {
     const [pos, setPos] = useState<{
       mouseX: number;
       mouseY: number;
@@ -58,7 +58,10 @@ export const ContextMenu = forwardRef(
       setPos(null);
     }
 
-    function handleItemClick(e: MouseEvent, onClick?: (e: MouseEvent) => void) {
+    function handleMenuItemClick(
+      e: MouseEvent,
+      onClick?: (e: MouseEvent) => void
+    ) {
       handleClose();
       onClick && onClick(e);
     }
@@ -86,13 +89,13 @@ export const ContextMenu = forwardRef(
             item.label === "-" ? (
               <Divider />
             ) : (
-              <MenuItem onClick={(e) => handleItemClick(e, item.onClick)}>
+              <MenuItem onClick={(e) => handleMenuItemClick(e, item.onExecute)}>
                 {hasIcon && (
                   <ListItemIcon>
                     {item.icon ? item.icon : <EmptyIcon fontSize="small" />}
                   </ListItemIcon>
                 )}
-                <ListItemText>{item.label}</ListItemText>
+                <ListItemText primary={item.label} />
                 {item.hotkey && (
                   <Typography
                     variant="body2"
