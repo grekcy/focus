@@ -10,6 +10,7 @@ import {
 import { ReactNode, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Cursors } from "./Cursors";
+import { PlayDateTime } from "./DateTime";
 import { PlayAutocomplete } from "./PlayAutocomplete";
 import { PlayCardBar } from "./PlayCardBar";
 import { PlayDateTimePicker } from "./PlayDateTimePicker";
@@ -98,6 +99,17 @@ const plays = [
         id: "drag-cursors",
         label: "Drag: Cursors",
         children: <Cursors />,
+      },
+    ],
+  },
+  {
+    id: "misc",
+    label: "Misc",
+    items: [
+      {
+        id: "datetime",
+        label: "DateTime",
+        children: <PlayDateTime />,
       },
     ],
   },

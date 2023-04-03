@@ -11,6 +11,7 @@ import {
   PopupContextMenu,
 } from "../lib/components/ContextMenu";
 import { LabelSelector } from "../lib/components/LabelSelector";
+import { datetime } from "../lib/datetime";
 import { Card, Label } from "../lib/proto/focus_pb";
 
 export function InboxPage() {
@@ -39,8 +40,12 @@ export function InboxPage() {
   }, []);
 
   const cardBarRef = useRef<ICardBar>(null);
+  const [cardNo, setCardNo] = useState(-1);
   function handleSelectCard(cardNo: number) {
-    cardBarRef.current && cardBarRef.current.setCardNo(cardNo);
+    if (cardBarRef.current) {
+      cardBarRef.current.setCardNo(cardNo);
+      setCardNo(cardNo);
+    }
   }
 
   const [selectedLabels, setSelectedLabels] = useState<number[]>([]);
@@ -59,6 +64,25 @@ export function InboxPage() {
   function handleLabelClick(id: number) {
     if (selectedLabels.indexOf(id) === -1)
       setSelectedLabels((p) => update(p, { $push: [id] }));
+  }
+
+  function deferUntilTomorrow() {
+    if (cardNo === -1) return;
+
+    const deferUntil = datetime
+      .now()
+      .set("hour", 9)
+      .set("minute", 0)
+      .set("second", 0)
+      .add(1, "day")
+      .toDate();
+
+    api
+      .updateCardDeferUntil(cardNo, deferUntil)
+      .then((r) =>
+        app.toast(`card ${cardNo} defered until ${deferUntil.toLocaleString()}`)
+      )
+      .catch((e) => app.toast(e.message, "error"));
   }
 
   const cardListRef = useRef<ICardListView>(null);
@@ -112,7 +136,7 @@ export function InboxPage() {
           {
             label: "defer until Tomorrow",
             hotkey: "⌘+Ctrl+T",
-            onExecute: () => app.toast("not implemented"),
+            onExecute: () => deferUntilTomorrow(),
           },
           {
             label: "defer until next Week",

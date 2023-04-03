@@ -463,6 +463,13 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 		case proto.CardField_LABEL:
 			updates["labels"] = pq.Int64Array(fx.Map(req.Card.Labels, func(x uint64) int64 { return int64(x) }))
 
+		case proto.CardField_DEFER_UNTIL:
+			if req.Card.DeferUntil == nil {
+				updates["defer_until"] = gorm.Expr("NULL")
+			} else {
+				updates["defer_until"] = req.Card.DeferUntil.AsTime()
+			}
+
 		default:
 			log.Warnf("unknown field: %v", field)
 		}

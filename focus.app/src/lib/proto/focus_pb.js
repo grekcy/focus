@@ -2499,7 +2499,8 @@ proto.CardField = {
   COMPLETED_AT: 1,
   CONTENT: 2,
   PARENT_CARD: 3,
-  LABEL: 4
+  LABEL: 4,
+  DEFER_UNTIL: 5
 };
 
 goog.object.extend(exports, proto);

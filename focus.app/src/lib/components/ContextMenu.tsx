@@ -22,6 +22,7 @@ export interface Action {
   label: string;
   icon?: JSX.Element;
   hotkey?: string;
+  onEnabled?: () => boolean;
   onExecute?: (e: MouseEvent) => void;
 }
 

@@ -27,7 +27,7 @@ export const Toast = forwardRef(
 
     useImperativeHandle(ref, () => ({
       toast(message: string, severity?: AlertColor) {
-        severity && setToastSeverity(severity);
+        setToastSeverity(severity ? severity : defaultseverity);
         setToastMessage(message);
         setOpenToast(true);
       },

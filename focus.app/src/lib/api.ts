@@ -155,6 +155,16 @@ export class FocusAPI {
     );
   };
 
+  updateCardDeferUntil = (cardNo: number, deferUntil: Date | null) => {
+    const card = new Card();
+    card.setCardNo(cardNo);
+    if (deferUntil) card.setDeferUntil(Timestamp.fromDate(deferUntil));
+
+    return this.patchCard(card.toObject(), CardField.DEFER_UNTIL).then((r) =>
+      r.toObject()
+    );
+  };
+
   patchCard = (card: Card.AsObject, ...fields: CardField[]) => {
     const req = new PatchCardReq();
     const c = new Card();
@@ -174,6 +184,16 @@ export class FocusAPI {
           break;
         case CardField.LABEL:
           c.setLabelsList(card.labelsList);
+          break;
+        case CardField.DEFER_UNTIL:
+          if (card.deferUntil) {
+            const defer = Timestamp.fromDate(
+              new Date(card.deferUntil.seconds * 1000)
+            );
+            c.setDeferUntil(defer);
+          } else {
+            c.clearDeferUntil()
+          }
           break;
         default:
           throw new Error(`not implemented patch: ${field}`);
