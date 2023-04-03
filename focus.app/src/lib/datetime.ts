@@ -5,7 +5,7 @@ dayjs.extend(utc);
 
 // function midnight(): Dayjs {}
 
-export namespace datetime {
+namespace datetime {
   export function now() {
     return dayjs();
   }
@@ -14,3 +14,4 @@ export namespace datetime {
     return dayjs().set("hour", 9).set("minute", 0).set("second", 0);
   }
 }
+export default datetime;

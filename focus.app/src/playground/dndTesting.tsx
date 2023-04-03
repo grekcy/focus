@@ -1,4 +1,4 @@
-import { Box } from "@mui/material";
+import Box from "@mui/material/Box";
 import type { Identifier } from "dnd-core";
 import update from "immutability-helper";
 import { useCallback, useRef, useState } from "react";
@@ -140,7 +140,7 @@ interface ContainerState {
   cards: Item[];
 }
 
-export function DragAndDropTesting() {
+function DragAndDropTesting() {
   const [cards, setCards] = useState([
     {
       id: 1,
@@ -208,3 +208,4 @@ export function DragAndDropTesting() {
     </DndProvider>
   );
 }
+export default DragAndDropTesting;

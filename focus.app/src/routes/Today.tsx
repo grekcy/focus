@@ -1,11 +1,12 @@
-import { Box, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { useEffect, useRef, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
-import { CardBar, ICardBar } from "../lib/components/CardBar";
-import { CardListView } from "../lib/components/CardList";
+import CardBar, { ICardBar } from "../lib/components/CardBar";
+import CardListView from "../lib/components/CardList";
 import { Card } from "../lib/proto/focus_pb";
 
-export function TodayPage() {
+function TodayPage() {
   const app = useFocusApp();
   const api = useFocusClient();
 
@@ -33,3 +34,4 @@ export function TodayPage() {
     </>
   );
 }
+export default TodayPage;

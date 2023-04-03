@@ -1,6 +1,6 @@
-import { datetime } from "../lib/datetime";
+import datetime from "../lib/datetime";
 
-export function PlayDateTime() {
+function PlayDateTime() {
   return (
     <>
       <ul>
@@ -30,3 +30,4 @@ export function PlayDateTime() {
     </>
   );
 }
+export default PlayDateTime;

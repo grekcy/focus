@@ -15,7 +15,7 @@ import {
   RankCardReq,
 } from "./proto/focus_pb";
 
-export class FocusAPI {
+class FocusAPI {
   s: V1Alpha1Client;
   listeners: { [event: string]: EventListener[] };
 
@@ -242,6 +242,7 @@ export class FocusAPI {
     return this.s.deleteLabel(req, null).then((r) => r.toObject());
   };
 }
+export default FocusAPI;
 
 class AuthInterceptor {
   getToken: () => string;

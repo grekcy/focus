@@ -1,17 +1,14 @@
 import AddIcon from "@mui/icons-material/Add";
 import MenuIcon from "@mui/icons-material/Menu";
-import {
-  Avatar,
-  Box,
-  IconButton,
-  InputAdornment,
-  ListItemButton,
-  SvgIcon,
-  SvgIconProps,
-  TextField,
-  Toolbar,
-} from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
+import ListItemButton from "@mui/material/ListItemButton";
+import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
+import TextField from "@mui/material/TextField";
+import Toolbar from "@mui/material/Toolbar";
 import { styled } from "@mui/material/styles";
 import { SyntheticEvent, useRef, useState } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -46,7 +43,7 @@ interface AppBarProps {
   open: boolean;
 }
 
-export function AppBar({ open }: AppBarProps) {
+function AppBar({ open }: AppBarProps) {
   const [qucikAddSubject, setQucikAddSubject] = useState("");
   const [adding, setAdding] = useState(false);
 
@@ -122,6 +119,7 @@ export function AppBar({ open }: AppBarProps) {
     </MAppBar>
   );
 }
+export default AppBar;
 
 function HomeIcon(props: SvgIconProps) {
   return (

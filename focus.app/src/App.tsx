@@ -1,27 +1,28 @@
-import { AlertColor, Box } from "@mui/material";
+import Box from "@mui/material/Box";
 import { useRef, useState } from "react";
 import { CookiesProvider } from "react-cookie";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import { AppBar } from "./AppBar";
+import AppBar from "./AppBar";
 import {
+  AlertColor,
   FocusClientProvider,
   FocusProvider,
   IFocusApp,
   IFocusProvider,
 } from "./FocusProvider";
-import { DrawerHeader, SideBar } from "./SideBar";
-import { PlayIndex } from "./playground/Playndex";
-import { CardPage } from "./routes/Cards";
-import { ChallengePage } from "./routes/Challenge";
-import { ErrorPage } from "./routes/ErrorPage";
-import { ForecastPage } from "./routes/Forecast";
-import { InboxPage } from "./routes/Inbox";
-import { LabelsPage } from "./routes/LabelsPage";
-import { PerformancePage } from "./routes/Performance";
-import { PlanningPage } from "./routes/Planning";
-import { Root } from "./routes/Root";
-import { TodayPage } from "./routes/Today";
+import SideBar, { DrawerHeader } from "./SideBar";
+import PlayIndex from "./playground/PlayIndex";
+import CardPage from "./routes/Cards";
+import ChallengePage from "./routes/Challenge";
+import ErrorPage from "./routes/ErrorPage";
+import ForecastPage from "./routes/Forecast";
+import InboxPage from "./routes/Inbox";
+import LabelsPage from "./routes/LabelsPage";
+import PerformancePage from "./routes/Performance";
+import PlanningPage from "./routes/Planning";
+import RootPage from "./routes/Root";
+import TodayPage from "./routes/Today";
 
 function App() {
   const [openSideBar, setOpenSideBar] = useState(false);
@@ -51,7 +52,7 @@ function App() {
                 <Routes>
                   <Route
                     index
-                    element={<Root />}
+                    element={<RootPage />}
                     errorElement={<ErrorPage />}
                   />
                   <Route path="/inbox" element={<InboxPage />} />

@@ -1,26 +1,23 @@
-import {
-  Box,
-  Checkbox,
-  FormControlLabel,
-  Stack,
-  Typography,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import update from "immutability-helper";
 import { useEffect, useRef, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { Event } from "../lib/api";
-import { CardBar, ICardBar } from "../lib/components/CardBar";
-import { CardListView, ICardListView } from "../lib/components/CardList";
-import {
-  ContextMenu,
+import CardBar, { ICardBar } from "../lib/components/CardBar";
+import CardListView, { ICardListView } from "../lib/components/CardList";
+import ContextMenu, {
   IContextMenu,
   PopupContextMenu,
 } from "../lib/components/ContextMenu";
-import { LabelSelector } from "../lib/components/LabelSelector";
-import { datetime } from "../lib/datetime";
+import LabelSelector from "../lib/components/LabelSelector";
+import datetime from "../lib/datetime";
 import { Card, Label } from "../lib/proto/focus_pb";
 
-export function InboxPage() {
+function InboxPage() {
   const app = useFocusApp();
   const api = useFocusClient();
 
@@ -171,3 +168,4 @@ export function InboxPage() {
     </>
   );
 }
+export default InboxPage;

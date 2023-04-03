@@ -1,28 +1,26 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import {
-  Box,
-  Button,
-  IconButton,
-  InputLabel,
-  Popover,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import InputLabel from "@mui/material/InputLabel";
+import Popover from "@mui/material/Popover";
+import Stack from "@mui/material/Stack";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 import update from "immutability-helper";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
-import { LabelChip, LabelColors } from "../lib/components/LabelChip";
+import LabelChip, { LabelColors } from "../lib/components/LabelChip";
 import { Label } from "../lib/proto/focus_pb";
 
-export function LabelsPage() {
+function LabelsPage() {
   const app = useFocusApp();
   const api = useFocusClient();
 
@@ -259,3 +257,4 @@ export function LabelsPage() {
     </>
   );
 }
+export default LabelsPage;

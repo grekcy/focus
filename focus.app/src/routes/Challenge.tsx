@@ -1,8 +1,10 @@
-import { Box, Button, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 import { useRef } from "react";
-import { CardBar, ICardBar } from "../lib/components/CardBar";
+import CardBar, { ICardBar } from "../lib/components/CardBar";
 
-export function ChallengePage() {
+function ChallengePage() {
   const cardBarRef = useRef<ICardBar>(null);
   function cardBarToggle() {
     cardBarRef.current && cardBarRef.current.toggle();
@@ -24,3 +26,4 @@ export function ChallengePage() {
     </>
   );
 }
+export default ChallengePage;

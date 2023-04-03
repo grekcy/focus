@@ -90,7 +90,7 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-export default function MiniDrawerEx() {
+function MiniDrawerEx() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -220,3 +220,4 @@ export default function MiniDrawerEx() {
     </Box>
   );
 }
+export default MiniDrawerEx;

@@ -1,4 +1,5 @@
-import { Alert, AlertColor, Snackbar, SnackbarOrigin } from "@mui/material";
+import Alert, { AlertColor } from "@mui/material/Alert";
+import Snackbar, { SnackbarOrigin } from "@mui/material/Snackbar";
 import { Ref, forwardRef, useImperativeHandle, useState } from "react";
 
 interface ToastProps {
@@ -11,7 +12,7 @@ export interface IToast {
   toast: (message: string, severity?: AlertColor) => void;
 }
 
-export const Toast = forwardRef(
+const Toast = forwardRef(
   (
     {
       defaultseverity = "info",
@@ -50,3 +51,4 @@ export const Toast = forwardRef(
     );
   }
 );
+export default Toast;

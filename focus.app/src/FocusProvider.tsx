@@ -1,4 +1,4 @@
-import { AlertColor as muiAlertColor } from "@mui/material";
+import { AlertColor as muiAlertColor } from "@mui/material/Alert";
 import {
   ReactNode,
   Ref,
@@ -9,8 +9,8 @@ import {
   useRef,
 } from "react";
 import { Cookies } from "react-cookie";
-import { FocusAPI } from "./lib/api";
-import { IToast, Toast } from "./lib/components/Toast";
+import FocusAPI from "./lib/api";
+import Toast, { IToast } from "./lib/components/Toast";
 
 export type AlertColor = muiAlertColor;
 

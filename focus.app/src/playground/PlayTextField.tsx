@@ -1,16 +1,8 @@
-import {
-  Autocomplete,
-  AutocompleteRenderInputParams,
-  Box,
-  Chip,
-  TextField,
-  Typography,
-} from "@mui/material";
-import update from "immutability-helper";
-import { KeyboardEvent, ReactNode, useEffect, useState } from "react";
-import { Key } from "ts-key-enum";
+import Chip from "@mui/material/Chip";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
 
-export function PlayTextField() {
+function PlayTextField() {
   return (
     <>
       <Typography>With chip</Typography>
@@ -26,7 +18,6 @@ export function PlayTextField() {
         fullWidth
       />
 
-
       <Typography>Width: with sx</Typography>
       <TextField sx={{ width: { sm: 200, md: 300 } }} placeholder="with sx" />
 
@@ -35,4 +26,4 @@ export function PlayTextField() {
     </>
   );
 }
-
+export default PlayTextField;

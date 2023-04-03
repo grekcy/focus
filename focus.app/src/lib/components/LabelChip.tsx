@@ -1,4 +1,4 @@
-import { Chip } from "@mui/material";
+import Chip from "@mui/material/Chip";
 import { SyntheticEvent } from "react";
 
 export const LabelColors: string[] = [
@@ -64,13 +64,7 @@ interface LabelChipProp {
   onDelete?: (e: SyntheticEvent<HTMLDivElement, MouseEvent>) => void;
 }
 
-export function LabelChip({
-  id,
-  label,
-  color,
-  onClick,
-  onDelete,
-}: LabelChipProp) {
+function LabelChip({ id, label, color, onClick, onDelete }: LabelChipProp) {
   const params: any = {};
   if (onDelete) params.onDelete = onDelete;
 
@@ -90,3 +84,4 @@ export function LabelChip({
     />
   );
 }
+export default LabelChip;

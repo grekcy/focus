@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import Button from "@mui/material/Button";
 import {
   DatePicker,
   DateTimePicker,
@@ -6,8 +6,9 @@ import {
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { useRef } from "react";
-import { CardBar, ICardBar } from "../lib/components/CardBar";
-export function PlayCardBar() {
+import CardBar, { ICardBar } from "../lib/components/CardBar";
+
+function PlayCardBar() {
   const ref = useRef<ICardBar>(null);
 
   return (
@@ -23,3 +24,4 @@ export function PlayCardBar() {
     </>
   );
 }
+export default PlayCardBar;

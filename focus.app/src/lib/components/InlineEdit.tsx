@@ -1,4 +1,4 @@
-import { TextField } from "@mui/material";
+import TextField from "@mui/material/TextField";
 import {
   ChangeEvent,
   FocusEvent,
@@ -24,7 +24,7 @@ export interface IInlineEdit {
 }
 
 // Ref: https://www.emgoto.com/react-inline-edit/
-export const InlineEdit = forwardRef(
+const InlineEdit = forwardRef(
   (
     { value = "", multiline = false, endAdornment, onSubmit }: InlineEditProp,
     ref: Ref<IInlineEdit>
@@ -112,3 +112,4 @@ export const InlineEdit = forwardRef(
     );
   }
 );
+export default InlineEdit;

@@ -1,12 +1,10 @@
-import {
-  Divider,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  MenuList,
-  Typography,
-} from "@mui/material";
+import Divider from "@mui/material/Divider";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import MenuList from "@mui/material/MenuList";
+import Typography from "@mui/material/Typography";
 import {
   MouseEvent,
   Ref,
@@ -39,7 +37,7 @@ export function PopupContextMenu(e: MouseEvent, ref: RefObject<IContextMenu>) {
   ref.current && ref.current.popup(e);
 }
 
-export const ContextMenu = forwardRef(
+const ContextMenu = forwardRef(
   ({ actions: items, dense }: ContextMenuProps, ref: Ref<IContextMenu>) => {
     const [pos, setPos] = useState<{
       mouseX: number;
@@ -114,3 +112,4 @@ export const ContextMenu = forwardRef(
     );
   }
 );
+export default ContextMenu;

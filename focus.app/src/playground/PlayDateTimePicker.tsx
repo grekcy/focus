@@ -2,7 +2,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 
-export function PlayDateTimePicker() {
+function PlayDateTimePicker() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DatePicker
@@ -13,3 +13,4 @@ export function PlayDateTimePicker() {
     </LocalizationProvider>
   );
 }
+export default PlayDateTimePicker;

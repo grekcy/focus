@@ -1,13 +1,11 @@
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import {
-  Box,
-  Divider,
-  Drawer,
-  IconButton,
-  Stack,
-  Typography,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import {
@@ -24,8 +22,8 @@ import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { DrawerHeader } from "../../SideBar";
 import { arrayContentEquals } from "../lib";
 import { Card, Label } from "../proto/focus_pb";
-import { InlineEdit } from "./InlineEdit";
-import { LabelSelector } from "./LabelSelector";
+import InlineEdit from "./InlineEdit";
+import LabelSelector from "./LabelSelector";
 
 export interface ICardBar {
   toggle: () => void;
@@ -37,7 +35,7 @@ interface CardBarProp {
   cardNo?: number;
 }
 
-export const CardBar = forwardRef(
+const CardBar = forwardRef(
   ({ open: inOpen, cardNo: inCardNo }: CardBarProp, ref: Ref<ICardBar>) => {
     const [open, setOpen] = useState(inOpen);
     const [cardNo, setCardNo] = useState(inCardNo);
@@ -208,3 +206,4 @@ export const CardBar = forwardRef(
     );
   }
 );
+export default CardBar;

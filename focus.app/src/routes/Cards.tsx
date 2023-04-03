@@ -1,11 +1,12 @@
-import { Divider, Typography } from "@mui/material";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
-import { InlineEdit } from "../lib/components/InlineEdit";
+import InlineEdit from "../lib/components/InlineEdit";
 import { Card } from "../lib/proto/focus_pb";
 
-export function CardPage() {
+function CardPage() {
   const app = useFocusApp();
   const api = useFocusClient();
 
@@ -54,3 +55,4 @@ export function CardPage() {
 
   return <>{!loading ? renderCard() : <Typography>Loading...</Typography>}</>;
 }
+export default CardPage;

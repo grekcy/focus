@@ -4,7 +4,9 @@ import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import TripOriginIcon from "@mui/icons-material/TripOrigin";
-import { Box, IconButton, Stack } from "@mui/material";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
 import type { Identifier, XYCoord } from "dnd-core";
 import update from "immutability-helper";
 import React, {
@@ -32,8 +34,8 @@ import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { Event } from "../api";
 import { Card, Label } from "../proto/focus_pb";
 import { EmptyIcon } from "./Icons";
-import { IInlineEdit, InlineEdit } from "./InlineEdit";
-import { LabelChip } from "./LabelChip";
+import InlineEdit, { IInlineEdit } from "./InlineEdit";
+import LabelChip from "./LabelChip";
 
 export enum CardAction {
   COMPLETE,
@@ -55,7 +57,7 @@ export interface ICardListView {
   addCard: (card: Card.AsObject) => void;
 }
 
-export const CardListView = forwardRef(
+const CardListView = forwardRef(
   (
     {
       cards: inCards,
@@ -580,6 +582,7 @@ export const CardListView = forwardRef(
     );
   }
 );
+export default CardListView;
 
 interface DragItem {
   index: number;

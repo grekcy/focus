@@ -1,4 +1,4 @@
-export function Cursors() {
+function PlayCursors() {
   const cursorStyle = {
     border: "1px dashed gray",
     width: "200px",
@@ -51,3 +51,4 @@ export function Cursors() {
     </>
   );
 }
+export default PlayCursors;

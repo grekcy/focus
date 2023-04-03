@@ -5,7 +5,7 @@ import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardItem } from "../lib/components/CardList";
 import { Card } from "../lib/proto/focus_pb";
 
-export function PlayCardListViewItem() {
+ function PlayCardListViewItem() {
   const app = useFocusApp();
   const api = useFocusClient();
   const [card, setCard] = useState<Card.AsObject | null>(null);
@@ -22,3 +22,4 @@ export function PlayCardListViewItem() {
     </DndProvider>
   );
 }
+export default PlayCardListViewItem;
