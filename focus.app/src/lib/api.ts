@@ -77,11 +77,13 @@ export class FocusAPI {
   listCards = ({
     excludeCompleted = true,
     excludeChallenges = true,
+    includeDeferred = false,
     labels = [],
   }: listCardsParams = {}) => {
     const req = new ListCardReq();
     req.setExcludeCompleted(excludeCompleted);
     req.setExcludeChallenges(excludeChallenges);
+    req.setIncludeDeferred(includeDeferred);
 
     const card = new Card();
     labels && card.setLabelsList(labels);
@@ -155,10 +157,10 @@ export class FocusAPI {
     );
   };
 
-  updateCardDeferUntil = (cardNo: number, deferUntil: Date | null) => {
+  updateCardDeferredUntil = (cardNo: number, deferredUntil: Date | null) => {
     const card = new Card();
     card.setCardNo(cardNo);
-    if (deferUntil) card.setDeferUntil(Timestamp.fromDate(deferUntil));
+    if (deferredUntil) card.setDeferredUntil(Timestamp.fromDate(deferredUntil));
 
     return this.patchCard(card.toObject(), CardField.DEFER_UNTIL).then((r) =>
       r.toObject()
@@ -186,13 +188,11 @@ export class FocusAPI {
           c.setLabelsList(card.labelsList);
           break;
         case CardField.DEFER_UNTIL:
-          if (card.deferUntil) {
+          if (card.deferredUntil) {
             const defer = Timestamp.fromDate(
-              new Date(card.deferUntil.seconds * 1000)
+              new Date(card.deferredUntil.seconds * 1000)
             );
-            c.setDeferUntil(defer);
-          } else {
-            c.clearDeferUntil()
+            c.setDeferredUntil(defer);
           }
           break;
         default:
@@ -273,5 +273,6 @@ type EventListener = (resId: number) => void;
 interface listCardsParams {
   excludeCompleted?: boolean;
   excludeChallenges?: boolean;
+  includeDeferred?: boolean;
   labels?: number[];
 }

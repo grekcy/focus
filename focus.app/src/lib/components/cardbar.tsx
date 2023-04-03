@@ -145,9 +145,10 @@ export const CardBar = forwardRef(
           <Divider textAlign="left">Dates</Divider>
           <Stack direction="column">
             <Box>
-              Defer until:
-              {card?.deferUntil &&
-                new Date(card?.deferUntil.seconds * 1000).toLocaleString()}
+              Deferred until:
+              {card?.deferredUntil
+                ? new Date(card?.deferredUntil.seconds * 1000).toLocaleString()
+                : "N/A"}
             </Box>
             <Box>
               Created:
@@ -158,6 +159,12 @@ export const CardBar = forwardRef(
               Updated:
               {card?.updatedAt &&
                 new Date(card?.updatedAt.seconds * 1000).toLocaleString()}
+            </Box>
+            <Box>
+              Completed at:
+              {card?.completedAt
+                ? new Date(card?.completedAt.seconds * 1000).toLocaleString()
+                : "N/A"}
             </Box>
           </Stack>
         </LocalizationProvider>

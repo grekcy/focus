@@ -53,10 +53,10 @@ export class Card extends jspb.Message {
   hasUpdatedAt(): boolean;
   clearUpdatedAt(): Card;
 
-  getDeferUntil(): google_protobuf_timestamp_pb.Timestamp | undefined;
-  setDeferUntil(value?: google_protobuf_timestamp_pb.Timestamp): Card;
-  hasDeferUntil(): boolean;
-  clearDeferUntil(): Card;
+  getDeferredUntil(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setDeferredUntil(value?: google_protobuf_timestamp_pb.Timestamp): Card;
+  hasDeferredUntil(): boolean;
+  clearDeferredUntil(): Card;
 
   getCompletedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
   setCompletedAt(value?: google_protobuf_timestamp_pb.Timestamp): Card;
@@ -92,7 +92,7 @@ export namespace Card {
     depth: number,
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     updatedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
-    deferUntil?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    deferredUntil?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     creatorId: number,
     subject: string,
@@ -105,9 +105,9 @@ export namespace Card {
     PARENT_CARD_NO = 2,
   }
 
-  export enum DeferUntilCase { 
-    _DEFER_UNTIL_NOT_SET = 0,
-    DEFER_UNTIL = 6,
+  export enum DeferredUntilCase { 
+    _DEFERRED_UNTIL_NOT_SET = 0,
+    DEFERRED_UNTIL = 6,
   }
 
   export enum CompletedAtCase { 
@@ -128,6 +128,9 @@ export class ListCardReq extends jspb.Message {
   getExcludeChallenges(): boolean;
   setExcludeChallenges(value: boolean): ListCardReq;
 
+  getIncludeDeferred(): boolean;
+  setIncludeDeferred(value: boolean): ListCardReq;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ListCardReq.AsObject;
   static toObject(includeInstance: boolean, msg: ListCardReq): ListCardReq.AsObject;
@@ -141,6 +144,7 @@ export namespace ListCardReq {
     card?: Card.AsObject,
     excludeCompleted: boolean,
     excludeChallenges: boolean,
+    includeDeferred: boolean,
   }
 }
 

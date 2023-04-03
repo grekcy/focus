@@ -38,7 +38,7 @@ message Card {
   uint32 depth = 3;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
-  optional google.protobuf.Timestamp defer_until = 6;
+  optional google.protobuf.Timestamp deferred_until = 6;
   optional google.protobuf.Timestamp completed_at = 7;
   uint64 creator_id = 8;
   string subject = 9;
@@ -50,6 +50,7 @@ message ListCardReq {
   Card card = 1;
   bool exclude_completed = 2;
   bool exclude_challenges = 3;
+  bool include_deferred = 4;
 }
 
 message ListCardResp { repeated Card items = 1; }

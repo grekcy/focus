@@ -218,17 +218,17 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 
 func cardModelToProto(in *CardWithDepth) *proto.Card {
 	return &proto.Card{
-		CardNo:       uint64(in.CardNo),
-		ParentCardNo: helper.PP(in.ParentCardNo),
-		Depth:        uint32(in.Depth),
-		CreatedAt:    timestamppb.New(in.CreatedAt),
-		UpdatedAt:    timestamppb.New(in.UpdatedAt),
-		DeferUntil:   helper.NewTimestamppb(in.DeferUntil),
-		CompletedAt:  helper.NewTimestamppb(in.CompletedAt),
-		CreatorId:    uint64(in.CreatorID),
-		Subject:      in.Subject,
-		Content:      in.Content,
-		Labels:       helper.ArrayToProto(in.Labels),
+		CardNo:        uint64(in.CardNo),
+		ParentCardNo:  helper.PP(in.ParentCardNo),
+		Depth:         uint32(in.Depth),
+		CreatedAt:     timestamppb.New(in.CreatedAt),
+		UpdatedAt:     timestamppb.New(in.UpdatedAt),
+		DeferredUntil: helper.NewTimestamppb(in.DeferredUntil),
+		CompletedAt:   helper.NewTimestamppb(in.CompletedAt),
+		CreatorId:     uint64(in.CreatorID),
+		Subject:       in.Subject,
+		Content:       in.Content,
+		Labels:        helper.ArrayToProto(in.Labels),
 	}
 }
 
@@ -239,7 +239,11 @@ func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCard
 		Labels: helper.ToArray(req.Card.Labels),
 	}
 
-	r, err := s.listCards(ctx, where, ListOpt{excludeCompleted: req.ExcludeCompleted})
+	r, err := s.listCards(ctx, where, ListOpt{
+		excludeCompleted:  req.ExcludeCompleted,
+		excludeChallenges: req.ExcludeChallenges,
+		excludeDeferred:   !req.IncludeDeferred,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -250,8 +254,10 @@ func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCard
 }
 
 type ListOpt struct {
-	CardNo           []uint
-	excludeCompleted bool
+	CardNo            []uint
+	excludeCompleted  bool
+	excludeChallenges bool
+	excludeDeferred   bool
 }
 
 type CardWithDepth struct {
@@ -303,6 +309,12 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card,
 		tx = tx.Select("*")
 		if opt.excludeCompleted {
 			tx = tx.Where("completed_at IS NULL")
+		}
+
+		if opt.excludeDeferred {
+			tx = tx.Where("deferred_until IS NULL OR deferred_until < now()")
+		} else {
+			tx = tx.Where("deferred_until IS NULL OR deferred_until > now()")
 		}
 
 		if where != nil {
@@ -464,10 +476,10 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 			updates["labels"] = pq.Int64Array(fx.Map(req.Card.Labels, func(x uint64) int64 { return int64(x) }))
 
 		case proto.CardField_DEFER_UNTIL:
-			if req.Card.DeferUntil == nil {
-				updates["defer_until"] = gorm.Expr("NULL")
+			if req.Card.DeferredUntil == nil {
+				updates["deferred_until"] = gorm.Expr("NULL")
 			} else {
-				updates["defer_until"] = req.Card.DeferUntil.AsTime()
+				updates["deferred_until"] = req.Card.DeferredUntil.AsTime()
 			}
 
 		default:

@@ -1,4 +1,10 @@
-import { Box, Typography } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Stack,
+  Typography,
+} from "@mui/material";
 import update from "immutability-helper";
 import { useEffect, useRef, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
@@ -49,17 +55,15 @@ export function InboxPage() {
   }
 
   const [selectedLabels, setSelectedLabels] = useState<number[]>([]);
-  function handleLabelChange(labels: number[]) {
-    setSelectedLabels(labels);
-  }
+  const [withDeferred, setWithDeferred] = useState(false);
 
   const [cards, setCards] = useState<Card.AsObject[]>([]);
   useEffect(() => {
     api
-      .listCards({ labels: selectedLabels })
+      .listCards({ labels: selectedLabels, includeDeferred: withDeferred })
       .then((r) => setCards(r))
       .catch((e) => app.toast(e.message, "error"));
-  }, [selectedLabels]);
+  }, [selectedLabels, withDeferred]);
 
   function handleLabelClick(id: number) {
     if (selectedLabels.indexOf(id) === -1)
@@ -70,7 +74,7 @@ export function InboxPage() {
     if (cardNo === -1) return;
 
     api
-      .updateCardDeferUntil(cardNo, deferUntil)
+      .updateCardDeferredUntil(cardNo, deferUntil)
       .then((r) =>
         deferUntil
           ? app.toast(
@@ -92,12 +96,23 @@ export function InboxPage() {
           Inbox cards
         </Typography>
         <Box flexGrow={0}>
-          <LabelSelector
-            labels={labels}
-            selected={selectedLabels}
-            sx={{ minWidth: { md: "300px" } }}
-            onSelectionChange={handleLabelChange}
-          />
+          <Stack direction="row">
+            <FormControlLabel
+              label="with defered"
+              control={
+                <Checkbox
+                  checked={withDeferred}
+                  onChange={() => setWithDeferred((p) => !p)}
+                />
+              }
+            />
+            <LabelSelector
+              labels={labels}
+              selected={selectedLabels}
+              sx={{ minWidth: { md: "300px" } }}
+              onSelectionChange={(labels) => setSelectedLabels(labels)}
+            />
+          </Stack>
         </Box>
       </Box>
 

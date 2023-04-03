@@ -482,7 +482,7 @@ proto.Card.toObject = function(includeInstance, msg) {
     depth: jspb.Message.getFieldWithDefault(msg, 3, 0),
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    deferUntil: (f = msg.getDeferUntil()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    deferredUntil: (f = msg.getDeferredUntil()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     completedAt: (f = msg.getCompletedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     creatorId: jspb.Message.getFieldWithDefault(msg, 8, 0),
     subject: jspb.Message.getFieldWithDefault(msg, 9, ""),
@@ -549,7 +549,7 @@ proto.Card.deserializeBinaryFromReader = function(msg, reader) {
     case 6:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
-      msg.setDeferUntil(value);
+      msg.setDeferredUntil(value);
       break;
     case 7:
       var value = new google_protobuf_timestamp_pb.Timestamp;
@@ -640,7 +640,7 @@ proto.Card.serializeBinaryToWriter = function(message, writer) {
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
-  f = message.getDeferUntil();
+  f = message.getDeferredUntil();
   if (f != null) {
     writer.writeMessage(
       6,
@@ -834,10 +834,10 @@ proto.Card.prototype.hasUpdatedAt = function() {
 
 
 /**
- * optional google.protobuf.Timestamp defer_until = 6;
+ * optional google.protobuf.Timestamp deferred_until = 6;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.Card.prototype.getDeferUntil = function() {
+proto.Card.prototype.getDeferredUntil = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 6));
 };
@@ -847,7 +847,7 @@ proto.Card.prototype.getDeferUntil = function() {
  * @param {?proto.google.protobuf.Timestamp|undefined} value
  * @return {!proto.Card} returns this
 */
-proto.Card.prototype.setDeferUntil = function(value) {
+proto.Card.prototype.setDeferredUntil = function(value) {
   return jspb.Message.setWrapperField(this, 6, value);
 };
 
@@ -856,8 +856,8 @@ proto.Card.prototype.setDeferUntil = function(value) {
  * Clears the message field making it undefined.
  * @return {!proto.Card} returns this
  */
-proto.Card.prototype.clearDeferUntil = function() {
-  return this.setDeferUntil(undefined);
+proto.Card.prototype.clearDeferredUntil = function() {
+  return this.setDeferredUntil(undefined);
 };
 
 
@@ -865,7 +865,7 @@ proto.Card.prototype.clearDeferUntil = function() {
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.Card.prototype.hasDeferUntil = function() {
+proto.Card.prototype.hasDeferredUntil = function() {
   return jspb.Message.getField(this, 6) != null;
 };
 
@@ -1032,7 +1032,8 @@ proto.ListCardReq.toObject = function(includeInstance, msg) {
   var f, obj = {
     card: (f = msg.getCard()) && proto.Card.toObject(includeInstance, f),
     excludeCompleted: jspb.Message.getBooleanFieldWithDefault(msg, 2, false),
-    excludeChallenges: jspb.Message.getBooleanFieldWithDefault(msg, 3, false)
+    excludeChallenges: jspb.Message.getBooleanFieldWithDefault(msg, 3, false),
+    includeDeferred: jspb.Message.getBooleanFieldWithDefault(msg, 4, false)
   };
 
   if (includeInstance) {
@@ -1082,6 +1083,10 @@ proto.ListCardReq.deserializeBinaryFromReader = function(msg, reader) {
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setExcludeChallenges(value);
       break;
+    case 4:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIncludeDeferred(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -1130,6 +1135,13 @@ proto.ListCardReq.serializeBinaryToWriter = function(message, writer) {
   if (f) {
     writer.writeBool(
       3,
+      f
+    );
+  }
+  f = message.getIncludeDeferred();
+  if (f) {
+    writer.writeBool(
+      4,
       f
     );
   }
@@ -1206,6 +1218,24 @@ proto.ListCardReq.prototype.getExcludeChallenges = function() {
  */
 proto.ListCardReq.prototype.setExcludeChallenges = function(value) {
   return jspb.Message.setProto3BooleanField(this, 3, value);
+};
+
+
+/**
+ * optional bool include_deferred = 4;
+ * @return {boolean}
+ */
+proto.ListCardReq.prototype.getIncludeDeferred = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 4, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.ListCardReq} returns this
+ */
+proto.ListCardReq.prototype.setIncludeDeferred = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 4, value);
 };
 
 
