@@ -444,7 +444,7 @@ proto.User.prototype.setName = function(value) {
  * @private {!Array<number>}
  * @const
  */
-proto.Card.repeatedFields_ = [11];
+proto.Card.repeatedFields_ = [12];
 
 
 
@@ -483,11 +483,12 @@ proto.Card.toObject = function(includeInstance, msg) {
     createdAt: (f = msg.getCreatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     updatedAt: (f = msg.getUpdatedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     deferredUntil: (f = msg.getDeferredUntil()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    dueTo: (f = msg.getDueTo()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     completedAt: (f = msg.getCompletedAt()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    creatorId: jspb.Message.getFieldWithDefault(msg, 8, 0),
-    subject: jspb.Message.getFieldWithDefault(msg, 9, ""),
-    content: jspb.Message.getFieldWithDefault(msg, 10, ""),
-    labelsList: (f = jspb.Message.getRepeatedField(msg, 11)) == null ? undefined : f
+    creatorId: jspb.Message.getFieldWithDefault(msg, 9, 0),
+    subject: jspb.Message.getFieldWithDefault(msg, 10, ""),
+    content: jspb.Message.getFieldWithDefault(msg, 11, ""),
+    labelsList: (f = jspb.Message.getRepeatedField(msg, 12)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -554,21 +555,26 @@ proto.Card.deserializeBinaryFromReader = function(msg, reader) {
     case 7:
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
-      msg.setCompletedAt(value);
+      msg.setDueTo(value);
       break;
     case 8:
+      var value = new google_protobuf_timestamp_pb.Timestamp;
+      reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
+      msg.setCompletedAt(value);
+      break;
+    case 9:
       var value = /** @type {number} */ (reader.readUint64());
       msg.setCreatorId(value);
       break;
-    case 9:
+    case 10:
       var value = /** @type {string} */ (reader.readString());
       msg.setSubject(value);
       break;
-    case 10:
+    case 11:
       var value = /** @type {string} */ (reader.readString());
       msg.setContent(value);
       break;
-    case 11:
+    case 12:
       var values = /** @type {!Array<number>} */ (reader.isDelimited() ? reader.readPackedUint64() : [reader.readUint64()]);
       for (var i = 0; i < values.length; i++) {
         msg.addLabels(values[i]);
@@ -648,7 +654,7 @@ proto.Card.serializeBinaryToWriter = function(message, writer) {
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
-  f = message.getCompletedAt();
+  f = message.getDueTo();
   if (f != null) {
     writer.writeMessage(
       7,
@@ -656,31 +662,39 @@ proto.Card.serializeBinaryToWriter = function(message, writer) {
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
     );
   }
+  f = message.getCompletedAt();
+  if (f != null) {
+    writer.writeMessage(
+      8,
+      f,
+      google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
   f = message.getCreatorId();
   if (f !== 0) {
     writer.writeUint64(
-      8,
+      9,
       f
     );
   }
   f = message.getSubject();
   if (f.length > 0) {
     writer.writeString(
-      9,
+      10,
       f
     );
   }
   f = message.getContent();
   if (f.length > 0) {
     writer.writeString(
-      10,
+      11,
       f
     );
   }
   f = message.getLabelsList();
   if (f.length > 0) {
     writer.writePackedUint64(
-      11,
+      12,
       f
     );
   }
@@ -871,10 +885,10 @@ proto.Card.prototype.hasDeferredUntil = function() {
 
 
 /**
- * optional google.protobuf.Timestamp completed_at = 7;
+ * optional google.protobuf.Timestamp due_to = 7;
  * @return {?proto.google.protobuf.Timestamp}
  */
-proto.Card.prototype.getCompletedAt = function() {
+proto.Card.prototype.getDueTo = function() {
   return /** @type{?proto.google.protobuf.Timestamp} */ (
     jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 7));
 };
@@ -884,8 +898,45 @@ proto.Card.prototype.getCompletedAt = function() {
  * @param {?proto.google.protobuf.Timestamp|undefined} value
  * @return {!proto.Card} returns this
 */
-proto.Card.prototype.setCompletedAt = function(value) {
+proto.Card.prototype.setDueTo = function(value) {
   return jspb.Message.setWrapperField(this, 7, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.Card} returns this
+ */
+proto.Card.prototype.clearDueTo = function() {
+  return this.setDueTo(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.Card.prototype.hasDueTo = function() {
+  return jspb.Message.getField(this, 7) != null;
+};
+
+
+/**
+ * optional google.protobuf.Timestamp completed_at = 8;
+ * @return {?proto.google.protobuf.Timestamp}
+ */
+proto.Card.prototype.getCompletedAt = function() {
+  return /** @type{?proto.google.protobuf.Timestamp} */ (
+    jspb.Message.getWrapperField(this, google_protobuf_timestamp_pb.Timestamp, 8));
+};
+
+
+/**
+ * @param {?proto.google.protobuf.Timestamp|undefined} value
+ * @return {!proto.Card} returns this
+*/
+proto.Card.prototype.setCompletedAt = function(value) {
+  return jspb.Message.setWrapperField(this, 8, value);
 };
 
 
@@ -903,16 +954,16 @@ proto.Card.prototype.clearCompletedAt = function() {
  * @return {boolean}
  */
 proto.Card.prototype.hasCompletedAt = function() {
-  return jspb.Message.getField(this, 7) != null;
+  return jspb.Message.getField(this, 8) != null;
 };
 
 
 /**
- * optional uint64 creator_id = 8;
+ * optional uint64 creator_id = 9;
  * @return {number}
  */
 proto.Card.prototype.getCreatorId = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 8, 0));
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 9, 0));
 };
 
 
@@ -921,33 +972,15 @@ proto.Card.prototype.getCreatorId = function() {
  * @return {!proto.Card} returns this
  */
 proto.Card.prototype.setCreatorId = function(value) {
-  return jspb.Message.setProto3IntField(this, 8, value);
+  return jspb.Message.setProto3IntField(this, 9, value);
 };
 
 
 /**
- * optional string subject = 9;
+ * optional string subject = 10;
  * @return {string}
  */
 proto.Card.prototype.getSubject = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 9, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.Card} returns this
- */
-proto.Card.prototype.setSubject = function(value) {
-  return jspb.Message.setProto3StringField(this, 9, value);
-};
-
-
-/**
- * optional string content = 10;
- * @return {string}
- */
-proto.Card.prototype.getContent = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 10, ""));
 };
 
@@ -956,17 +989,35 @@ proto.Card.prototype.getContent = function() {
  * @param {string} value
  * @return {!proto.Card} returns this
  */
-proto.Card.prototype.setContent = function(value) {
+proto.Card.prototype.setSubject = function(value) {
   return jspb.Message.setProto3StringField(this, 10, value);
 };
 
 
 /**
- * repeated uint64 labels = 11;
+ * optional string content = 11;
+ * @return {string}
+ */
+proto.Card.prototype.getContent = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 11, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.Card} returns this
+ */
+proto.Card.prototype.setContent = function(value) {
+  return jspb.Message.setProto3StringField(this, 11, value);
+};
+
+
+/**
+ * repeated uint64 labels = 12;
  * @return {!Array<number>}
  */
 proto.Card.prototype.getLabelsList = function() {
-  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 11));
+  return /** @type {!Array<number>} */ (jspb.Message.getRepeatedField(this, 12));
 };
 
 
@@ -975,7 +1026,7 @@ proto.Card.prototype.getLabelsList = function() {
  * @return {!proto.Card} returns this
  */
 proto.Card.prototype.setLabelsList = function(value) {
-  return jspb.Message.setField(this, 11, value || []);
+  return jspb.Message.setField(this, 12, value || []);
 };
 
 
@@ -985,7 +1036,7 @@ proto.Card.prototype.setLabelsList = function(value) {
  * @return {!proto.Card} returns this
  */
 proto.Card.prototype.addLabels = function(value, opt_index) {
-  return jspb.Message.addToRepeatedField(this, 11, value, opt_index);
+  return jspb.Message.addToRepeatedField(this, 12, value, opt_index);
 };
 
 

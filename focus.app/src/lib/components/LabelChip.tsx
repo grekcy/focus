@@ -21,7 +21,7 @@ export const LabelColors: string[] = [
   "success.light",
   "success.main",
   "success.dark",
-  
+
   // other pre-defined colors: adaped from github
   "#B60205",
   "#D93F0B",

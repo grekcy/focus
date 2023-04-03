@@ -603,12 +603,12 @@ interface ItemProp {
   onClick?: (index: number) => void;
   onSubmit?: (value: string) => void;
   onActionClick?: (index: number, action: CardAction) => void;
-  onDragOver: (dragIndex: number, hoverIndex: number) => void;
-  onCanDrop: (dragIndex: number, hoverIndex: number) => boolean;
-  onDragDrop: (dragIndex: number, dropIndex: number) => void;
+  onDragOver?: (dragIndex: number, hoverIndex: number) => void;
+  onCanDrop?: (dragIndex: number, hoverIndex: number) => boolean;
+  onDragDrop?: (dragIndex: number, dropIndex: number) => void;
 }
 
-const CardItem = forwardRef(
+export const CardItem = forwardRef(
   (
     {
       key,
@@ -693,10 +693,10 @@ const CardItem = forwardRef(
           return;
         }
 
-        if (!onCanDrop(dragIndex, hoverIndex)) return;
+        if (onCanDrop && !onCanDrop(dragIndex, hoverIndex)) return;
 
         // Time to actually perform the action
-        onDragOver(dragIndex, hoverIndex);
+        onDragOver && onDragOver(dragIndex, hoverIndex);
 
         // Note: we're mutating the monitor item here!
         // Generally it's better to avoid mutations,
@@ -733,70 +733,95 @@ const CardItem = forwardRef(
         }}
         onClick={() => onClick && onClick(index)}
       >
-        <Box
-          sx={{
-            flexGrow: 0,
-            color: "GrayText",
-            height: 0,
-          }}
-        >
-          <DragIndicatorIcon />
-        </Box>
-        {card.depth > 0 && (
-          <Box sx={{ flexGrow: 0, width: card.depth * 20 }}></Box>
-        )}
-        <IconButton
-          size="small"
-          onClick={() => app.toast("collapse: not implemented", "warning")}
-        >
-          {hasChild && hasChild(card.cardNo) ? (
-            <ArrowDropDownIcon fontSize="small" />
-          ) : (
-            <EmptyIcon fontSize="small" />
-          )}
-        </IconButton>
-        {showCardNo && (
-          <>
-            <Box sx={{ flexGrow: 0, pr: 1 }}>
+        <Box sx={{ flexGrow: 0, display: "flex" }}>
+          <Box>
+            <DragIndicatorIcon sx={{ color: "GrayText" }} />
+          </Box>
+          {card.depth > 0 && <Box sx={{ width: card.depth * 20 }}></Box>}
+          <Box>
+            <IconButton
+              size="small"
+              onClick={() => app.toast("collapse: not implemented", "warning")}
+            >
+              {hasChild && hasChild(card.cardNo) ? (
+                <ArrowDropDownIcon fontSize="small" />
+              ) : (
+                <EmptyIcon fontSize="small" />
+              )}
+            </IconButton>
+          </Box>
+          {showCardNo && (
+            <Box sx={{ pr: 1 }}>
               <Link to={`/cards/` + card.cardNo}>{card.cardNo}</Link>
             </Box>
-          </>
-        )}
-        {/* {card.parentCardNo}&nbsp; */}
-        <Box sx={{ flexGrow: 1 }}>
-          <InlineEdit
-            ref={ref}
-            value={card.subject}
-            endAdornment={endAdornment}
-            onSubmit={(e, value) => onSubmit && onSubmit(value)}
-          />
-        </Box>
-        <Box sx={{ flexGrow: 0, color: "grey", height: 0 }}>
-          {card.completedAt ? (
-            <IconButton
-              onClick={() => handleActionClick(index, CardAction.INPROGRESS)}
-            >
-              <TaskAltIcon fontSize="small" />
-            </IconButton>
-          ) : (
-            <IconButton
-              onClick={() => handleActionClick(index, CardAction.COMPLETE)}
-            >
-              <TripOriginIcon fontSize="small" />
-            </IconButton>
           )}
-          <IconButton
-            onClick={() => handleActionClick(index, CardAction.DELETE)}
-          >
-            <DeleteIcon fontSize="small" />
-          </IconButton>
-          {false && (
+        </Box>
+        <Box sx={{ flexGrow: 1 }}>
+          <Box sx={{ flexGrow: 1, display: "flex" }}>
+            <Box sx={{ flexGrow: 1 }}>
+              <InlineEdit
+                ref={ref}
+                value={card.subject}
+                endAdornment={endAdornment}
+                onSubmit={(e, value) => onSubmit && onSubmit(value)}
+              />
+            </Box>
+          </Box>
+          {(card.deferredUntil || card.dueTo) && (
+            <Box sx={{ display: "flex" }}>
+              <Box sx={{ flexGrow: 1 }}></Box>
+              <Box
+                sx={{
+                  flexGrow: 0,
+                  color: card.deferredUntil ? "gray" : "lightgray",
+                }}
+              >
+                {card.deferredUntil
+                  ? new Date(card.deferredUntil.seconds * 1000).toLocaleString()
+                  : "no defered date"}
+              </Box>
+              <Box
+                sx={{
+                  flexGrow: 0,
+                  pl: "1rem",
+                  color: card.dueTo ? "gray" : "lightgray",
+                }}
+              >
+                {card.dueTo
+                  ? new Date(card.dueTo.seconds * 1000).toLocaleString()
+                  : "no due date"}
+              </Box>
+            </Box>
+          )}
+        </Box>
+        <Box sx={{ flexGrow: 0 }}>
+          <Box>
+            {card.completedAt ? (
+              <IconButton
+                onClick={() => handleActionClick(index, CardAction.INPROGRESS)}
+              >
+                <TaskAltIcon fontSize="small" />
+              </IconButton>
+            ) : (
+              <IconButton
+                onClick={() => handleActionClick(index, CardAction.COMPLETE)}
+              >
+                <TripOriginIcon fontSize="small" />
+              </IconButton>
+            )}
             <IconButton
               onClick={() => handleActionClick(index, CardAction.DELETE)}
             >
-              <CancelIcon fontSize="small" />
+              <DeleteIcon fontSize="small" />
             </IconButton>
-          )}
+            {false && (
+              <IconButton
+                onClick={() => handleActionClick(index, CardAction.DELETE)}
+              >
+                <CancelIcon fontSize="small" />
+              </IconButton>
+            )}
+          </Box>
         </Box>
       </Box>
     );

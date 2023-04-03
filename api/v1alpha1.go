@@ -224,6 +224,7 @@ func cardModelToProto(in *CardWithDepth) *proto.Card {
 		CreatedAt:     timestamppb.New(in.CreatedAt),
 		UpdatedAt:     timestamppb.New(in.UpdatedAt),
 		DeferredUntil: helper.NewTimestamppb(in.DeferredUntil),
+		DueTo:         helper.NewTimestamppb(in.DueTo),
 		CompletedAt:   helper.NewTimestamppb(in.CompletedAt),
 		CreatorId:     uint64(in.CreatorID),
 		Subject:       in.Subject,
@@ -407,7 +408,10 @@ func (s *v1alpha1ServiceImpl) GetCards(ctx context.Context, req *proto.GetCardRe
 }
 
 func (s *v1alpha1ServiceImpl) getCard(ctx context.Context, cardNo uint) (*CardWithDepth, error) {
-	r, err := s.listCards(ctx, &models.Card{CardNo: cardNo}, ListOpt{})
+	r, err := s.listCards(ctx, &models.Card{CardNo: cardNo}, ListOpt{
+		excludeCompleted: false,
+		excludeDeferred:  false,
+	})
 	if err != nil {
 		return nil, err
 	}

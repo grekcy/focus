@@ -11,7 +11,7 @@ import {
   IFocusProvider,
 } from "./FocusProvider";
 import { DrawerHeader, SideBar } from "./SideBar";
-import { PlaygroundIndex } from "./playground/PlaygroundIndex";
+import { PlayIndex } from "./playground/Playndex";
 import { CardPage } from "./routes/Cards";
 import { ChallengePage } from "./routes/Challenge";
 import { ErrorPage } from "./routes/ErrorPage";
@@ -65,10 +65,7 @@ function App() {
                   <Route path="/planning" element={<PlanningPage />} />
                   <Route path="/performance" element={<PerformancePage />} />
                   <Route path="/labels" element={<LabelsPage />} />
-                  <Route
-                    path="/playground/:playId?"
-                    element={<PlaygroundIndex />}
-                  />
+                  <Route path="/playground/:playId?" element={<PlayIndex />} />
                   <Route path="*" element={<ErrorPage />} />
                 </Routes>
               </Box>

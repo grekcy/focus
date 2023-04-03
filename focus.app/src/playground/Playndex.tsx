@@ -17,6 +17,7 @@ import { PlayDateTimePicker } from "./PlayDateTimePicker";
 import { PlayFocus } from "./PlayFocus";
 import { PlayLabelSelector } from "./PlayLabelSelector";
 import { PlayLayout } from "./PlayLayout";
+import { PlayCardListViewItem } from "./PlayListViewItem";
 import { PlayTextField } from "./PlayTextField";
 import { DragAndDropCancel } from "./dndCancel";
 import { DragAndDropSortable } from "./dndSotrable";
@@ -33,6 +34,11 @@ const plays = [
     id: "focus-app",
     label: "Focus",
     items: [
+      {
+        id: "card-list-view-item",
+        label: "Card List View item",
+        children: <PlayCardListViewItem />,
+      },
       {
         id: "card-bar",
         label: "Card Bar",
@@ -115,7 +121,7 @@ const plays = [
   },
 ];
 
-export function PlaygroundIndex() {
+export function PlayIndex() {
   const { playId } = useParams();
 
   const [play, setPlay] = useState<IPlay | null>(null);

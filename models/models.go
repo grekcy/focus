@@ -51,6 +51,7 @@ type Card struct {
 	Rank          uint       `gorm:"not null;default:0"`
 	ParentCardNo  *uint      `grom:"index"`
 	DeferredUntil *time.Time `gorm:"index"`
+	DueTo         *time.Time `gorm:"index"`
 	CompletedAt   *time.Time `gorm:"index"`
 	Subject       string     `gorm:"type:varchar(500);not null;default:''"`
 	Content       string     `gorm:"type:text;not null;default:''"`

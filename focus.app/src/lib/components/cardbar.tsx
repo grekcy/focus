@@ -151,6 +151,12 @@ export const CardBar = forwardRef(
                 : "N/A"}
             </Box>
             <Box>
+              Due to:
+              {card?.dueTo
+                ? new Date(card?.dueTo.seconds * 1000).toLocaleString()
+                : "N/A"}
+            </Box>
+            <Box>
               Created:
               {card?.createdAt &&
                 new Date(card?.createdAt.seconds * 1000).toLocaleString()}

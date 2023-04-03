@@ -58,6 +58,11 @@ export class Card extends jspb.Message {
   hasDeferredUntil(): boolean;
   clearDeferredUntil(): Card;
 
+  getDueTo(): google_protobuf_timestamp_pb.Timestamp | undefined;
+  setDueTo(value?: google_protobuf_timestamp_pb.Timestamp): Card;
+  hasDueTo(): boolean;
+  clearDueTo(): Card;
+
   getCompletedAt(): google_protobuf_timestamp_pb.Timestamp | undefined;
   setCompletedAt(value?: google_protobuf_timestamp_pb.Timestamp): Card;
   hasCompletedAt(): boolean;
@@ -93,6 +98,7 @@ export namespace Card {
     createdAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     updatedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     deferredUntil?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    dueTo?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     creatorId: number,
     subject: string,
@@ -110,9 +116,14 @@ export namespace Card {
     DEFERRED_UNTIL = 6,
   }
 
+  export enum DueToCase { 
+    _DUE_TO_NOT_SET = 0,
+    DUE_TO = 7,
+  }
+
   export enum CompletedAtCase { 
     _COMPLETED_AT_NOT_SET = 0,
-    COMPLETED_AT = 7,
+    COMPLETED_AT = 8,
   }
 }
 
