@@ -11,9 +11,9 @@ import TextField from "@mui/material/TextField";
 import Toolbar from "@mui/material/Toolbar";
 import { styled } from "@mui/material/styles";
 import { SyntheticEvent, useRef, useState } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
 import { Link } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "./FocusProvider";
+import { useAction } from "./lib/components/Action";
 
 const drawerWidth = 170;
 
@@ -70,7 +70,11 @@ function AppBar({ open }: AppBarProps) {
     }
   };
 
-  useHotkeys(["meta+ctrl+a"], () => ref.current && ref.current.focus());
+  useAction({
+    label: "Quick add card",
+    hotkey: "⌘+Ctrl+A",
+    onExecute: () => ref.current && ref.current.focus(),
+  });
 
   const ref = useRef<HTMLDivElement>(null);
 

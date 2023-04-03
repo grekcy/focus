@@ -14,15 +14,8 @@ import {
   useMemo,
   useState,
 } from "react";
+import { Action } from "./Action";
 import { EmptyIcon } from "./Icons";
-
-export interface Action {
-  label: string;
-  icon?: JSX.Element;
-  hotkey?: string;
-  onEnabled?: () => boolean;
-  onExecute?: (e: MouseEvent) => void;
-}
 
 interface ContextMenuProps {
   actions: Action[];
@@ -88,7 +81,10 @@ const ContextMenu = forwardRef(
             item.label === "-" ? (
               <Divider />
             ) : (
-              <MenuItem onClick={(e) => handleMenuItemClick(e, item.onExecute)}>
+              <MenuItem
+                disabled={item.onEnabled ? !item.onEnabled() : false}
+                onClick={(e) => handleMenuItemClick(e, item.onExecute)}
+              >
                 {hasIcon && (
                   <ListItemIcon>
                     {item.icon ? item.icon : <EmptyIcon fontSize="small" />}

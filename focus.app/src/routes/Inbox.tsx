@@ -7,11 +7,12 @@ import update from "immutability-helper";
 import { useEffect, useRef, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { Event } from "../lib/api";
+import { actDivider, useAction } from "../lib/components/Action";
 import CardBar, { ICardBar } from "../lib/components/CardBar";
 import CardListView, { ICardListView } from "../lib/components/CardList";
 import ContextMenu, {
   IContextMenu,
-  PopupContextMenu,
+  PopupContextMenu as popupContextMenu,
 } from "../lib/components/ContextMenu";
 import LabelSelector from "../lib/components/LabelSelector";
 import datetime from "../lib/datetime";
@@ -67,6 +68,13 @@ function InboxPage() {
       setSelectedLabels((p) => update(p, { $push: [id] }));
   }
 
+  const actChallengeThis = useAction({
+    label: "Challenge this",
+    hotkey: "⌘+Ctrl+C",
+    onEnabled: () => cardNo !== -1,
+    onExecute: () => app.toast("challenge this: not implemented"),
+  });
+
   function deferUntil(deferUntil: Date | null) {
     if (cardNo === -1) return;
 
@@ -81,10 +89,35 @@ function InboxPage() {
       )
       .catch((e) => app.toast(e.message, "error"));
   }
+  const actDeferUntilTomorrow = useAction({
+    label: "defer until Tomorrow",
+    hotkey: "⌘+Ctrl+T",
+    onEnabled: () => cardNo !== -1,
+    onExecute: () => deferUntil(datetime.workTime().add(1, "day").toDate()),
+  });
+  const actDeferUntilNextWeek = useAction({
+    label: "defer until next Week",
+    hotkey: "⌘+Ctrl+W",
+    onEnabled: () => cardNo !== -1,
+    onExecute: () => deferUntil(datetime.workTime().add(7, "day").toDate()),
+  });
+  const actDeferUntilNextMonth = useAction({
+    label: "defer until next Month",
+    onEnabled: () => cardNo !== -1,
+    onExecute: () => deferUntil(datetime.workTime().add(1, "month").toDate()),
+  });
+  const actClearDefer = useAction({
+    label: "clear defer",
+    onEnabled: () => cardNo !== -1,
+    onExecute: () => deferUntil(null),
+  });
+  const actDueTo = useAction({
+    label: "Due to...",
+    onExecute: () => app.toast("not implemented"),
+  });
 
   const cardListRef = useRef<ICardListView>(null);
   const contextMenuRef = useRef<IContextMenu>(null);
-  const deferMenuRef = useRef<IContextMenu>(null);
 
   return (
     <>
@@ -119,51 +152,23 @@ function InboxPage() {
         showCardNo={false}
         onDoubleClick={() => cardBarRef.current && cardBarRef.current.toggle()}
         onSelect={handleSelectCard}
-        onContextMenu={(e) => PopupContextMenu(e, contextMenuRef)}
+        onContextMenu={(e) => popupContextMenu(e, contextMenuRef)}
         onLabelClick={handleLabelClick}
       />
       <ContextMenu
         ref={contextMenuRef}
         actions={[
-          {
-            label: "Challenge this...",
-            hotkey: "⌘+Ctrl+C",
-            onExecute: () => app.toast("not implemented"),
-          },
-          { label: "-" },
-          {
-            label: "defer until...",
-            onExecute: (e) => PopupContextMenu(e, deferMenuRef),
-          },
-          { label: "due to...", onExecute: () => app.toast("not implemented") },
+          actChallengeThis,
+          actDivider,
+          actDeferUntilTomorrow,
+          actDeferUntilNextWeek,
+          actDeferUntilNextMonth,
+          actClearDefer,
+          actDivider,
+          actDueTo,
         ]}
       />
-      <ContextMenu
-        ref={deferMenuRef}
-        actions={[
-          {
-            label: "defer until Tomorrow",
-            hotkey: "⌘+Ctrl+T",
-            onExecute: () =>
-              deferUntil(datetime.workTime().add(1, "day").toDate()),
-          },
-          {
-            label: "defer until next Week",
-            hotkey: "⌘+Ctrl+W",
-            onExecute: () =>
-              deferUntil(datetime.workTime().add(7, "day").toDate()),
-          },
-          {
-            label: "defer until next Month",
-            onExecute: () =>
-              deferUntil(datetime.workTime().add(1, "month").toDate()),
-          },
-          {
-            label: "clear defer until",
-            onExecute: () => deferUntil(null),
-          },
-        ]}
-      />
+
       <CardBar ref={cardBarRef} />
     </>
   );

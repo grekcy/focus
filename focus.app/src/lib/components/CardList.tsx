@@ -27,12 +27,12 @@ import {
   useDrop,
 } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { useHotkeys } from "react-hotkeys-hook";
 import { Link } from "react-router-dom";
 import { Key } from "ts-key-enum";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { Event } from "../api";
 import { Card, Label } from "../proto/focus_pb";
+import { useAction } from "./Action";
 import { EmptyIcon } from "./Icons";
 import InlineEdit, { IInlineEdit } from "./InlineEdit";
 import LabelChip from "./LabelChip";
@@ -245,7 +245,12 @@ const CardListView = forwardRef(
     // HotKeys
     //
 
-    useHotkeys([Key.ArrowUp], selUp, { preventDefault: false });
+    useAction({
+      label: "sel up",
+      hotkey: Key.ArrowUp,
+      onExecute: selUp,
+      hotkeyOptions: { preventDefault: false },
+    });
     function selUp() {
       if (selected === 0 || selected === -1) return;
       setSelected((p) => p - 1);
@@ -255,7 +260,12 @@ const CardListView = forwardRef(
       //   refs.current[selected - 1].scrollIntoView({ block: "start" });
     }
 
-    useHotkeys([Key.ArrowDown], selDown, { preventDefault: false });
+    useAction({
+      label: "sel down",
+      hotkey: Key.ArrowDown,
+      onExecute: selDown,
+      hotkeyOptions: { preventDefault: false },
+    });
     function selDown() {
       if (selected === cards.length - 1) return;
       setSelected((p) => p + 1);
@@ -263,7 +273,11 @@ const CardListView = forwardRef(
       //   refs.current[selected + 1].scrollIntoView({ block: "end" });
     }
 
-    useHotkeys(["meta+ctrl+right", "meta+ctrl+]"], moveRight);
+    useAction({
+      label: "move right",
+      hotkey: ["⌘+Ctrl+right", "⌘+Ctrl+]"],
+      onExecute: moveRight,
+    });
     function moveRight() {
       const upward = findFirstSiblingUpward(selected);
       if (upward === -1) return;
@@ -288,7 +302,11 @@ const CardListView = forwardRef(
         .catch((e) => app.toast(e.message, "error"));
     }
 
-    useHotkeys(["meta+ctrl+left", "meta+ctrl+["], moveLeft);
+    useAction({
+      label: "move left",
+      hotkey: ["meta+ctrl+left", "meta+ctrl+["],
+      onExecute: moveLeft,
+    });
     function moveLeft() {
       if (selected === 0) return;
       if (cards[selected].depth === 0) return;
@@ -366,7 +384,7 @@ const CardListView = forwardRef(
       return -1;
     }
 
-    useHotkeys("meta+ctrl+up", moveUp);
+    useAction({ label: "move up", hotkey: "⌘+Ctrl+Up", onExecute: moveUp });
     function moveUp() {
       const upwardIndex = findFirstSiblingUpward(selected);
       if (upwardIndex === -1) return;
@@ -410,7 +428,11 @@ const CardListView = forwardRef(
       return r;
     }
 
-    useHotkeys("meta+ctrl+down", moveDown);
+    useAction({
+      label: "move down",
+      hotkey: "⌘+Ctrl+Down",
+      onExecute: moveDown,
+    });
     function moveDown() {
       let downwardIndex = findFirstSiblingDownward(selected);
       if (downwardIndex === -1) return;
@@ -466,15 +488,20 @@ const CardListView = forwardRef(
         .catch((e) => app.toast(e.message, "error"));
     }
 
-    useHotkeys(Key.Enter, () => {
-      if (selected === -1) return;
-      refs.current[selected].edit();
+    useAction({
+      label: "Edit",
+      hotkey: Key.Enter,
+      onExecute: () => {
+        if (selected === -1) return;
+        refs.current[selected].edit();
+      },
     });
 
-    useHotkeys("meta+Enter", insertAfter);
-    function insertAfter() {
-      app.toast("insert after");
-    }
+    useAction({
+      label: "Insert after",
+      hotkey: "⌘+Enter",
+      onExecute: () => app.toast("not implemented: insert after"),
+    });
 
     const refs = useRef<IInlineEdit[]>([]);
 
