@@ -145,6 +145,11 @@ export const CardBar = forwardRef(
           <Divider textAlign="left">Dates</Divider>
           <Stack direction="column">
             <Box>
+              Defer until:
+              {card?.deferUntil &&
+                new Date(card?.deferUntil.seconds * 1000).toLocaleString()}
+            </Box>
+            <Box>
               Created:
               {card?.createdAt &&
                 new Date(card?.createdAt.seconds * 1000).toLocaleString()}

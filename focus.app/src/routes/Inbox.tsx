@@ -66,21 +66,17 @@ export function InboxPage() {
       setSelectedLabels((p) => update(p, { $push: [id] }));
   }
 
-  function deferUntilTomorrow() {
+  function deferUntil(deferUntil: Date | null) {
     if (cardNo === -1) return;
-
-    const deferUntil = datetime
-      .now()
-      .set("hour", 9)
-      .set("minute", 0)
-      .set("second", 0)
-      .add(1, "day")
-      .toDate();
 
     api
       .updateCardDeferUntil(cardNo, deferUntil)
       .then((r) =>
-        app.toast(`card ${cardNo} defered until ${deferUntil.toLocaleString()}`)
+        deferUntil
+          ? app.toast(
+              `card ${cardNo} defered until ${deferUntil.toLocaleString()}`
+            )
+          : app.toast(`card ${cardNo} clear defered`)
       )
       .catch((e) => app.toast(e.message, "error"));
   }
@@ -136,16 +132,23 @@ export function InboxPage() {
           {
             label: "defer until Tomorrow",
             hotkey: "⌘+Ctrl+T",
-            onExecute: () => deferUntilTomorrow(),
+            onExecute: () =>
+              deferUntil(datetime.workTime().add(1, "day").toDate()),
           },
           {
             label: "defer until next Week",
             hotkey: "⌘+Ctrl+W",
-            onExecute: () => app.toast("not implemented"),
+            onExecute: () =>
+              deferUntil(datetime.workTime().add(7, "day").toDate()),
           },
           {
             label: "defer until next Month",
-            onExecute: () => app.toast("not implemented"),
+            onExecute: () =>
+              deferUntil(datetime.workTime().add(1, "month").toDate()),
+          },
+          {
+            label: "clear defer until",
+            onExecute: () => deferUntil(null),
           },
         ]}
       />
