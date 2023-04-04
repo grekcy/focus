@@ -8,6 +8,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Dayjs } from "dayjs";
 import {
   Ref,
   forwardRef,
@@ -24,6 +25,7 @@ import { DrawerHeader } from "../../SideBar";
 import { arrayContentEquals } from "../lib";
 import { Card, Label } from "../proto/focus_pb";
 import useAction from "./Action";
+import DatePickerEx from "./DatePickerEx";
 import InlineEdit from "./InlineEdit";
 import LabelSelector from "./LabelSelector";
 
@@ -134,7 +136,7 @@ const CardBar = forwardRef(
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <Typography variant="h6">Subject: </Typography>
           <InlineEdit
-            value={card?.subject}
+            value={card!.subject}
             onSubmit={(target, value) => handleSubjectChanged(value)}
           />
 
@@ -149,27 +151,32 @@ const CardBar = forwardRef(
           <Typography variant="h6">Description:</Typography>
           <InlineEdit
             multiline
-            value={card?.content}
+            value={card!.content}
             onSubmit={(target, value) => handleDescriptionChanged(value)}
           />
           <Divider textAlign="left">Dates</Divider>
           <Stack direction="column">
             <Box>
+              {/* TODO 가로 정렬이 약간 안맞군 */}
               Deferred until:
-              {card?.deferUntil
-                ? new Date(card?.deferUntil.seconds * 1000).toLocaleString()
-                : "N/A"}
+              <DatePickerEx
+                value={
+                  card!.deferUntil ? new Dayjs(card!.deferUntil.seconds) : null
+                }
+                sx={{ pl: "0.5rem" }}
+              />
             </Box>
             <Box>
-              Due to:
-              {card?.dueDate
-                ? new Date(card?.dueDate.seconds * 1000).toLocaleString()
-                : "N/A"}
+              Due date:
+              <DatePickerEx
+                value={card!.dueDate ? new Dayjs(card!.dueDate.seconds) : null}
+                sx={{ pl: "0.5rem" }}
+              />
             </Box>
             <Box>
               Created:
-              {card?.createdAt &&
-                new Date(card?.createdAt.seconds * 1000).toLocaleString()}
+              {card!.createdAt &&
+                new Date(card!.createdAt.seconds * 1000).toLocaleString()}
             </Box>
             <Box>
               Updated:
@@ -178,8 +185,8 @@ const CardBar = forwardRef(
             </Box>
             <Box>
               Completed at:
-              {card?.completedAt
-                ? new Date(card?.completedAt.seconds * 1000).toLocaleString()
+              {card!.completedAt
+                ? new Date(card!.completedAt.seconds * 1000).toLocaleString()
                 : "N/A"}
             </Box>
           </Stack>
@@ -212,11 +219,7 @@ const CardBar = forwardRef(
           tabIndex={-1}
           sx={{ p: 1, width: 400, outline: "0px solid transparent" }}
         >
-          {cardNo ? (
-            <CardPanel />
-          ) : (
-            <Typography>Please select card!</Typography>
-          )}
+          {card ? <CardPanel /> : <Typography>Please select card!</Typography>}
         </Box>
       </Drawer>
     );
