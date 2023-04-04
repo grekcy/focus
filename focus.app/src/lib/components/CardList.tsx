@@ -32,7 +32,7 @@ import { Key } from "ts-key-enum";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { Event } from "../api";
 import { Card, Label } from "../proto/focus_pb";
-import { useAction } from "./Action";
+import useAction from "./Action";
 import { EmptyIcon } from "./Icons";
 import InlineEdit, { IInlineEdit } from "./InlineEdit";
 import LabelChip from "./LabelChip";

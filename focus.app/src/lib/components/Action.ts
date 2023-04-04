@@ -1,5 +1,10 @@
+import { MutableRefObject } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { Keys, OptionsOrDependencyArray } from "react-hotkeys-hook/dist/types";
+import {
+  Keys,
+  OptionsOrDependencyArray,
+  RefType,
+} from "react-hotkeys-hook/dist/types";
 
 export const actDivider = { label: "-" };
 
@@ -16,7 +21,13 @@ function repl(s: string): string {
   return s.replace("⌘", "meta");
 }
 
-export function useAction(act: Action) {
+export default function useAction(
+  act: Action
+): [Action, MutableRefObject<RefType<HTMLElement>>] {
+  return [act, _useAction(act)];
+}
+
+function _useAction(act: Action): MutableRefObject<RefType<HTMLElement>> {
   let hotkey = act.hotkey;
 
   if (hotkey) {
@@ -28,7 +39,7 @@ export function useAction(act: Action) {
       hotkey = hotkey.map((c) => repl(c));
   }
 
-  useHotkeys(
+  const ref = useHotkeys(
     hotkey ? hotkey : "",
     () => {
       if (act.onEnabled && !act.onEnabled()) return;
@@ -36,5 +47,6 @@ export function useAction(act: Action) {
     },
     act.hotkeyOptions
   );
-  return act;
+
+  return ref;
 }

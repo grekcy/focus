@@ -4,10 +4,10 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import update from "immutability-helper";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { Event } from "../lib/api";
-import { actDivider, useAction } from "../lib/components/Action";
+import useAction, { actDivider } from "../lib/components/Action";
 import CardBar, { ICardBar } from "../lib/components/CardBar";
 import CardListView, { ICardListView } from "../lib/components/CardList";
 import ContextMenu, {
@@ -68,7 +68,7 @@ function InboxPage() {
       setSelectedLabels((p) => update(p, { $push: [id] }));
   }
 
-  const actChallengeThis = useAction({
+  const [actChallengeThis] = useAction({
     label: "Challenge this",
     hotkey: "⌘+Ctrl+C",
     onEnabled: () => cardNo !== -1,
@@ -89,29 +89,35 @@ function InboxPage() {
       )
       .catch((e) => app.toast(e.message, "error"));
   }
-  const actDeferUntilTomorrow = useAction({
+  const [actDeferUntilTomorrow] = useAction({
     label: "defer until Tomorrow",
     hotkey: "⌘+Ctrl+T",
-    onEnabled: () => cardNo !== -1,
+    onEnabled: () => !!selectedCard,
     onExecute: () => deferUntil(datetime.workTime().add(1, "day").toDate()),
   });
-  const actDeferUntilNextWeek = useAction({
+  const [actDeferUntilNextWeek] = useAction({
     label: "defer until next Week",
     hotkey: "⌘+Ctrl+W",
-    onEnabled: () => cardNo !== -1,
+    onEnabled: () => !!selectedCard,
     onExecute: () => deferUntil(datetime.workTime().add(7, "day").toDate()),
   });
-  const actDeferUntilNextMonth = useAction({
+  const [actDeferUntilNextMonth] = useAction({
     label: "defer until next Month",
-    onEnabled: () => cardNo !== -1,
+    onEnabled: () => !!selectedCard,
     onExecute: () => deferUntil(datetime.workTime().add(1, "month").toDate()),
   });
-  const actClearDefer = useAction({
+
+  const selectedCard = useMemo(() => {
+    if (cardNo == -1) return;
+    return cards.find((c) => c.cardNo === cardNo);
+  }, [cardNo, cards]);
+
+  const [actClearDefer] = useAction({
     label: "clear defer",
-    onEnabled: () => cardNo !== -1,
+    onEnabled: () => !!selectedCard && !!selectedCard.deferUntil,
     onExecute: () => deferUntil(null),
   });
-  const actDueTo = useAction({
+  const [actDueTo] = useAction({
     label: "Due to...",
     onExecute: () => app.toast("not implemented"),
   });

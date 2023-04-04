@@ -13,7 +13,7 @@ import { styled } from "@mui/material/styles";
 import { SyntheticEvent, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "./FocusProvider";
-import { useAction } from "./lib/components/Action";
+import useAction from "./lib/components/Action";
 
 const drawerWidth = 170;
 

@@ -18,10 +18,12 @@ import {
   useState,
 } from "react";
 import { Link } from "react-router-dom";
+import { Key } from "ts-key-enum";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { DrawerHeader } from "../../SideBar";
 import { arrayContentEquals } from "../lib";
 import { Card, Label } from "../proto/focus_pb";
+import useAction from "./Action";
 import InlineEdit from "./InlineEdit";
 import LabelSelector from "./LabelSelector";
 
@@ -64,6 +66,16 @@ const CardBar = forwardRef(
         .then((r) => setCard(r))
         .catch((e) => app.toast(e.message, "error"));
     }, [cardNo]);
+
+    useEffect(() => {
+      open && cardRef.current && cardRef.current.focus();
+    }, [open]);
+
+    const [actClose, cardRef] = useAction({
+      label: "close",
+      hotkey: Key.Escape,
+      onExecute: () => setOpen(false),
+    });
 
     function handleSubjectChanged(subject: string) {
       if (!card) return;
@@ -195,7 +207,11 @@ const CardBar = forwardRef(
           </IconButton>
         </DrawerHeader>
         <Divider />
-        <Box sx={{ p: 1, width: 400 }}>
+        <Box
+          ref={cardRef}
+          tabIndex={-1}
+          sx={{ p: 1, width: 400, outline: "0px solid transparent" }}
+        >
           {cardNo ? (
             <CardPanel />
           ) : (
