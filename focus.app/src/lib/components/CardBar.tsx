@@ -8,7 +8,7 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import {
   Ref,
   forwardRef,
@@ -129,6 +129,24 @@ const CardBar = forwardRef(
         .catch((e) => app.toast(e.message, "error"));
     }
 
+    function handleDeferUntilChange(value: Dayjs | null) {
+      if (!card) return;
+
+      api
+        .updateCardDeferUntil(card.cardNo, value ? value.toDate() : null)
+        .then((r) => setCard(r))
+        .catch((e) => app.toast(e.message, "error"));
+    }
+
+    function handleDueDateChange(value: Dayjs | null) {
+      if (!card) return;
+
+      api
+        .updateCardDueDate(card.cardNo, value ? value.toDate() : null)
+        .then((r) => setCard(r))
+        .catch((e) => app.toast(e.message, "error"));
+    }
+
     const labelSelectorRef = useRef<HTMLDivElement>(null);
 
     function CardPanel() {
@@ -161,16 +179,18 @@ const CardBar = forwardRef(
               Deferred until:
               <DatePickerEx
                 value={
-                  card!.deferUntil ? new Dayjs(card!.deferUntil.seconds) : null
+                  card!.deferUntil ? dayjs(card!.deferUntil.seconds) : null
                 }
                 sx={{ pl: "0.5rem" }}
+                onChange={(value) => handleDeferUntilChange(value)}
               />
             </Box>
             <Box>
               Due date:
               <DatePickerEx
-                value={card!.dueDate ? new Dayjs(card!.dueDate.seconds) : null}
+                value={card!.dueDate ? dayjs(card!.dueDate.seconds) : null}
                 sx={{ pl: "0.5rem" }}
+                onChange={(value) => handleDueDateChange(value)}
               />
             </Box>
             <Box>

@@ -332,4 +332,5 @@ export enum CardField {
   PARENT_CARD = 3,
   LABEL = 4,
   DEFER_UNTIL = 5,
+  DUE_DATE = 6,
 }

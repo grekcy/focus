@@ -486,6 +486,13 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 				updates["defer_until"] = req.Card.DeferUntil.AsTime()
 			}
 
+		case proto.CardField_DUE_DATE:
+			if req.Card.DueDate == nil {
+				updates["due_date"] = gorm.Expr("NULL")
+			} else {
+				updates["due_date"] = req.Card.DueDate.AsTime()
+			}
+
 		default:
 			log.Warnf("unknown field: %v", field)
 		}

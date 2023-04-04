@@ -167,6 +167,16 @@ class FocusAPI {
     );
   };
 
+  updateCardDueDate = (cardNo: number, dueDate: Date | null) => {
+    const card = new Card();
+    card.setCardNo(cardNo);
+    if (dueDate) card.setDueDate(Timestamp.fromDate(dueDate));
+
+    return this.patchCard(card.toObject(), CardField.DUE_DATE).then((r) =>
+      r.toObject()
+    );
+  };
+
   patchCard = (card: Card.AsObject, ...fields: CardField[]) => {
     const req = new PatchCardReq();
     const c = new Card();
