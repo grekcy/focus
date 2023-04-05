@@ -1,13 +1,11 @@
-import Button from "@mui/material/Button";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
+import { Button, List, ListItem } from "@mui/material";
 import update from "immutability-helper";
 import { useEffect, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
-import LabelSelector from "../lib/components/LabelSelector";
+import { LabelSelector } from "../lib/components/LabelSelector";
 import { Label } from "../lib/proto/focus_pb";
 
-function PlayLabelSelector() {
+export function PlayLabelSelector() {
   const app = useFocusApp();
   const api = useFocusClient();
 
@@ -68,4 +66,3 @@ function PlayLabelSelector() {
     </>
   );
 }
-export default PlayLabelSelector;

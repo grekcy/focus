@@ -11,11 +11,12 @@ import {
   GetCardReq,
   Label,
   ListCardReq,
+  ListLabelsReq,
   PatchCardReq,
   RankCardReq,
 } from "./proto/focus_pb";
 
-class FocusAPI {
+export class FocusAPI {
   s: V1Alpha1Client;
   listeners: { [event: string]: EventListener[] };
 
@@ -61,9 +62,9 @@ class FocusAPI {
   //
   // FocusAPI
   //
-  quickAddCard = (subject: string) => {
+  quickAddCard = (objective: string) => {
     const s = new StringValue();
-    s.setValue(subject);
+    s.setValue(objective);
 
     return this.s
       .quickAddCard(s, null)
@@ -117,12 +118,12 @@ class FocusAPI {
     return this.s.patchCard(req, null).then((r) => r.toObject());
   };
 
-  updateCardSubject = (cardNo: number, subject: string) => {
+  updateCardObjective = (cardNo: number, objective: string) => {
     const card = new Card();
     card.setCardNo(cardNo);
-    card.setSubject(subject);
+    card.setObjective(objective);
 
-    return this.patchCard(card.toObject(), CardField.SUBJECT).then((r) =>
+    return this.patchCard(card.toObject(), CardField.OBJECTIVE).then((r) =>
       r.toObject()
     );
   };
@@ -183,8 +184,8 @@ class FocusAPI {
     c.setCardNo(card.cardNo);
     fields.forEach((field) => {
       switch (field) {
-        case CardField.SUBJECT:
-          c.setSubject(card.subject);
+        case CardField.OBJECTIVE:
+          c.setObjective(card.objective);
           break;
         case CardField.CONTENT:
           c.setContent(card.content);
@@ -203,6 +204,14 @@ class FocusAPI {
               new Date(card.deferUntil.seconds * 1000)
             );
             c.setDeferUntil(defer);
+          }
+          break;
+        case CardField.DUE_DATE:
+          if (card.dueDate) {
+            const defer = Timestamp.fromDate(
+              new Date(card.dueDate.seconds * 1000)
+            );
+            c.setDueDate(defer);
           }
           break;
         default:
@@ -231,10 +240,10 @@ class FocusAPI {
     return this.s.deleteCard(no, null);
   };
 
-  listLabels = () => {
-    return this.s
-      .listLabels(new Empty(), null)
-      .then((r) => r.toObject().labelsList);
+  listLabels = (labels?: string[]) => {
+    const req = new ListLabelsReq();
+    if (labels && labels.length > 0) req.setLabelsList(labels);
+    return this.s.listLabels(req, null).then((r) => r.toObject().labelsList);
   };
 
   updateLabel = (label: Label.AsObject) => {
@@ -252,7 +261,6 @@ class FocusAPI {
     return this.s.deleteLabel(req, null).then((r) => r.toObject());
   };
 }
-export default FocusAPI;
 
 class AuthInterceptor {
   getToken: () => string;

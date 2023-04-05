@@ -1,18 +1,19 @@
-import Autocomplete, {
+import {
+  Autocomplete,
   AutocompleteRenderInputParams,
-} from "@mui/material/Autocomplete";
-import Box from "@mui/material/Box";
-import Checkbox from "@mui/material/Checkbox";
-import Chip from "@mui/material/Chip";
-import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+  Box,
+  Checkbox,
+  Chip,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { SxProps, Theme } from "@mui/material/styles";
 import update from "immutability-helper";
 import { KeyboardEvent, ReactNode, useEffect, useState } from "react";
 import { Key } from "ts-key-enum";
 
-function PlayAutocomplete() {
+export function PlayAutocomplete() {
   return (
     <>
       <Stack direction="row">
@@ -26,7 +27,6 @@ function PlayAutocomplete() {
     </>
   );
 }
-export default PlayAutocomplete;
 
 interface MovieSelectProps {
   sx?: SxProps<Theme>;

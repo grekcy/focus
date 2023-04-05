@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"focus/models"
-
 	"github.com/stretchr/testify/require"
+
+	"focus/models"
 )
 
 func TestLabelList(t *testing.T) {

@@ -11,9 +11,9 @@ import (
 	"github.com/whitekid/goxp/log"
 	"github.com/whitekid/goxp/validate"
 	"google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gorm.io/gorm"
 
@@ -51,19 +51,19 @@ func (s *v1alpha1ServiceImpl) defaultWorkspace(ctx context.Context) *models.Work
 }
 
 func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.StringValue) (*proto.Card, error) {
-	log.Debugf("quickAdd: subject=%v", in)
+	log.Debugf("quickAdd: objective=%v", in)
 
 	if err := validate.Struct(&struct {
-		Subject string `validate:"required"`
+		Objective string `validate:"required"`
 	}{
-		Subject: in.Value,
+		Objective: in.Value,
 	}); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	newCard := &CardWithDepth{
 		Card: &models.Card{
-			Subject:     in.Value,
+			Objective:   in.Value,
 			CreatorID:   s.user(ctx).ID,
 			WorkspaceID: s.defaultWorkspace(ctx).ID,
 		},
@@ -227,7 +227,7 @@ func cardModelToProto(in *CardWithDepth) *proto.Card {
 		DueDate:      helper.NewTimestamppb(in.DueDate),
 		CompletedAt:  helper.NewTimestamppb(in.CompletedAt),
 		CreatorId:    uint64(in.CreatorID),
-		Subject:      in.Subject,
+		Objective:    in.Objective,
 		Content:      in.Content,
 		Labels:       helper.ArrayToProto(in.Labels),
 	}
@@ -314,8 +314,6 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card,
 
 		if opt.excludeDeferred {
 			tx = tx.Where("defer_until IS NULL OR defer_until < now()")
-		} else {
-			tx = tx.Where("defer_until IS NULL OR defer_until > now()")
 		}
 
 		if where != nil {
@@ -392,6 +390,11 @@ func (s *v1alpha1ServiceImpl) GetCards(ctx context.Context, req *proto.GetCardRe
 	if err != nil {
 		return nil, err
 	}
+
+	if len(r) == 0 {
+		return nil, status.Errorf(codes.NotFound, "not found")
+	}
+
 	if len(r) != len(req.CardNos) {
 		return nil, status.Errorf(codes.NotFound, "expected %d but got %d", len(req.CardNos), len(r))
 	}
@@ -408,10 +411,7 @@ func (s *v1alpha1ServiceImpl) GetCards(ctx context.Context, req *proto.GetCardRe
 }
 
 func (s *v1alpha1ServiceImpl) getCard(ctx context.Context, cardNo uint) (*CardWithDepth, error) {
-	r, err := s.listCards(ctx, &models.Card{CardNo: cardNo}, ListOpt{
-		excludeCompleted: false,
-		excludeDeferred:  false,
-	})
+	r, err := s.listCards(ctx, &models.Card{CardNo: cardNo}, ListOpt{})
 	if err != nil {
 		return nil, err
 	}
@@ -437,8 +437,8 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 	updates := map[string]any{}
 	for _, field := range req.Fields {
 		switch field {
-		case proto.CardField_SUBJECT:
-			updates["subject"] = req.Card.Subject
+		case proto.CardField_OBJECTIVE:
+			updates["objective"] = req.Card.Objective
 
 		case proto.CardField_CONTENT:
 			updates["content"] = req.Card.Content

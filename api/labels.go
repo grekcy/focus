@@ -7,9 +7,9 @@ import (
 	"github.com/whitekid/goxp/fx"
 	"github.com/whitekid/goxp/log"
 	"google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
+	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gorm.io/gorm"
 
@@ -38,8 +38,8 @@ func labelModelToProto(in *models.Label) *proto.Label {
 	}
 }
 
-func (s *v1alpha1ServiceImpl) ListLabels(ctx context.Context, _ *emptypb.Empty) (*proto.ListLabelsResp, error) {
-	log.Debugf("ListLabel()")
+func (s *v1alpha1ServiceImpl) ListLabels(ctx context.Context, req *proto.ListLabelsReq) (*proto.ListLabelsResp, error) {
+	log.Debugf("ListLabel(): req=%+v", req)
 
 	r, err := s.listLabels(ctx, nil)
 	if err != nil {
@@ -103,7 +103,7 @@ func (s *v1alpha1ServiceImpl) DeleteLabel(ctx context.Context, req *wrapperspb.U
 		if tx.RowsAffected != 1 {
 			log.Warnf("delete exactly id=%v, but deleted %d", req.Value, tx.RowsAffected)
 		}
-		
+
 		return nil
 	}); err != nil {
 		return helper.Empty(), status.Errorf(codes.Internal, "delete failed: %v", err.Error())

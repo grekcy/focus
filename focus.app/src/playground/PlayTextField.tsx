@@ -1,8 +1,6 @@
-import Chip from "@mui/material/Chip";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import { Typography, TextField, Chip } from "@mui/material";
 
-function PlayTextField() {
+export function PlayTextField() {
   return (
     <>
       <Typography>With chip</Typography>
@@ -26,4 +24,3 @@ function PlayTextField() {
     </>
   );
 }
-export default PlayTextField;

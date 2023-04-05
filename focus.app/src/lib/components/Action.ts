@@ -21,7 +21,7 @@ function repl(s: string): string {
   return s.replace("⌘", "meta");
 }
 
-export default function useAction(
+export function useAction(
   act: Action
 ): [Action, MutableRefObject<RefType<HTMLElement>>] {
   return [act, _useAction(act)];

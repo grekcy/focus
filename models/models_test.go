@@ -32,7 +32,7 @@ func TestCardLabels(t *testing.T) {
 	card := &Card{
 		CreatorID:   1,
 		WorkspaceID: 1,
-		Subject:     "test for label",
+		Objective:   "test for label",
 		Labels:      []int64{1, 6, 4},
 	}
 	require.NoError(t, _db.Save(card).Error)

@@ -1,11 +1,7 @@
 import EventIcon from "@mui/icons-material/Event";
-import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import Popover from "@mui/material/Popover";
-import TextField from "@mui/material/TextField";
+import { Button, Divider, IconButton, Popover, TextField } from "@mui/material";
 import { SxProps, Theme } from "@mui/material/styles";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { DateCalendar } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { useRef, useState } from "react";
 
@@ -15,7 +11,7 @@ interface DatePickerExProp {
   sx?: SxProps<Theme>;
 }
 
-export default function DatePickerEx({
+export function DatePickerEx({
   value: inValue,
   sx,
   onChange,
@@ -37,16 +33,17 @@ export default function DatePickerEx({
           readOnly: true,
           endAdornment: (
             <IconButton
+              size="small"
               onClick={() => {
                 setAnchor(ref.current);
                 setOpen(true);
               }}
             >
-              <EventIcon sx={{ color: "graytext" }} />
+              <EventIcon color="action" fontSize="small" />
             </IconButton>
           ),
         }}
-        sx={{ width: { md: 150 }, ...sx }}
+        sx={{ width: { md: 120 }, ...sx }}
       ></TextField>
       <Popover
         open={open}
@@ -70,6 +67,7 @@ export default function DatePickerEx({
           onClick={() => {
             setValue(dayjs());
             setOpen(false);
+            onChange && onChange(dayjs());
           }}
         >
           Today
@@ -78,6 +76,7 @@ export default function DatePickerEx({
           onClick={() => {
             setValue(null);
             setOpen(false);
+            onChange && onChange(null);
           }}
         >
           Clear

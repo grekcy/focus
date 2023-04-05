@@ -1,4 +1,4 @@
-function ErrorPage() {
+export function ErrorPage() {
   return (
     <>
       <h1>Oops!</h1>
@@ -6,4 +6,3 @@ function ErrorPage() {
     </>
   );
 }
-export default ErrorPage;

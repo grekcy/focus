@@ -130,7 +130,7 @@ interface ContainerState {
   cards: Item[];
 }
 
-function DragAndDropSortable() {
+export function DragAndDropSortable() {
   const [cards, setCards] = useState([
     {
       id: 1,
@@ -202,4 +202,3 @@ function DragAndDropSortable() {
     </>
   );
 }
-export default DragAndDropSortable;

@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/codes"
 	_ "google.golang.org/grpc/encoding/gzip"
 	"google.golang.org/grpc/keepalive"
-	status "google.golang.org/grpc/status"
+	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 
 	"focus/config"

@@ -1,10 +1,9 @@
-import Typography from "@mui/material/Typography";
+import { Typography } from "@mui/material";
 
-function PlanningPage() {
+export function PlanningPage() {
   return (
     <>
       <Typography variant="h5">Planning</Typography>
     </>
   );
 }
-export default PlanningPage;

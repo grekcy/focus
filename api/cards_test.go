@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/whitekid/goxp/fixtures"
 	"github.com/whitekid/goxp/fx"
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"focus/helper"
@@ -18,14 +18,14 @@ import (
 
 func TestQuickAdd(t *testing.T) {
 	type args struct {
-		subject string
+		objective string
 	}
 	tests := [...]struct {
 		name    string
 		args    args
 		wantErr bool
 	}{
-		{"default", args{subject: "test subject"}, false},
+		{"default", args{objective: "test objective"}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -34,7 +34,7 @@ func TestQuickAdd(t *testing.T) {
 
 			ctx, service := newTestClient(ctx, t)
 
-			got, err := service.QuickAddCard(ctx, wrapperspb.String(tt.args.subject))
+			got, err := service.QuickAddCard(ctx, wrapperspb.String(tt.args.objective))
 			require.Truef(t, (err != nil) == tt.wantErr, `QuickAddCard() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
 			if tt.wantErr {
 				return
@@ -45,7 +45,7 @@ func TestQuickAdd(t *testing.T) {
 			}()
 
 			require.NotEqual(t, uint64(0), got.CardNo)
-			require.Equal(t, tt.args.subject, got.Subject)
+			require.Equal(t, tt.args.objective, got.Objective)
 
 			got1, err := service.GetCard(ctx, helper.UInt64(got.CardNo))
 			require.NoError(t, err)
@@ -206,8 +206,8 @@ func TestCompleteCard(t *testing.T) {
 	}
 }
 
-func newCardForTest(ctx context.Context, t *testing.T, service *v1alpha1ServiceImpl, subject string) (*proto.Card, fixtures.Teardown) {
-	card, err := service.QuickAddCard(ctx, wrapperspb.String(subject))
+func newCardForTest(ctx context.Context, t *testing.T, service *v1alpha1ServiceImpl, objective string) (*proto.Card, fixtures.Teardown) {
+	card, err := service.QuickAddCard(ctx, wrapperspb.String(objective))
 	require.NoError(t, err, "fail to create card")
 
 	return card, func() {
@@ -221,13 +221,13 @@ func TestRankDown(t *testing.T) {
 	defer cancel()
 
 	ctx, service := newTestClient(ctx, t)
-	card1, teardown := newCardForTest(ctx, t, service, "test subject for rank #1")
+	card1, teardown := newCardForTest(ctx, t, service, "test objective for rank #1")
 	defer teardown()
 
-	card2, teardown := newCardForTest(ctx, t, service, "test subject for rank #2")
+	card2, teardown := newCardForTest(ctx, t, service, "test objective for rank #2")
 	defer teardown()
 
-	card3, teardown := newCardForTest(ctx, t, service, "test subject for rank #3")
+	card3, teardown := newCardForTest(ctx, t, service, "test objective for rank #3")
 	defer teardown()
 
 	_ = card2

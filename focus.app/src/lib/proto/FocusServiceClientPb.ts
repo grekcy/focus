@@ -431,26 +431,26 @@ export class V1Alpha1Client {
   methodDescriptorlistLabels = new grpcWeb.MethodDescriptor(
     '/V1Alpha1/listLabels',
     grpcWeb.MethodType.UNARY,
-    google_protobuf_empty_pb.Empty,
+    focus_pb.ListLabelsReq,
     focus_pb.ListLabelsResp,
-    (request: google_protobuf_empty_pb.Empty) => {
+    (request: focus_pb.ListLabelsReq) => {
       return request.serializeBinary();
     },
     focus_pb.ListLabelsResp.deserializeBinary
   );
 
   listLabels(
-    request: google_protobuf_empty_pb.Empty,
+    request: focus_pb.ListLabelsReq,
     metadata: grpcWeb.Metadata | null): Promise<focus_pb.ListLabelsResp>;
 
   listLabels(
-    request: google_protobuf_empty_pb.Empty,
+    request: focus_pb.ListLabelsReq,
     metadata: grpcWeb.Metadata | null,
     callback: (err: grpcWeb.RpcError,
                response: focus_pb.ListLabelsResp) => void): grpcWeb.ClientReadableStream<focus_pb.ListLabelsResp>;
 
   listLabels(
-    request: google_protobuf_empty_pb.Empty,
+    request: focus_pb.ListLabelsReq,
     metadata: grpcWeb.Metadata | null,
     callback?: (err: grpcWeb.RpcError,
                response: focus_pb.ListLabelsResp) => void) {

@@ -1,6 +1,6 @@
-import datetime from "../lib/datetime";
+import { datetime } from "../lib/datetime";
 
-function PlayDateTime() {
+export function PlayDateTime() {
   return (
     <ul>
       <li>Now: {datetime.now().toDate().toLocaleString()}</li>
@@ -28,4 +28,3 @@ function PlayDateTime() {
     </ul>
   );
 }
-export default PlayDateTime;

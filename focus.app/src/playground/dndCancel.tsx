@@ -161,7 +161,7 @@ const Container: FC = memo(function Container() {
   );
 });
 
-function DragAndDropCancel() {
+export function DragAndDropCancel() {
   return (
     <>
       <DndProvider backend={HTML5Backend}>
@@ -171,4 +171,3 @@ function DragAndDropCancel() {
   );
 }
 
-export default DragAndDropCancel;

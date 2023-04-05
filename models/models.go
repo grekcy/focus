@@ -53,7 +53,7 @@ type Card struct {
 	DeferUntil   *time.Time `gorm:"index"`
 	DueDate      *time.Time `gorm:"index"`
 	CompletedAt  *time.Time `gorm:"index"`
-	Subject      string     `gorm:"type:varchar(500);not null;default:''"`
+	Objective    string     `gorm:"type:varchar(500);not null;default:''"`
 	Content      string     `gorm:"type:text;not null;default:''"`
 
 	Creator   *User      `gorm:"foreignKey:CreatorID"`
@@ -65,7 +65,7 @@ type Card struct {
 	// LIMIT: 각 element에 대한 fk는 되지 않음
 	//
 	// update cards set labels = '{1,4,6}' where card_no = 5;
-	// SELECT card_no, subject, labels FROM cards WHERE ARRAY[1,6]::bigint[] <@ labels
+	// SELECT card_no, objective, labels FROM cards WHERE ARRAY[1,6]::bigint[] <@ labels
 	//
 	Labels pq.Int64Array `gorm:"type:bigint[];index:,type:gin"`
 }

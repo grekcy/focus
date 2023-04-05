@@ -71,8 +71,8 @@ export class Card extends jspb.Message {
   getCreatorId(): number;
   setCreatorId(value: number): Card;
 
-  getSubject(): string;
-  setSubject(value: string): Card;
+  getObjective(): string;
+  setObjective(value: string): Card;
 
   getContent(): string;
   setContent(value: string): Card;
@@ -101,7 +101,7 @@ export namespace Card {
     dueDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     creatorId: number,
-    subject: string,
+    objective: string,
     content: string,
     labelsList: Array<number>,
   }
@@ -305,6 +305,26 @@ export namespace Label {
   }
 }
 
+export class ListLabelsReq extends jspb.Message {
+  getLabelsList(): Array<string>;
+  setLabelsList(value: Array<string>): ListLabelsReq;
+  clearLabelsList(): ListLabelsReq;
+  addLabels(value: string, index?: number): ListLabelsReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListLabelsReq.AsObject;
+  static toObject(includeInstance: boolean, msg: ListLabelsReq): ListLabelsReq.AsObject;
+  static serializeBinaryToWriter(message: ListLabelsReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListLabelsReq;
+  static deserializeBinaryFromReader(message: ListLabelsReq, reader: jspb.BinaryReader): ListLabelsReq;
+}
+
+export namespace ListLabelsReq {
+  export type AsObject = {
+    labelsList: Array<string>,
+  }
+}
+
 export class ListLabelsResp extends jspb.Message {
   getLabelsList(): Array<Label>;
   setLabelsList(value: Array<Label>): ListLabelsResp;
@@ -326,7 +346,7 @@ export namespace ListLabelsResp {
 }
 
 export enum CardField { 
-  SUBJECT = 0,
+  OBJECTIVE = 0,
   COMPLETED_AT = 1,
   CONTENT = 2,
   PARENT_CARD = 3,

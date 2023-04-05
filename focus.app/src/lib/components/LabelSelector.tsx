@@ -1,9 +1,10 @@
 import { Theme } from "@emotion/react";
-import Autocomplete, {
+import {
+  Autocomplete,
   AutocompleteRenderInputParams,
-} from "@mui/material/Autocomplete";
-import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
+  Box,
+  TextField,
+} from "@mui/material";
 import { SxProps } from "@mui/material/styles";
 import update from "immutability-helper";
 import {
@@ -17,7 +18,7 @@ import {
 } from "react";
 import { Key } from "ts-key-enum";
 import { arrayContentEquals } from "../lib";
-import LabelChip from "./LabelChip";
+import { LabelChip } from "./LabelChip";
 
 export interface LabelOption {
   id: number;
@@ -34,7 +35,7 @@ interface LabelSelectorProps {
 
 interface ILabelSelector {}
 
-const LabelSelector = forwardRef(
+export const LabelSelector = forwardRef(
   (
     {
       labels,
@@ -131,4 +132,3 @@ const LabelSelector = forwardRef(
     );
   }
 );
-export default LabelSelector;

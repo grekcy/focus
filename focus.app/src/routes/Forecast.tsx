@@ -1,10 +1,9 @@
-import Typography from "@mui/material/Typography";
+import { Typography } from "@mui/material";
 
-function ForecastPage() {
+export function ForecastPage() {
   return (
     <>
       <Typography variant="h5">Forecast</Typography>
     </>
   );
 }
-export default ForecastPage;

@@ -1,19 +1,23 @@
 import AddIcon from "@mui/icons-material/Add";
 import MenuIcon from "@mui/icons-material/Menu";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import Avatar from "@mui/material/Avatar";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import InputAdornment from "@mui/material/InputAdornment";
-import ListItemButton from "@mui/material/ListItemButton";
-import SvgIcon, { SvgIconProps } from "@mui/material/SvgIcon";
-import TextField from "@mui/material/TextField";
-import Toolbar from "@mui/material/Toolbar";
+import {
+  Avatar,
+  Box,
+  IconButton,
+  InputAdornment,
+  ListItemButton,
+  AppBar as MuiAppBar,
+  AppBarProps as MuiAppBarProps,
+  SvgIcon,
+  SvgIconProps,
+  TextField,
+  Toolbar,
+} from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { SyntheticEvent, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "./FocusProvider";
-import useAction from "./lib/components/Action";
+import { useAction } from "./lib/components/Action";
 
 const drawerWidth = 170;
 
@@ -43,8 +47,8 @@ interface AppBarProps {
   open: boolean;
 }
 
-function AppBar({ open }: AppBarProps) {
-  const [qucikAddSubject, setQucikAddSubject] = useState("");
+export function AppBar({ open }: AppBarProps) {
+  const [qucikAddObjective, setQucikAddObjective] = useState("");
   const [adding, setAdding] = useState(false);
 
   const app = useFocusApp();
@@ -53,16 +57,16 @@ function AppBar({ open }: AppBarProps) {
   const onQuickAddKeyUp = (e: SyntheticEvent) => {
     if ((e.nativeEvent as KeyboardEvent).key === "Enter") {
       if (adding) return; // NOTE 한글의 경우 글을 조합하는 도중에 Enter를 누르면 2번 호출됨
-      const subject = qucikAddSubject.trim();
-      if (subject === "") return;
+      const objective = qucikAddObjective.trim();
+      if (objective === "") return;
 
       setAdding(true);
 
       api
-        .quickAddCard(subject)
+        .quickAddCard(objective)
         .then((r) => {
-          setQucikAddSubject("");
-          app.toast(`added: ${subject}`, "success");
+          setQucikAddObjective("");
+          app.toast(`added: ${objective}`, "success");
           return r;
         })
         .catch((e) => app.toast(e.message, "error"))
@@ -100,8 +104,8 @@ function AppBar({ open }: AppBarProps) {
             inputRef={ref}
             variant="standard"
             placeholder="add card to inbox... ⌘+Ctrl+A"
-            value={qucikAddSubject}
-            onChange={(e) => setQucikAddSubject(e.target.value)}
+            value={qucikAddObjective}
+            onChange={(e) => setQucikAddObjective(e.target.value)}
             onKeyUp={onQuickAddKeyUp}
             InputProps={{
               sx: { color: "inherit" },
@@ -123,7 +127,6 @@ function AppBar({ open }: AppBarProps) {
     </MAppBar>
   );
 }
-export default AppBar;
 
 function HomeIcon(props: SvgIconProps) {
   return (

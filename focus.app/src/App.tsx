@@ -1,9 +1,9 @@
-import Box from "@mui/material/Box";
+import { Box } from "@mui/material";
 import { useRef, useState } from "react";
 import { CookiesProvider } from "react-cookie";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import AppBar from "./AppBar";
+import { AppBar } from "./AppBar";
 import {
   AlertColor,
   FocusClientProvider,
@@ -11,18 +11,18 @@ import {
   IFocusApp,
   IFocusProvider,
 } from "./FocusProvider";
-import SideBar, { DrawerHeader } from "./SideBar";
-import PlayIndex from "./playground/PlayIndex";
-import CardPage from "./routes/Cards";
-import ChallengePage from "./routes/Challenge";
-import ErrorPage from "./routes/ErrorPage";
-import ForecastPage from "./routes/Forecast";
-import InboxPage from "./routes/Inbox";
-import LabelsPage from "./routes/LabelsPage";
-import PerformancePage from "./routes/Performance";
-import PlanningPage from "./routes/Planning";
-import RootPage from "./routes/Root";
-import TodayPage from "./routes/Today";
+import { DrawerHeader, SideBar } from "./SideBar";
+import { PlayIndex } from "./playground/PlayIndex";
+import { CardPage } from "./routes/Cards";
+import { ChallengeIndex } from "./routes/Challenge";
+import { ErrorPage } from "./routes/ErrorPage";
+import { ForecastPage } from "./routes/Forecast";
+import { InboxPage } from "./routes/Inbox";
+import { LabelsPage } from "./routes/LabelsPage";
+import { PerformancePage } from "./routes/Performance";
+import { PlanningPage } from "./routes/Planning";
+import { RootPage } from "./routes/Root";
+import { TodayPage } from "./routes/Today";
 
 function App() {
   const [openSideBar, setOpenSideBar] = useState(false);
@@ -58,10 +58,10 @@ function App() {
                   <Route path="/inbox" element={<InboxPage />} />
                   <Route path="/today" element={<TodayPage />} />
                   <Route path="/forecast" element={<ForecastPage />} />
-                  <Route path="/cards/:cardNo" element={<CardPage />} />
+                  <Route path="/cards/:cardNo?" element={<CardPage />} />
                   <Route
-                    path="/challenges/:challengeId"
-                    element={<ChallengePage />}
+                    path="/challenges/:challengeId?"
+                    element={<ChallengeIndex />}
                   />
                   <Route path="/planning" element={<PlanningPage />} />
                   <Route path="/performance" element={<PerformancePage />} />

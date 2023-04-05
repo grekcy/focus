@@ -1,10 +1,9 @@
-import Typography from "@mui/material/Typography";
+import { Typography } from "@mui/material";
 
-function PerformancePage() {
+export function PerformancePage() {
   return (
     <>
       <Typography variant="h5">Performance</Typography>
     </>
   );
 }
-export default PerformancePage;

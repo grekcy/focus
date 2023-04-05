@@ -1,12 +1,9 @@
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import Container from "@mui/material/Container";
-import Divider from "@mui/material/Divider";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
+import { Container, Divider, Grid, Paper } from "@mui/material";
 import { SxProps, Theme } from "@mui/material/styles";
 import { ReactNode } from "react";
 
-function PlayLayout() {
+export function PlayLayout() {
   return (
     <>
       <Divider textAlign="left">CardListViewItem with FlexGrow</Divider>
@@ -53,7 +50,6 @@ function PlayLayout() {
     </>
   );
 }
-export default PlayLayout;
 
 interface FilledProp {
   color?: string;

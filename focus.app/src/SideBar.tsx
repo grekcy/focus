@@ -7,16 +7,18 @@ import InsightsIcon from "@mui/icons-material/Insights";
 import LabelIcon from "@mui/icons-material/Label";
 import MicrowaveIcon from "@mui/icons-material/Microwave";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
-import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
-import MuiDrawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import Tooltip from "@mui/material/Tooltip";
+import {
+  Box,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Drawer as MuiDrawer,
+  Tooltip,
+} from "@mui/material";
 import { CSSObject, Theme, styled } from "@mui/material/styles";
 import {
   Ref,
@@ -108,16 +110,10 @@ const pages = [
   },
   { title: "-" },
   {
-    href: "/challenges/1",
-    title: "Challenge #1",
+    href: "/challenges/",
+    title: "Challenges",
     icon: ViewColumnIcon,
-    tooltip: "Challenge #1",
-  },
-  {
-    href: "/challenges/2",
-    title: "Challenge #2",
-    icon: ViewColumnIcon,
-    tooltip: "Challenge #2",
+    tooltip: "Challenge",
   },
   { title: "-" },
   {
@@ -153,7 +149,7 @@ if (process.env.REACT_APP_ENV === "development") {
   );
 }
 
-const SideBar = forwardRef(({ open }: SideBarProps, ref: Ref<ISideBar>) => {
+export const SideBar = forwardRef(({ open }: SideBarProps, ref: Ref<ISideBar>) => {
   useImperativeHandle(ref, () => ({
     toggle() {
       setCurrentOpen((p) => !p);
@@ -226,4 +222,3 @@ const SideBar = forwardRef(({ open }: SideBarProps, ref: Ref<ISideBar>) => {
     setCurrentOpen((p) => !p);
   }
 });
-export default SideBar;

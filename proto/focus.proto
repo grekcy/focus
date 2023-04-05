@@ -20,7 +20,7 @@ service V1Alpha1 {
   rpc rerankCard(RankCardReq) returns (google.protobuf.Empty) {}
   rpc deleteCard(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {}
 
-  rpc listLabels(google.protobuf.Empty) returns (ListLabelsResp) {}
+  rpc listLabels(ListLabelsReq) returns (ListLabelsResp) {}
   rpc updateLabel(Label) returns (Label) {}
   rpc deleteLabel(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {
   }
@@ -42,7 +42,7 @@ message Card {
   optional google.protobuf.Timestamp due_date = 7;
   optional google.protobuf.Timestamp completed_at = 8;
   uint64 creator_id = 9;
-  string subject = 10;
+  string objective = 10;
   string content = 11;
   repeated uint64 labels = 12;
 }
@@ -66,7 +66,7 @@ message RankCardReq {
 }
 
 enum CardField {
-  SUBJECT = 0;
+  OBJECTIVE = 0;
   COMPLETED_AT = 1;
   CONTENT = 2;
   PARENT_CARD = 3;
@@ -88,5 +88,7 @@ message Label {
   string color = 5;
   google.protobuf.Timestamp created_at = 6;
 }
+
+message ListLabelsReq { repeated string labels = 1; }
 
 message ListLabelsResp { repeated Label labels = 1; }

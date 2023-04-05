@@ -48,7 +48,7 @@ type V1Alpha1Client interface {
 	PatchCard(ctx context.Context, in *PatchCardReq, opts ...grpc.CallOption) (*Card, error)
 	RerankCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	ListLabels(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListLabelsResp, error)
+	ListLabels(ctx context.Context, in *ListLabelsReq, opts ...grpc.CallOption) (*ListLabelsResp, error)
 	UpdateLabel(ctx context.Context, in *Label, opts ...grpc.CallOption) (*Label, error)
 	DeleteLabel(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -142,7 +142,7 @@ func (c *v1Alpha1Client) DeleteCard(ctx context.Context, in *wrapperspb.UInt64Va
 	return out, nil
 }
 
-func (c *v1Alpha1Client) ListLabels(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListLabelsResp, error) {
+func (c *v1Alpha1Client) ListLabels(ctx context.Context, in *ListLabelsReq, opts ...grpc.CallOption) (*ListLabelsResp, error) {
 	out := new(ListLabelsResp)
 	err := c.cc.Invoke(ctx, V1Alpha1_ListLabels_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -182,7 +182,7 @@ type V1Alpha1Server interface {
 	PatchCard(context.Context, *PatchCardReq) (*Card, error)
 	RerankCard(context.Context, *RankCardReq) (*emptypb.Empty, error)
 	DeleteCard(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error)
-	ListLabels(context.Context, *emptypb.Empty) (*ListLabelsResp, error)
+	ListLabels(context.Context, *ListLabelsReq) (*ListLabelsResp, error)
 	UpdateLabel(context.Context, *Label) (*Label, error)
 	DeleteLabel(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error)
 	mustEmbedUnimplementedV1Alpha1Server()
@@ -219,7 +219,7 @@ func (UnimplementedV1Alpha1Server) RerankCard(context.Context, *RankCardReq) (*e
 func (UnimplementedV1Alpha1Server) DeleteCard(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCard not implemented")
 }
-func (UnimplementedV1Alpha1Server) ListLabels(context.Context, *emptypb.Empty) (*ListLabelsResp, error) {
+func (UnimplementedV1Alpha1Server) ListLabels(context.Context, *ListLabelsReq) (*ListLabelsResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListLabels not implemented")
 }
 func (UnimplementedV1Alpha1Server) UpdateLabel(context.Context, *Label) (*Label, error) {
@@ -404,7 +404,7 @@ func _V1Alpha1_DeleteCard_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _V1Alpha1_ListLabels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(ListLabelsReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -416,7 +416,7 @@ func _V1Alpha1_ListLabels_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: V1Alpha1_ListLabels_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(V1Alpha1Server).ListLabels(ctx, req.(*emptypb.Empty))
+		return srv.(V1Alpha1Server).ListLabels(ctx, req.(*ListLabelsReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }

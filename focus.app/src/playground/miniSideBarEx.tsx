@@ -3,20 +3,23 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import CssBaseline from "@mui/material/CssBaseline";
-import Divider from "@mui/material/Divider";
-import MuiDrawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import { CSSObject, styled, Theme, useTheme } from "@mui/material/styles";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
+import {
+  Box,
+  CssBaseline,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  AppBar as MuiAppBar,
+  AppBarProps as MuiAppBarProps,
+  Drawer as MuiDrawer,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import { CSSObject, Theme, styled, useTheme } from "@mui/material/styles";
 import * as React from "react";
 
 const drawerWidth = 240;
@@ -90,7 +93,7 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
-function MiniDrawerEx() {
+export function MiniDrawerEx() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -220,4 +223,3 @@ function MiniDrawerEx() {
     </Box>
   );
 }
-export default MiniDrawerEx;

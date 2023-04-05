@@ -1,25 +1,27 @@
-import Collapse from "@mui/material/Collapse";
-import Grid from "@mui/material/Grid";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import Typography from "@mui/material/Typography";
+import {
+  Collapse,
+  Grid,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import { ReactNode, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import PlayAutocomplete from "./PlayAutocomplete";
-import PlayCardBar from "./PlayCardBar";
-import PlayCursors from "./PlayCursors";
-import PlayDateTime from "./PlayDateTime";
-import PlayDateTimePicker from "./PlayDateTimePicker";
-import PlayFocus from "./PlayFocus";
-import PlayLabelSelector from "./PlayLabelSelector";
-import PlayLayout from "./PlayLayout";
-import PlayCardListViewItem from "./PlayListViewItem";
-import PlayTextField from "./PlayTextField";
-import DragAndDropCancel from "./dndCancel";
-import DragAndDropSortable from "./dndSotrable";
-import DragAndDropTesting from "./dndTesting";
+import { PlayAutocomplete } from "./PlayAutocomplete";
+import { PlayCardBar } from "./PlayCardBar";
+import { PlayCursors } from "./PlayCursors";
+import { PlayDateTime } from "./PlayDateTime";
+import { PlayDateTimePicker } from "./PlayDateTimePicker";
+import { PlayFocus } from "./PlayFocus";
+import { PlayLabelSelector } from "./PlayLabelSelector";
+import { PlayLayout } from "./PlayLayout";
+import { PlayCardListViewItem } from "./PlayListViewItem";
+import { PlayTextField } from "./PlayTextField";
+import { DragAndDropCancel } from "./dndCancel";
+import { DragAndDropSortable } from "./dndSotrable";
+import { DragAndDropTesting } from "./dndTesting";
 
 interface IPlay {
   id: string;
@@ -119,7 +121,7 @@ const plays = [
   },
 ];
 
-function PlayIndex() {
+export function PlayIndex() {
   const { playId } = useParams();
 
   const [play, setPlay] = useState<IPlay | null>(null);
@@ -188,4 +190,3 @@ function PlayIndex() {
     </>
   );
 }
-export default PlayIndex;

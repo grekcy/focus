@@ -1,12 +1,10 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import CancelIcon from "@mui/icons-material/Cancel";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
+import DeleteIcon from "@mui/icons-material/Delete";
 import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import TripOriginIcon from "@mui/icons-material/TripOrigin";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import Stack from "@mui/material/Stack";
+import { Box, IconButton, Stack, Tooltip } from "@mui/material";
 import type { Identifier, XYCoord } from "dnd-core";
 import update from "immutability-helper";
 import React, {
@@ -32,10 +30,10 @@ import { Key } from "ts-key-enum";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { Event } from "../api";
 import { Card, Label } from "../proto/focus_pb";
-import useAction from "./Action";
+import { useAction } from "./Action";
 import { EmptyIcon } from "./Icons";
-import InlineEdit, { IInlineEdit } from "./InlineEdit";
-import LabelChip from "./LabelChip";
+import { IInlineEdit, InlineEdit } from "./InlineEdit";
+import { LabelChip } from "./LabelChip";
 
 export enum CardAction {
   COMPLETE,
@@ -57,7 +55,7 @@ export interface ICardListView {
   addCard: (card: Card.AsObject) => void;
 }
 
-const CardListView = forwardRef(
+export const CardListView = forwardRef(
   (
     {
       cards: inCards,
@@ -138,12 +136,12 @@ const CardListView = forwardRef(
       return isParent(i, p);
     }
 
-    function handleSubmit(index: number, subject: string) {
+    function handleSubmit(index: number, objective: string) {
       const card = cards[index];
       api
-        .updateCardSubject(card.cardNo, subject)
+        .updateCardObjective(card.cardNo, objective)
         .then(() => {
-          card.subject = subject;
+          card.objective = objective;
           setCards((p) => update(p, { index: { $set: card } }));
         })
         .catch((e) => app.toast(e.message, "error"));
@@ -246,8 +244,8 @@ const CardListView = forwardRef(
     //
 
     useAction({
-      label: "sel up",
-      hotkey: Key.ArrowUp,
+      label: "selection up",
+      hotkey: [Key.ArrowUp, "K"],
       onExecute: selUp,
       hotkeyOptions: { preventDefault: false },
     });
@@ -261,8 +259,8 @@ const CardListView = forwardRef(
     }
 
     useAction({
-      label: "sel down",
-      hotkey: Key.ArrowDown,
+      label: "selection down",
+      hotkey: [Key.ArrowDown, "J"],
       onExecute: selDown,
       hotkeyOptions: { preventDefault: false },
     });
@@ -275,7 +273,7 @@ const CardListView = forwardRef(
 
     useAction({
       label: "move right",
-      hotkey: ["⌘+Ctrl+right", "⌘+Ctrl+]"],
+      hotkey: ["⌘+Ctrl+Right", "⌘+Ctrl+]"],
       onExecute: moveRight,
     });
     function moveRight() {
@@ -304,7 +302,7 @@ const CardListView = forwardRef(
 
     useAction({
       label: "move left",
-      hotkey: ["meta+ctrl+left", "meta+ctrl+["],
+      hotkey: ["⌘+Ctrl+Left", "⌘+ctrl+["],
       onExecute: moveLeft,
     });
     function moveLeft() {
@@ -533,8 +531,8 @@ const CardListView = forwardRef(
         .then((r) => setCards((p) => update(p, { [index]: { $set: r } })))
         .then(() => {
           complete
-            ? app.toast(`card completed: ${card.subject}`)
-            : app.toast(`card set to in progress: ${card.subject}`);
+            ? app.toast(`card completed: ${card.objective}`)
+            : app.toast(`card set to in progress: ${card.objective}`);
         })
         .catch((e) => app.toast(e.message));
     }
@@ -550,7 +548,7 @@ const CardListView = forwardRef(
       api
         .deleteCard(card.cardNo)
         .then(() => setCards((p) => p.filter((c) => c.cardNo !== card.cardNo)))
-        .then(() => app.toast(`card deleted: ${card.subject}`))
+        .then(() => app.toast(`card deleted: ${card.objective}`))
         .catch((e) => app.toast(e.message, "error"))
         .finally(() => setDeletingCard(false));
     }
@@ -609,7 +607,6 @@ const CardListView = forwardRef(
     );
   }
 );
-export default CardListView;
 
 interface DragItem {
   index: number;
@@ -791,7 +788,7 @@ export const CardItem = forwardRef(
             <Box sx={{ flexGrow: 1 }}>
               <InlineEdit
                 ref={ref}
-                value={card.subject}
+                value={card.objective}
                 endAdornment={endAdornment}
                 onSubmit={(e, value) => onSubmit && onSubmit(value)}
               />
@@ -807,8 +804,10 @@ export const CardItem = forwardRef(
                 }}
               >
                 {card.deferUntil
-                  ? new Date(card.deferUntil.seconds * 1000).toLocaleString()
-                  : "no defered date"}
+                  ? `defer until ${new Date(
+                      card.deferUntil.seconds * 1000
+                    ).toLocaleDateString()}`
+                  : "not deferred"}
               </Box>
               <Box
                 sx={{
@@ -818,37 +817,47 @@ export const CardItem = forwardRef(
                 }}
               >
                 {card.dueDate
-                  ? new Date(card.dueDate.seconds * 1000).toLocaleString()
+                  ? `due to ${new Date(
+                      card.dueDate.seconds * 1000
+                    ).toLocaleDateString()}`
                   : "no due date"}
               </Box>
             </Box>
           )}
         </Box>
-        <Box sx={{ flexGrow: 0 }}>
+        <Box sx={{ flexGrow: 0, pl: "1rem" }}>
           <Box>
             {card.completedAt ? (
-              <IconButton
-                onClick={() => handleActionClick(index, CardAction.INPROGRESS)}
-              >
-                <TaskAltIcon fontSize="small" />
-              </IconButton>
+              <Tooltip title="back to progress">
+                <IconButton
+                  onClick={() =>
+                    handleActionClick(index, CardAction.INPROGRESS)
+                  }
+                >
+                  <TaskAltIcon />
+                </IconButton>
+              </Tooltip>
             ) : (
-              <IconButton
-                onClick={() => handleActionClick(index, CardAction.COMPLETE)}
-              >
-                <TripOriginIcon fontSize="small" />
-              </IconButton>
+              <Tooltip title="complete card">
+                <IconButton
+                  onClick={() => handleActionClick(index, CardAction.COMPLETE)}
+                >
+                  <TripOriginIcon />
+                </IconButton>
+              </Tooltip>
             )}
-            <IconButton
-              onClick={() => handleActionClick(index, CardAction.DELETE)}
-            >
-              <DeleteIcon fontSize="small" />
-            </IconButton>
-            {false && (
+            <Tooltip title="delete">
               <IconButton
                 onClick={() => handleActionClick(index, CardAction.DELETE)}
               >
-                <CancelIcon fontSize="small" />
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+            {false && (
+              <IconButton
+                onClick={() => handleActionClick(index, CardAction.UNDELETE)}
+              >
+                <CancelIcon />
               </IconButton>
             )}
           </Box>

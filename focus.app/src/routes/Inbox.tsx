@@ -1,26 +1,33 @@
-import Box from "@mui/material/Box";
-import Checkbox from "@mui/material/Checkbox";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
+import {
+  Box,
+  Checkbox,
+  FormControlLabel,
+  Stack,
+  Typography,
+} from "@mui/material";
 import update from "immutability-helper";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { Event } from "../lib/api";
-import useAction, { actDivider } from "../lib/components/Action";
-import CardBar, { ICardBar } from "../lib/components/CardBar";
-import CardListView, { ICardListView } from "../lib/components/CardList";
-import ContextMenu, {
+import { actDivider, useAction } from "../lib/components/Action";
+import { CardBar, ICardBar } from "../lib/components/CardBar";
+import { CardListView, ICardListView } from "../lib/components/CardList";
+import {
+  ContextMenu,
   IContextMenu,
-  PopupContextMenu as popupContextMenu,
+  popupContextMenu,
 } from "../lib/components/ContextMenu";
-import LabelSelector from "../lib/components/LabelSelector";
-import datetime from "../lib/datetime";
+import { LabelSelector } from "../lib/components/LabelSelector";
+import { datetime } from "../lib/datetime";
 import { Card, Label } from "../lib/proto/focus_pb";
 
-function InboxPage() {
+export function InboxPage() {
   const app = useFocusApp();
   const api = useFocusClient();
+
+  // TODO useSearchParamsState
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     const handler = api.addEventListener(
@@ -52,11 +59,28 @@ function InboxPage() {
     }
   }
 
-  const [selectedLabels, setSelectedLabels] = useState<number[]>([]);
-  const [withDeferred, setWithDeferred] = useState(false);
+  const [selectedLabels, setSelectedLabels] = useState<number[]>(
+    searchParams
+      .getAll("label")
+      .map((x) => parseInt(x))
+      .filter((x) => !isNaN(x))
+  );
+
+  const [withDeferred, setWithDeferred] = useState(
+    searchParams.get("deferred") === "true"
+  );
 
   const [cards, setCards] = useState<Card.AsObject[]>([]);
   useEffect(() => {
+    setSearchParams((p) => {
+      if (withDeferred) p.set("deferred", withDeferred.toString());
+      else p.delete("deferred");
+
+      p.delete("label");
+      selectedLabels.forEach((x) => p.append("label", x.toString()));
+      return p;
+    });
+
     api
       .listCards({ labels: selectedLabels, includeDeferred: withDeferred })
       .then((r) => setCards(r))
@@ -75,7 +99,7 @@ function InboxPage() {
     onExecute: () => app.toast("challenge this: not implemented"),
   });
 
-  function deferUntil(deferUntil: Date | null) {
+  function updateDeferUntil(deferUntil: Date | null) {
     if (cardNo === -1) return;
 
     api
@@ -93,33 +117,82 @@ function InboxPage() {
     label: "defer until Tomorrow",
     hotkey: "⌘+Ctrl+T",
     onEnabled: () => !!selectedCard,
-    onExecute: () => deferUntil(datetime.workTime().add(1, "day").toDate()),
+    onExecute: () =>
+      updateDeferUntil(datetime.workTime().add(1, "day").toDate()),
   });
   const [actDeferUntilNextWeek] = useAction({
     label: "defer until next Week",
     hotkey: "⌘+Ctrl+W",
     onEnabled: () => !!selectedCard,
-    onExecute: () => deferUntil(datetime.workTime().add(7, "day").toDate()),
+    onExecute: () =>
+      updateDeferUntil(datetime.workTime().add(7, "day").toDate()),
   });
   const [actDeferUntilNextMonth] = useAction({
-    label: "defer until next Month",
+    label: "defer later...",
     onEnabled: () => !!selectedCard,
-    onExecute: () => deferUntil(datetime.workTime().add(1, "month").toDate()),
+    onExecute: () =>
+      updateDeferUntil(
+        datetime
+          .workTime()
+          .add(Math.random() * 30 + 7, "day")
+          .toDate()
+      ),
   });
 
   const selectedCard = useMemo(() => {
-    if (cardNo == -1) return;
+    if (cardNo === -1) return;
     return cards.find((c) => c.cardNo === cardNo);
   }, [cardNo, cards]);
 
   const [actClearDefer] = useAction({
     label: "clear defer",
     onEnabled: () => !!selectedCard && !!selectedCard.deferUntil,
-    onExecute: () => deferUntil(null),
+    onExecute: () => updateDeferUntil(null),
   });
-  const [actDueTo] = useAction({
-    label: "Due to...",
-    onExecute: () => app.toast("not implemented"),
+
+  function updateDueDate(dueDate: Date | null) {
+    if (cardNo === -1) return;
+
+    api
+      .updateCardDueDate(cardNo, dueDate)
+      .then((r) =>
+        dueDate
+          ? app.toast(
+              `set card ${cardNo} due date to ${dueDate.toLocaleString()}`
+            )
+          : app.toast(`card ${cardNo} due date cleared`)
+      )
+      .catch((e) => app.toast(e.message, "error"));
+  }
+
+  const [actDueToTomorrow] = useAction({
+    label: "due to Tomorrow",
+    onEnabled: () => !!selectedCard,
+    onExecute: () => updateDueDate(datetime.workTime().add(1, "day").toDate()),
+  });
+
+  const [actDueToNextWeek] = useAction({
+    label: "due to next Week",
+    onEnabled: () => !!selectedCard,
+    onExecute: () => updateDueDate(datetime.workTime().add(7, "day").toDate()),
+  });
+
+  const [actDueToLater] = useAction({
+    label: "due to later...",
+    onEnabled: () => !!selectedCard,
+    onExecute: () =>
+      updateDueDate(
+        datetime
+          .workTime()
+          .add(Math.random() * 30 + 7, "day")
+          .toDate()
+      ),
+  });
+
+  const [actClearDueDate] = useAction({
+    label: "clear due date",
+    onEnabled: () => !!selectedCard && !!selectedCard.dueDate,
+    onExecute: () => updateDueDate(null),
   });
 
   const cardListRef = useRef<ICardListView>(null);
@@ -130,11 +203,14 @@ function InboxPage() {
       <Box display="flex">
         <Typography variant="h5" flexGrow={1}>
           Inbox cards
+          <Typography display="inline" sx={{ pl: "1rem" }}>
+            collect idea, organize and make Inbox to zero.
+          </Typography>
         </Typography>
         <Box flexGrow={0}>
           <Stack direction="row">
             <FormControlLabel
-              label="with defered"
+              label="show deferred"
               control={
                 <Checkbox
                   checked={withDeferred}
@@ -171,7 +247,10 @@ function InboxPage() {
           actDeferUntilNextMonth,
           actClearDefer,
           actDivider,
-          actDueTo,
+          actDueToTomorrow,
+          actDueToNextWeek,
+          actDueToLater,
+          actClearDueDate,
         ]}
       />
 
@@ -179,4 +258,3 @@ function InboxPage() {
     </>
   );
 }
-export default InboxPage;

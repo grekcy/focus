@@ -1,11 +1,13 @@
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
-import Drawer from "@mui/material/Drawer";
-import IconButton from "@mui/material/IconButton";
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
+import {
+  Box,
+  Divider,
+  Drawer,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
@@ -24,10 +26,10 @@ import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { DrawerHeader } from "../../SideBar";
 import { arrayContentEquals } from "../lib";
 import { Card, Label } from "../proto/focus_pb";
-import useAction from "./Action";
-import DatePickerEx from "./DatePickerEx";
-import InlineEdit from "./InlineEdit";
-import LabelSelector from "./LabelSelector";
+import { useAction } from "./Action";
+import { DatePickerEx } from "./DatePickerEx";
+import { InlineEdit } from "./InlineEdit";
+import { LabelSelector } from "./LabelSelector";
 
 export interface ICardBar {
   toggle: () => void;
@@ -39,7 +41,7 @@ interface CardBarProp {
   cardNo?: number;
 }
 
-const CardBar = forwardRef(
+export const CardBar = forwardRef(
   ({ open: inOpen, cardNo: inCardNo }: CardBarProp, ref: Ref<ICardBar>) => {
     const [open, setOpen] = useState(inOpen);
     const [cardNo, setCardNo] = useState(inCardNo);
@@ -79,11 +81,11 @@ const CardBar = forwardRef(
       onExecute: () => setOpen(false),
     });
 
-    function handleSubjectChanged(subject: string) {
+    function handleObjectiveChanged(objective: string) {
       if (!card) return;
 
       api
-        .updateCardSubject(card.cardNo, subject)
+        .updateCardObjective(card.cardNo, objective)
         .then((r) => setCard(r))
         .catch((e) => app.toast(e.message, "error"));
     }
@@ -133,7 +135,12 @@ const CardBar = forwardRef(
       if (!card) return;
 
       api
-        .updateCardDeferUntil(card.cardNo, value ? value.toDate() : null)
+        .updateCardDeferUntil(
+          card.cardNo,
+          value
+            ? value.set("hour", 0).set("minute", 0).set("second", 0).toDate()
+            : null
+        )
         .then((r) => setCard(r))
         .catch((e) => app.toast(e.message, "error"));
     }
@@ -142,7 +149,12 @@ const CardBar = forwardRef(
       if (!card) return;
 
       api
-        .updateCardDueDate(card.cardNo, value ? value.toDate() : null)
+        .updateCardDueDate(
+          card.cardNo,
+          value
+            ? value.set("hour", 0).set("minute", 0).set("second", 0).toDate()
+            : null
+        )
         .then((r) => setCard(r))
         .catch((e) => app.toast(e.message, "error"));
     }
@@ -152,13 +164,12 @@ const CardBar = forwardRef(
     function CardPanel() {
       return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <Typography variant="h6">Subject: </Typography>
           <InlineEdit
-            value={card!.subject}
-            onSubmit={(target, value) => handleSubjectChanged(value)}
+            value={card!.objective}
+            onSubmit={(target, value) => handleObjectiveChanged(value)}
           />
 
-          <Typography variant="h6">Labels:</Typography>
+          <Typography variant="subtitle1">Labels:</Typography>
           <LabelSelector
             ref={labelSelectorRef}
             labels={labels}
@@ -166,7 +177,7 @@ const CardBar = forwardRef(
             onSelectionChange={handleLabelChange}
           />
 
-          <Typography variant="h6">Description:</Typography>
+          <Typography variant="subtitle1">Description:</Typography>
           <InlineEdit
             multiline
             value={card!.content}
@@ -179,7 +190,9 @@ const CardBar = forwardRef(
               Deferred until:
               <DatePickerEx
                 value={
-                  card!.deferUntil ? dayjs(card!.deferUntil.seconds) : null
+                  card!.deferUntil
+                    ? dayjs(card!.deferUntil.seconds * 1000)
+                    : null
                 }
                 sx={{ pl: "0.5rem" }}
                 onChange={(value) => handleDeferUntilChange(value)}
@@ -188,7 +201,9 @@ const CardBar = forwardRef(
             <Box>
               Due date:
               <DatePickerEx
-                value={card!.dueDate ? dayjs(card!.dueDate.seconds) : null}
+                value={
+                  card!.dueDate ? dayjs(card!.dueDate.seconds * 1000) : null
+                }
                 sx={{ pl: "0.5rem" }}
                 onChange={(value) => handleDueDateChange(value)}
               />
@@ -245,4 +260,3 @@ const CardBar = forwardRef(
     );
   }
 );
-export default CardBar;

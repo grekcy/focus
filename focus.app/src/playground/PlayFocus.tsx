@@ -1,7 +1,7 @@
-import Button from "@mui/material/Button";
+import { Button } from "@mui/material";
 import { useFocusApp } from "../FocusProvider";
 
-function PlayFocus() {
+export function PlayFocus() {
   const app = useFocusApp();
 
   return (
@@ -10,4 +10,3 @@ function PlayFocus() {
     </>
   );
 }
-export default PlayFocus;
