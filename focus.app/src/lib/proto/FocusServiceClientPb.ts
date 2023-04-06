@@ -557,5 +557,91 @@ export class V1Alpha1Client {
     this.methodDescriptordeleteLabel);
   }
 
+  methodDescriptorlistChallenges = new grpcWeb.MethodDescriptor(
+    '/V1Alpha1/listChallenges',
+    grpcWeb.MethodType.UNARY,
+    focus_pb.ListChallengesReq,
+    focus_pb.ListChallengesResp,
+    (request: focus_pb.ListChallengesReq) => {
+      return request.serializeBinary();
+    },
+    focus_pb.ListChallengesResp.deserializeBinary
+  );
+
+  listChallenges(
+    request: focus_pb.ListChallengesReq,
+    metadata: grpcWeb.Metadata | null): Promise<focus_pb.ListChallengesResp>;
+
+  listChallenges(
+    request: focus_pb.ListChallengesReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: focus_pb.ListChallengesResp) => void): grpcWeb.ClientReadableStream<focus_pb.ListChallengesResp>;
+
+  listChallenges(
+    request: focus_pb.ListChallengesReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: focus_pb.ListChallengesResp) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/V1Alpha1/listChallenges',
+        request,
+        metadata || {},
+        this.methodDescriptorlistChallenges,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/V1Alpha1/listChallenges',
+    request,
+    metadata || {},
+    this.methodDescriptorlistChallenges);
+  }
+
+  methodDescriptorgetChallenge = new grpcWeb.MethodDescriptor(
+    '/V1Alpha1/getChallenge',
+    grpcWeb.MethodType.UNARY,
+    google_protobuf_wrappers_pb.UInt64Value,
+    focus_pb.Challenge,
+    (request: google_protobuf_wrappers_pb.UInt64Value) => {
+      return request.serializeBinary();
+    },
+    focus_pb.Challenge.deserializeBinary
+  );
+
+  getChallenge(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null): Promise<focus_pb.Challenge>;
+
+  getChallenge(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: focus_pb.Challenge) => void): grpcWeb.ClientReadableStream<focus_pb.Challenge>;
+
+  getChallenge(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: focus_pb.Challenge) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/V1Alpha1/getChallenge',
+        request,
+        metadata || {},
+        this.methodDescriptorgetChallenge,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/V1Alpha1/getChallenge',
+    request,
+    metadata || {},
+    this.methodDescriptorgetChallenge);
+  }
+
 }
 

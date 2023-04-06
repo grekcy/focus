@@ -94,7 +94,12 @@ export function InboxPage() {
     label: "Challenge this card",
     hotkey: "⌘+Ctrl+C",
     onEnabled: () => cardNo !== -1,
-    onExecute: () => app.toast("challenge this: not implemented"),
+    onExecute: () => {
+      api
+        .updateCardType(cardNo, "challenge")
+        .then(() => app.toast("please review in challenge view", "success"))
+        .catch((e) => app.toast(e.message, "error"));
+    },
   });
 
   function updateDeferUntil(deferUntil: Date | null) {

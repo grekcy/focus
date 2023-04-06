@@ -18,6 +18,7 @@ type User struct {
 	*gorm.Model
 
 	Email string `gorm:"type:varchar(100);not null;index;check:email<>''"`
+	Name  string `gorm:"type:varchar(50);not null;name<>''"`
 }
 
 type Workspace struct {
@@ -45,19 +46,22 @@ type UserWorkspace struct {
 type Card struct {
 	*gorm.Model
 
-	WorkspaceID  uint       `gorm:"not null;uniqueIndex:idx_card_no"`
-	CreatorID    uint       `gorm:"not null"`
-	CardNo       uint       `gorm:"not null;uniqueIndex:idx_card_no"`
-	Rank         uint       `gorm:"not null;default:0"`
-	ParentCardNo *uint      `grom:"index"`
-	DeferUntil   *time.Time `gorm:"index"`
-	DueDate      *time.Time `gorm:"index"`
-	CompletedAt  *time.Time `gorm:"index"`
-	Objective    string     `gorm:"type:varchar(500);not null;default:''"`
-	Content      string     `gorm:"type:text;not null;default:''"`
+	WorkspaceID      uint       `gorm:"not null;uniqueIndex:idx_card_no"`
+	CreatorID        uint       `gorm:"not null;index"`
+	ResponsibilityID *uint      `gorm:"index"`
+	CardNo           uint       `gorm:"not null;uniqueIndex:idx_card_no"`
+	Rank             uint       `gorm:"not null;default:0"`
+	ParentCardNo     *uint      `grom:"index"`
+	DeferUntil       *time.Time `gorm:"index"`
+	DueDate          *time.Time `gorm:"index"`
+	CompletedAt      *time.Time `gorm:"index"`
+	CardType         string     `gorm:"type:varchar(50);not null;default:'card';check:card_type in ('card','challenge')"`
+	Objective        string     `gorm:"type:varchar(500);not null;default:''"`
+	Content          string     `gorm:"type:text;not null;default:''"`
 
-	Creator   *User      `gorm:"foreignKey:CreatorID"`
-	Workspace *Workspace `gorm:"foreignKey:WorkspaceID"`
+	Creator        *User      `gorm:"foreignKey:CreatorID"`
+	Responsibility *User      `gorm:"foreignKey:ResponsibilityID"`
+	Workspace      *Workspace `gorm:"foreignKey:WorkspaceID"`
 
 	//
 	// alter table cards add labels bigint[];

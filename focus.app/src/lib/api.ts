@@ -11,6 +11,7 @@ import {
   GetCardReq,
   Label,
   ListCardReq,
+  ListChallengesReq,
   ListLabelsReq,
   PatchCardReq,
   RankCardReq,
@@ -62,6 +63,13 @@ export class FocusAPI {
   //
   // FocusAPI
   //
+  getUser = (id: number) => {
+    const userId = new UInt64Value();
+    userId.setValue(id);
+
+    return this.s.getUser(userId, null).then((r) => r.toObject());
+  };
+
   quickAddCard = (objective: string) => {
     const s = new StringValue();
     s.setValue(objective);
@@ -178,6 +186,16 @@ export class FocusAPI {
     );
   };
 
+  updateCardType = (cardNo: number, cardType: string) => {
+    const card = new Card();
+    card.setCardNo(cardNo);
+    card.setCardType(cardType);
+
+    return this.patchCard(card.toObject(), CardField.DUE_DATE).then((r) =>
+      r.toObject()
+    );
+  };
+
   patchCard = (card: Card.AsObject, ...fields: CardField[]) => {
     const req = new PatchCardReq();
     const c = new Card();
@@ -259,6 +277,17 @@ export class FocusAPI {
     const req = new UInt64Value();
     req.setValue(id);
     return this.s.deleteLabel(req, null).then((r) => r.toObject());
+  };
+
+  listChallenges = () => {
+    const req = new ListChallengesReq();
+    return this.s.listChallenges(req, null).then((r) => r.toObject().itemsList);
+  };
+
+  getChallenge = (id: number) => {
+    const req = new UInt64Value();
+    req.setValue(id);
+    return this.s.getChallenge(req, null).then((r) => r.toObject());
   };
 }
 

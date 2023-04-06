@@ -218,18 +218,20 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 
 func cardModelToProto(in *CardWithDepth) *proto.Card {
 	return &proto.Card{
-		CardNo:       uint64(in.CardNo),
-		ParentCardNo: helper.PP(in.ParentCardNo),
-		Depth:        uint32(in.Depth),
-		CreatedAt:    timestamppb.New(in.CreatedAt),
-		UpdatedAt:    timestamppb.New(in.UpdatedAt),
-		DeferUntil:   helper.NewTimestamppb(in.DeferUntil),
-		DueDate:      helper.NewTimestamppb(in.DueDate),
-		CompletedAt:  helper.NewTimestamppb(in.CompletedAt),
-		CreatorId:    uint64(in.CreatorID),
-		Objective:    in.Objective,
-		Content:      in.Content,
-		Labels:       helper.ArrayToProto(in.Labels),
+		CardNo:           uint64(in.CardNo),
+		ParentCardNo:     helper.PP(in.ParentCardNo),
+		Depth:            uint32(in.Depth),
+		CreatedAt:        timestamppb.New(in.CreatedAt),
+		UpdatedAt:        timestamppb.New(in.UpdatedAt),
+		DeferUntil:       helper.NewTimestamppb(in.DeferUntil),
+		DueDate:          helper.NewTimestamppb(in.DueDate),
+		CompletedAt:      helper.NewTimestamppb(in.CompletedAt),
+		CreatorId:        uint64(in.CreatorID),
+		ResponsibilityId: helper.PP(in.ResponsibilityID),
+		CardType:         in.CardType,
+		Objective:        in.Objective,
+		Content:          in.Content,
+		Labels:           helper.ArrayToProto(in.Labels),
 	}
 }
 
@@ -323,6 +325,9 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card,
 
 			if len(where.Labels) > 0 {
 				tx = tx.Where("? <@ labels", where.Labels)
+			}
+			if where.CardType != "" {
+				tx = tx.Where("card_type = ?", where.CardType)
 			}
 		}
 

@@ -71,6 +71,14 @@ export class Card extends jspb.Message {
   getCreatorId(): number;
   setCreatorId(value: number): Card;
 
+  getResponsibilityId(): number;
+  setResponsibilityId(value: number): Card;
+  hasResponsibilityId(): boolean;
+  clearResponsibilityId(): Card;
+
+  getCardType(): string;
+  setCardType(value: string): Card;
+
   getObjective(): string;
   setObjective(value: string): Card;
 
@@ -101,6 +109,8 @@ export namespace Card {
     dueDate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     completedAt?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     creatorId: number,
+    responsibilityId?: number,
+    cardType: string,
     objective: string,
     content: string,
     labelsList: Array<number>,
@@ -124,6 +134,11 @@ export namespace Card {
   export enum CompletedAtCase { 
     _COMPLETED_AT_NOT_SET = 0,
     COMPLETED_AT = 8,
+  }
+
+  export enum ResponsibilityIdCase { 
+    _RESPONSIBILITY_ID_NOT_SET = 0,
+    RESPONSIBILITY_ID = 10,
   }
 }
 
@@ -345,6 +360,72 @@ export namespace ListLabelsResp {
   }
 }
 
+export class ListChallengesReq extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListChallengesReq.AsObject;
+  static toObject(includeInstance: boolean, msg: ListChallengesReq): ListChallengesReq.AsObject;
+  static serializeBinaryToWriter(message: ListChallengesReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListChallengesReq;
+  static deserializeBinaryFromReader(message: ListChallengesReq, reader: jspb.BinaryReader): ListChallengesReq;
+}
+
+export namespace ListChallengesReq {
+  export type AsObject = {
+  }
+}
+
+export class Challenge extends jspb.Message {
+  getCard(): Card | undefined;
+  setCard(value?: Card): Challenge;
+  hasCard(): boolean;
+  clearCard(): Challenge;
+
+  getTotalcards(): number;
+  setTotalcards(value: number): Challenge;
+
+  getInprogressCards(): number;
+  setInprogressCards(value: number): Challenge;
+
+  getCompletedcards(): number;
+  setCompletedcards(value: number): Challenge;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): Challenge.AsObject;
+  static toObject(includeInstance: boolean, msg: Challenge): Challenge.AsObject;
+  static serializeBinaryToWriter(message: Challenge, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): Challenge;
+  static deserializeBinaryFromReader(message: Challenge, reader: jspb.BinaryReader): Challenge;
+}
+
+export namespace Challenge {
+  export type AsObject = {
+    card?: Card.AsObject,
+    totalcards: number,
+    inprogressCards: number,
+    completedcards: number,
+  }
+}
+
+export class ListChallengesResp extends jspb.Message {
+  getItemsList(): Array<Challenge>;
+  setItemsList(value: Array<Challenge>): ListChallengesResp;
+  clearItemsList(): ListChallengesResp;
+  addItems(value?: Challenge, index?: number): Challenge;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListChallengesResp.AsObject;
+  static toObject(includeInstance: boolean, msg: ListChallengesResp): ListChallengesResp.AsObject;
+  static serializeBinaryToWriter(message: ListChallengesResp, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListChallengesResp;
+  static deserializeBinaryFromReader(message: ListChallengesResp, reader: jspb.BinaryReader): ListChallengesResp;
+}
+
+export namespace ListChallengesResp {
+  export type AsObject = {
+    itemsList: Array<Challenge.AsObject>,
+  }
+}
+
 export enum CardField { 
   OBJECTIVE = 0,
   COMPLETED_AT = 1,
@@ -353,4 +434,5 @@ export enum CardField {
   LABEL = 4,
   DEFER_UNTIL = 5,
   DUE_DATE = 6,
+  CARD_TYPE = 7,
 }

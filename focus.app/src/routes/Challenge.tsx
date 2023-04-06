@@ -9,7 +9,11 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useFocusApp, useFocusClient } from "../FocusProvider";
+import { Challenge } from "../lib/proto/focus_pb";
+import { newChallenge } from "../lib/proto/helper";
 
 export function ChallengeIndex() {
   const { challengeId: challengeIdParam } = useParams();
@@ -46,8 +50,19 @@ const challenges = [
   },
 ];
 
+// https://mui.com/material-ui/react-masonry/
 function ChallengeList() {
-  // https://mui.com/material-ui/react-masonry/
+  const app = useFocusApp();
+  const api = useFocusClient();
+
+  const [challenges, setChallenges] = useState<Challenge.AsObject[]>([]);
+  useEffect(() => {
+    api
+      .listChallenges()
+      .then((r) => setChallenges(r))
+      .catch((e) => app.toast(e.message, "error"));
+  }, []);
+
   return (
     <>
       <Box display="flex">
@@ -65,18 +80,26 @@ function ChallengeList() {
           </TableHead>
           <TableBody>
             {challenges.map((ch) => {
-              const completedPercent = Math.round((ch.done * 100) / ch.total);
+              const completedPercent =
+                ch.totalcards === 0
+                  ? 0
+                  : Math.round((ch.completedcards * 100) / ch.totalcards);
               const inProgressPercent = Math.round(
-                ((ch.done + ch.inProgress) * 100) / ch.total
+                ((ch.completedcards + ch.inprogressCards) * 100) / ch.totalcards
               );
               return (
                 <TableRow>
                   <TableCell>
-                    <Link to={ch.id.toString()}>
-                      <Typography variant="h6">{ch.objective}</Typography>
+                    <Link to={ch.card!.cardNo.toString()}>
+                      <Typography variant="h6">{ch.card!.objective}</Typography>
                     </Link>
                     <Typography>
-                      Due: {ch.dueDate.toLocaleDateString()}
+                      Due:{" "}
+                      {ch.card!.dueDate
+                        ? new Date(
+                            ch.card!.dueDate!.seconds * 1000
+                          ).toLocaleDateString()
+                        : "None"}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -90,10 +113,10 @@ function ChallengeList() {
                       {completedPercent}% complete,
                     </Typography>
                     <Typography component="span" sx={{ mr: 1 }}>
-                      {ch.done} cards completed,
+                      {ch.completedcards} cards completed,
                     </Typography>
                     <Typography component="span" sx={{ mr: 1 }}>
-                      {ch.total - ch.done} cards are remained.
+                      {ch.totalcards - ch.completedcards} cards are remained.
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -111,13 +134,28 @@ interface ChallengeViewProps {
 }
 
 function ChallengeView({ challengeId }: ChallengeViewProps) {
-  const challenge = challenges.find((c) => c.id === challengeId)!;
+  const app = useFocusApp();
+  const api = useFocusClient();
+
+  const [challenge, setChallenge] = useState<Challenge.AsObject>(
+    newChallenge()
+  );
+  useEffect(() => {
+    if (challengeId) {
+      api
+        .getChallenge(challengeId)
+        .then((r) => setChallenge(r))
+        .catch((e) => app.toast(e.message, "error"));
+    } else {
+      setChallenge(newChallenge());
+    }
+  }, [challengeId]);
 
   return (
     <>
       <Box display="flex">
         <Typography variant="h5" flexGrow={1}>
-          Challenge #{challengeId}: {challenge.objective}
+          Challenge #{challengeId}: {challenge.card?.objective}
         </Typography>
       </Box>
 

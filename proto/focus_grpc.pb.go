@@ -21,18 +21,20 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	V1Alpha1_Version_FullMethodName      = "/V1Alpha1/version"
-	V1Alpha1_GetUser_FullMethodName      = "/V1Alpha1/getUser"
-	V1Alpha1_QuickAddCard_FullMethodName = "/V1Alpha1/quickAddCard"
-	V1Alpha1_ListCards_FullMethodName    = "/V1Alpha1/listCards"
-	V1Alpha1_GetCard_FullMethodName      = "/V1Alpha1/getCard"
-	V1Alpha1_GetCards_FullMethodName     = "/V1Alpha1/getCards"
-	V1Alpha1_PatchCard_FullMethodName    = "/V1Alpha1/patchCard"
-	V1Alpha1_RerankCard_FullMethodName   = "/V1Alpha1/rerankCard"
-	V1Alpha1_DeleteCard_FullMethodName   = "/V1Alpha1/deleteCard"
-	V1Alpha1_ListLabels_FullMethodName   = "/V1Alpha1/listLabels"
-	V1Alpha1_UpdateLabel_FullMethodName  = "/V1Alpha1/updateLabel"
-	V1Alpha1_DeleteLabel_FullMethodName  = "/V1Alpha1/deleteLabel"
+	V1Alpha1_Version_FullMethodName        = "/V1Alpha1/version"
+	V1Alpha1_GetUser_FullMethodName        = "/V1Alpha1/getUser"
+	V1Alpha1_QuickAddCard_FullMethodName   = "/V1Alpha1/quickAddCard"
+	V1Alpha1_ListCards_FullMethodName      = "/V1Alpha1/listCards"
+	V1Alpha1_GetCard_FullMethodName        = "/V1Alpha1/getCard"
+	V1Alpha1_GetCards_FullMethodName       = "/V1Alpha1/getCards"
+	V1Alpha1_PatchCard_FullMethodName      = "/V1Alpha1/patchCard"
+	V1Alpha1_RerankCard_FullMethodName     = "/V1Alpha1/rerankCard"
+	V1Alpha1_DeleteCard_FullMethodName     = "/V1Alpha1/deleteCard"
+	V1Alpha1_ListLabels_FullMethodName     = "/V1Alpha1/listLabels"
+	V1Alpha1_UpdateLabel_FullMethodName    = "/V1Alpha1/updateLabel"
+	V1Alpha1_DeleteLabel_FullMethodName    = "/V1Alpha1/deleteLabel"
+	V1Alpha1_ListChallenges_FullMethodName = "/V1Alpha1/listChallenges"
+	V1Alpha1_GetChallenge_FullMethodName   = "/V1Alpha1/getChallenge"
 )
 
 // V1Alpha1Client is the client API for V1Alpha1 service.
@@ -51,6 +53,8 @@ type V1Alpha1Client interface {
 	ListLabels(ctx context.Context, in *ListLabelsReq, opts ...grpc.CallOption) (*ListLabelsResp, error)
 	UpdateLabel(ctx context.Context, in *Label, opts ...grpc.CallOption) (*Label, error)
 	DeleteLabel(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListChallenges(ctx context.Context, in *ListChallengesReq, opts ...grpc.CallOption) (*ListChallengesResp, error)
+	GetChallenge(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*Challenge, error)
 }
 
 type v1Alpha1Client struct {
@@ -169,6 +173,24 @@ func (c *v1Alpha1Client) DeleteLabel(ctx context.Context, in *wrapperspb.UInt64V
 	return out, nil
 }
 
+func (c *v1Alpha1Client) ListChallenges(ctx context.Context, in *ListChallengesReq, opts ...grpc.CallOption) (*ListChallengesResp, error) {
+	out := new(ListChallengesResp)
+	err := c.cc.Invoke(ctx, V1Alpha1_ListChallenges_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *v1Alpha1Client) GetChallenge(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*Challenge, error) {
+	out := new(Challenge)
+	err := c.cc.Invoke(ctx, V1Alpha1_GetChallenge_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // V1Alpha1Server is the server API for V1Alpha1 service.
 // All implementations must embed UnimplementedV1Alpha1Server
 // for forward compatibility
@@ -185,6 +207,8 @@ type V1Alpha1Server interface {
 	ListLabels(context.Context, *ListLabelsReq) (*ListLabelsResp, error)
 	UpdateLabel(context.Context, *Label) (*Label, error)
 	DeleteLabel(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error)
+	ListChallenges(context.Context, *ListChallengesReq) (*ListChallengesResp, error)
+	GetChallenge(context.Context, *wrapperspb.UInt64Value) (*Challenge, error)
 	mustEmbedUnimplementedV1Alpha1Server()
 }
 
@@ -227,6 +251,12 @@ func (UnimplementedV1Alpha1Server) UpdateLabel(context.Context, *Label) (*Label,
 }
 func (UnimplementedV1Alpha1Server) DeleteLabel(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteLabel not implemented")
+}
+func (UnimplementedV1Alpha1Server) ListChallenges(context.Context, *ListChallengesReq) (*ListChallengesResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListChallenges not implemented")
+}
+func (UnimplementedV1Alpha1Server) GetChallenge(context.Context, *wrapperspb.UInt64Value) (*Challenge, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetChallenge not implemented")
 }
 func (UnimplementedV1Alpha1Server) mustEmbedUnimplementedV1Alpha1Server() {}
 
@@ -457,6 +487,42 @@ func _V1Alpha1_DeleteLabel_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _V1Alpha1_ListChallenges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListChallengesReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(V1Alpha1Server).ListChallenges(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: V1Alpha1_ListChallenges_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(V1Alpha1Server).ListChallenges(ctx, req.(*ListChallengesReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _V1Alpha1_GetChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(wrapperspb.UInt64Value)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(V1Alpha1Server).GetChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: V1Alpha1_GetChallenge_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(V1Alpha1Server).GetChallenge(ctx, req.(*wrapperspb.UInt64Value))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // V1Alpha1_ServiceDesc is the grpc.ServiceDesc for V1Alpha1 service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -511,6 +577,14 @@ var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "deleteLabel",
 			Handler:    _V1Alpha1_DeleteLabel_Handler,
+		},
+		{
+			MethodName: "listChallenges",
+			Handler:    _V1Alpha1_ListChallenges_Handler,
+		},
+		{
+			MethodName: "getChallenge",
+			Handler:    _V1Alpha1_GetChallenge_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

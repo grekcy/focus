@@ -24,6 +24,9 @@ service V1Alpha1 {
   rpc updateLabel(Label) returns (Label) {}
   rpc deleteLabel(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {
   }
+
+  rpc listChallenges(ListChallengesReq) returns (ListChallengesResp) {}
+  rpc getChallenge(google.protobuf.UInt64Value) returns (Challenge) {}
 }
 
 message User {
@@ -42,9 +45,11 @@ message Card {
   optional google.protobuf.Timestamp due_date = 7;
   optional google.protobuf.Timestamp completed_at = 8;
   uint64 creator_id = 9;
-  string objective = 10;
-  string content = 11;
-  repeated uint64 labels = 12;
+  optional uint64 responsibility_id = 10;
+  string card_type = 11;
+  string objective = 12;
+  string content = 13;
+  repeated uint64 labels = 14;
 }
 
 message ListCardReq {
@@ -73,6 +78,7 @@ enum CardField {
   LABEL = 4;
   DEFER_UNTIL = 5;
   DUE_DATE = 6;
+  CARD_TYPE = 7;
 }
 
 message PatchCardReq {
@@ -92,3 +98,14 @@ message Label {
 message ListLabelsReq { repeated string labels = 1; }
 
 message ListLabelsResp { repeated Label labels = 1; }
+
+message ListChallengesReq {}
+
+message Challenge {
+  Card card = 1; // card informations
+  uint64 totalCards = 2;
+  uint64 inprogress_cards = 3;
+  uint64 completedCards = 4;
+}
+
+message ListChallengesResp { repeated Challenge items = 1; }

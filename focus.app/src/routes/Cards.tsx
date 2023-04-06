@@ -1,9 +1,13 @@
+import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
+  AccordionActions,
   AccordionDetails,
   AccordionSummary,
   Box,
+  Button,
+  IconButton,
   LinearProgress,
   LinearProgressProps,
   Table,
@@ -13,11 +17,13 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
+import { CardListView } from "../lib/components/CardList";
 import { InlineEdit } from "../lib/components/InlineEdit";
 import { LabelSelector } from "../lib/components/LabelSelector";
-import { Card } from "../lib/proto/focus_pb";
+import { Card, User } from "../lib/proto/focus_pb";
+import { newEmptyUser } from "../lib/proto/helper";
 
 export function CardPage() {
   const app = useFocusApp();
@@ -33,6 +39,23 @@ export function CardPage() {
       .then((r) => setCard(r))
       .catch((e) => app.toast(e.message, "error"));
   }, [cardNo]);
+
+  const [creator, setCreator] = useState<User.AsObject>(newEmptyUser());
+  const [responsibility, setResponsibility] = useState<User.AsObject>(
+    newEmptyUser()
+  );
+  useEffect(() => {
+    if (!card) {
+      setCreator(newEmptyUser());
+      setResponsibility(newEmptyUser());
+      return;
+    }
+
+    api.getUser(card.creatorId).then((r) => setCreator(r));
+    if (card.responsibilityId)
+      api.getUser(card.responsibilityId).then((r) => setResponsibility(r));
+    else setResponsibility(newEmptyUser());
+  }, [card]);
 
   function handleDescriptionChanged(content: string) {
     if (!card) return;
@@ -59,37 +82,98 @@ export function CardPage() {
 
         <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h6">Status</Typography>
+            <Typography variant="h6">Status:</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <TableContainer>
               <Table>
                 <TableRow>
                   <TableCell variant="head">Responsibility</TableCell>
-                  <TableCell>{card.creatorId}</TableCell>
-                  <TableCell variant="head">Status</TableCell>
-                  <TableCell>In progress</TableCell>
-                  <TableCell variant="head">Completed at</TableCell>
                   <TableCell>
-                    {card.completedAt
-                      ? new Date(
-                          card.completedAt.seconds * 1000
-                        ).toLocaleString()
-                      : "not completed"}
+                    <Button
+                      onClick={() =>
+                        app.toast(
+                          "set responsibility: not implemented",
+                          "warning"
+                        )
+                      }
+                    >
+                      {responsibility.name}
+                    </Button>
                   </TableCell>
-                  <TableCell variant="head">Created at</TableCell>
-                  <TableCell>
-                    Created at:
+                  <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
+                    Reported by
+                  </TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    <Button
+                      onClick={() =>
+                        app.toast(
+                          "view user information: not implemented",
+                          "warning"
+                        )
+                      }
+                    >
+                      {creator.name}
+                    </Button>
+                  </TableCell>
+                  <TableCell variant="head">Status</TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    In progress
+                  </TableCell>
+                  <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
+                    Created at
+                  </TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
                     {new Date(card.createdAt!.seconds * 1000).toLocaleString()}
+                  </TableCell>
+                  <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
+                    Completed at
+                  </TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    {card.completedAt ? (
+                      new Date(card.completedAt.seconds * 1000).toLocaleString()
+                    ) : (
+                      <Button
+                        onClick={() =>
+                          app.toast("completed: not implemented", "warning")
+                        }
+                      >
+                        not completed
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell variant="head">Created by</TableCell>
-                  <TableCell>{card.creatorId}</TableCell>
-                  <TableCell variant="head">Parent</TableCell>
-                  <TableCell>{card.parentCardNo}</TableCell>
+                  <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
+                    Belongs to
+                  </TableCell>
+                  <TableCell>
+                    {card.parentCardNo! > 0 ? (
+                      <Link to={`/cards/${card.parentCardNo}`}>
+                        {card.parentCardNo}
+                      </Link>
+                    ) : (
+                      "None"
+                    )}
+                  </TableCell>
+                  <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
+                    Due to
+                  </TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    {card.dueDate ? (
+                      new Date(card.dueDate.seconds * 1000).toLocaleString()
+                    ) : (
+                      <Button
+                        onClick={() =>
+                          app.toast("set due date: not implemented", "warning")
+                        }
+                      >
+                        None
+                      </Button>
+                    )}
+                  </TableCell>
                   <TableCell variant="head">Labels</TableCell>
-                  <TableCell colSpan={3}>
+                  <TableCell colSpan={5}>
                     <LabelSelector labels={[]} />
                   </TableCell>
                 </TableRow>
@@ -118,15 +202,22 @@ export function CardPage() {
               value={20}
               valueBuffer={30}
               color="success"
+              sx={{ width: "20rem", ml: "1rem" }}
             />
           </AccordionSummary>
           <AccordionDetails>
-            <Typography>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
-              eget.
-            </Typography>
+            <CardListView cards={[]}></CardListView>
           </AccordionDetails>
+          <AccordionActions>
+            <IconButton
+              onClick={(e) => {
+                e.preventDefault();
+                alert("xx");
+              }}
+            >
+              <AddIcon />
+            </IconButton>
+          </AccordionActions>
         </Accordion>
 
         <Accordion defaultExpanded>
