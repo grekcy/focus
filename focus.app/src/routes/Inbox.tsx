@@ -53,10 +53,8 @@ export function InboxPage() {
   const cardBarRef = useRef<ICardBar>(null);
   const [cardNo, setCardNo] = useState(-1);
   function handleSelectCard(cardNo: number) {
-    if (cardBarRef.current) {
-      cardBarRef.current.setCardNo(cardNo);
-      setCardNo(cardNo);
-    }
+    if (cardBarRef.current) cardBarRef.current.setCardNo(cardNo);
+    setCardNo(cardNo);
   }
 
   const [selectedLabels, setSelectedLabels] = useState<number[]>(
@@ -93,7 +91,7 @@ export function InboxPage() {
   }
 
   const [actChallengeThis] = useAction({
-    label: "Challenge this",
+    label: "Challenge this card",
     hotkey: "⌘+Ctrl+C",
     onEnabled: () => cardNo !== -1,
     onExecute: () => app.toast("challenge this: not implemented"),
@@ -237,6 +235,7 @@ export function InboxPage() {
         onContextMenu={(e) => popupContextMenu(e, contextMenuRef)}
         onLabelClick={handleLabelClick}
       />
+
       <ContextMenu
         ref={contextMenuRef}
         actions={[
@@ -253,7 +252,6 @@ export function InboxPage() {
           actClearDueDate,
         ]}
       />
-
       <CardBar ref={cardBarRef} />
     </>
   );

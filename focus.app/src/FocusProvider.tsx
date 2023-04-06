@@ -23,21 +23,27 @@ export interface IFocusApp {
 const FocusContext = createContext<IFocusApp | null>(null);
 
 interface FocusProviderProp {
-  app: IFocusApp;
   children: ReactNode;
+  onToggleSideBar?: () => void;
 }
 
-export interface IFocusProvider {
-  toast: (message: string, severity?: AlertColor) => void;
-}
+export interface IFocusProvider {}
 
 export const FocusProvider = forwardRef(
-  ({ app, children }: FocusProviderProp, ref: Ref<IFocusProvider>) => {
-    useImperativeHandle(ref, () => ({
+  (
+    { children, onToggleSideBar }: FocusProviderProp,
+    ref: Ref<IFocusProvider>
+  ) => {
+    const app: IFocusApp = {
+      toggleSidebar() {
+        onToggleSideBar && onToggleSideBar();
+      },
       toast(message: string, severity?: AlertColor) {
         toastRef.current && toastRef.current.toast(message, severity);
       },
-    }));
+    };
+
+    useImperativeHandle(ref, () => ({}));
 
     const toastRef = useRef<IToast>(null);
 
@@ -65,7 +71,7 @@ interface FocusClientProviderProps {
   children: ReactNode;
 }
 
-interface IFocusClientProvider {}
+export interface IFocusClientProvider {}
 
 // TODO get token from cookie
 const cookies = new Cookies();
@@ -77,7 +83,11 @@ export const FocusClientProvider = forwardRef(
       () => "whitekid@gmail.com" // FIXME
     );
 
-    useImperativeHandle(ref, () => ({}));
+    useImperativeHandle(ref, () => ({
+      client() {
+        return api;
+      },
+    }));
 
     return (
       <FocusClientContext.Provider value={api}>

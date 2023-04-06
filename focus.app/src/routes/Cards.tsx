@@ -12,11 +12,11 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { InlineEdit } from "../lib/components/InlineEdit";
+import { LabelSelector } from "../lib/components/LabelSelector";
 import { Card } from "../lib/proto/focus_pb";
 
 export function CardPage() {
@@ -25,20 +25,27 @@ export function CardPage() {
 
   const { cardNo } = useParams();
   const [card, setCard] = useState<Card.AsObject | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const cardNoAsNumber = parseInt(cardNo!, 10);
-    setLoading(true);
     api
       .getCard(cardNoAsNumber)
       .then((r) => setCard(r))
-      .catch((e) => app.toast(e.message, "error"))
-      .finally(() => setLoading(false));
+      .catch((e) => app.toast(e.message, "error"));
   }, [cardNo]);
+
+  function handleDescriptionChanged(content: string) {
+    if (!card) return;
+
+    api
+      .updateCardContent(card.cardNo, content)
+      .then((r) => setCard(r))
+      .catch((e) => app.toast(e.message, "error"));
+  }
 
   function renderCard() {
     if (!card) return;
+
     return (
       <>
         <Box display="flex">
@@ -59,11 +66,32 @@ export function CardPage() {
               <Table>
                 <TableRow>
                   <TableCell variant="head">Responsibility</TableCell>
-                  <TableCell>whitekid@gmail.com</TableCell>
+                  <TableCell>{card.creatorId}</TableCell>
                   <TableCell variant="head">Status</TableCell>
                   <TableCell>In progress</TableCell>
                   <TableCell variant="head">Completed at</TableCell>
-                  <TableCell>{dayjs().toDate().toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    {card.completedAt
+                      ? new Date(
+                          card.completedAt.seconds * 1000
+                        ).toLocaleString()
+                      : "not completed"}
+                  </TableCell>
+                  <TableCell variant="head">Created at</TableCell>
+                  <TableCell>
+                    Created at:
+                    {new Date(card.createdAt!.seconds * 1000).toLocaleString()}
+                  </TableCell>
+                </TableRow>
+                <TableRow>
+                  <TableCell variant="head">Created by</TableCell>
+                  <TableCell>{card.creatorId}</TableCell>
+                  <TableCell variant="head">Parent</TableCell>
+                  <TableCell>{card.parentCardNo}</TableCell>
+                  <TableCell variant="head">Labels</TableCell>
+                  <TableCell colSpan={3}>
+                    <LabelSelector labels={[]} />
+                  </TableCell>
                 </TableRow>
               </Table>
             </TableContainer>
@@ -75,13 +103,17 @@ export function CardPage() {
             <Typography variant="h6">Description</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <InlineEdit value={card.content} multiline />
+            <InlineEdit
+              value={card.content}
+              multiline
+              onSubmit={(target, value) => handleDescriptionChanged(value)}
+            />
           </AccordionDetails>
         </Accordion>
 
         <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h6">Sub cards</Typography>
+            <Typography variant="h6">Cards</Typography>
             <LinearProgressWithLabel
               value={20}
               valueBuffer={30}
@@ -94,35 +126,6 @@ export function CardPage() {
               Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
               eget.
             </Typography>
-          </AccordionDetails>
-        </Accordion>
-
-        <Accordion defaultExpanded>
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel3a-content"
-            id="panel3a-header"
-          >
-            <Typography variant="h6">Dates</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <ul>
-              <li>
-                Completed at:
-                {card.completedAt
-                  ? new Date(card.completedAt.seconds * 1000).toLocaleString()
-                  : "not completed"}
-              </li>
-              <li>
-                Created at:
-                {new Date(card.createdAt!.seconds * 1000).toLocaleString()}
-                &nbsp; by &nbsp; {card?.creatorId}
-              </li>
-              <li>
-                Last update:
-                {new Date(card.updatedAt!.seconds * 1000).toLocaleString()}
-              </li>
-            </ul>
           </AccordionDetails>
         </Accordion>
 
@@ -142,7 +145,7 @@ export function CardPage() {
     );
   }
 
-  return <>{!loading ? renderCard() : <Typography>Loading...</Typography>}</>;
+  return <>{renderCard()}</>;
 }
 
 function LinearProgressWithLabel(

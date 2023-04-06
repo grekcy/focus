@@ -1,16 +1,10 @@
 import { Box } from "@mui/material";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { CookiesProvider } from "react-cookie";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import { AppBar } from "./AppBar";
-import {
-  AlertColor,
-  FocusClientProvider,
-  FocusProvider,
-  IFocusApp,
-  IFocusProvider,
-} from "./FocusProvider";
+import { FocusClientProvider, FocusProvider } from "./FocusProvider";
 import { DrawerHeader, SideBar } from "./SideBar";
 import { PlayIndex } from "./playground/PlayIndex";
 import { CardPage } from "./routes/Cards";
@@ -27,21 +21,10 @@ import { TodayPage } from "./routes/Today";
 function App() {
   const [openSideBar, setOpenSideBar] = useState(false);
 
-  const impl: IFocusApp = {
-    toggleSidebar() {
-      setOpenSideBar((p) => !p);
-    },
-    toast(message: string, severity?: AlertColor) {
-      focusRef.current && focusRef.current.toast(message, severity);
-    },
-  };
-
-  const focusRef = useRef<IFocusProvider>(null);
-
   return (
     <CookiesProvider>
       <FocusClientProvider>
-        <FocusProvider app={impl} ref={focusRef}>
+        <FocusProvider onToggleSideBar={() => setOpenSideBar((p) => !p)}>
           <BrowserRouter>
             <Box sx={{ display: "flex" }}>
               <AppBar open={openSideBar} />
