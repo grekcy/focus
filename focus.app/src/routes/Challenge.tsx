@@ -12,8 +12,8 @@ import {
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
-import { DatePickButton } from "../lib/components/DatePickButton";
-import { Challenge } from "../lib/proto/focus_pb";
+import { CardListView } from "../lib/components/CardList";
+import { Card, Challenge } from "../lib/proto/focus_pb";
 import { newChallenge } from "../lib/proto/helper";
 
 export function ChallengeIndex() {
@@ -86,9 +86,6 @@ function ChallengeList() {
                 ch.totalcards === 0
                   ? 0
                   : Math.round((ch.completedcards * 100) / ch.totalcards);
-              const inProgressPercent = Math.round(
-                ((ch.completedcards + ch.inprogressCards) * 100) / ch.totalcards
-              );
               return (
                 <TableRow>
                   <TableCell>
@@ -105,21 +102,10 @@ function ChallengeList() {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <LinearProgress
-                      variant="buffer"
-                      color="success"
-                      value={completedPercent}
-                      valueBuffer={inProgressPercent}
+                    <ChallengeProgress
+                      done={ch.completedcards}
+                      total={ch.totalcards}
                     />
-                    <Typography component="span" sx={{ mr: 1 }}>
-                      {completedPercent}% complete,
-                    </Typography>
-                    <Typography component="span" sx={{ mr: 1 }}>
-                      {ch.completedcards} done,
-                    </Typography>
-                    <Typography component="span" sx={{ mr: 1 }}>
-                      {ch.totalcards - ch.completedcards} cards are remained.
-                    </Typography>
                   </TableCell>
                 </TableRow>
               );
@@ -139,9 +125,7 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
   const app = useFocusApp();
   const api = useFocusClient();
 
-  const [challenge, setChallenge] = useState<Challenge.AsObject>(
-    newChallenge()
-  );
+  const [challenge, setChallenge] = useState<Challenge.AsObject | null>(null);
   useEffect(() => {
     if (challengeId) {
       api
@@ -153,18 +137,76 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
     }
   }, [challengeId]);
 
+  const [cards, setCards] = useState<Card.AsObject[]>([]);
+  useEffect(() => {
+    if (!challenge) return;
+
+    api
+      .listCards({ parentCardNo: challengeId })
+      .then((r) => setCards(r))
+      .catch((e) => app.toast(e.message, "error"));
+  }, [challenge]);
+
+  if (!challenge) return <></>;
+
   return (
     <>
-      <Box display="flex">
+      <Box>
         <Typography variant="h5" flexGrow={1}>
           Challenge #{challengeId}: {challenge.card?.objective}
         </Typography>
       </Box>
 
+      <Box sx={{ display: "flex", p: "1rem" }}>
+        <Typography sx={{ flexGrow: "0", pr: "1rem" }}>
+          Due to:{" "}
+          {challenge.card!.dueDate
+            ? new Date(
+                challenge.card!.dueDate.seconds * 1000
+              ).toLocaleDateString()
+            : "None"}
+        </Typography>
+        <Box sx={{ flexGrow: "1" }}>
+          <ChallengeProgress
+            done={challenge.completedcards}
+            total={challenge.totalcards}
+          />
+        </Box>
+      </Box>
+
+      <CardListView cards={cards} />
+
       <ul>
         <li>Objective</li>
-        <li>Cards</li>
       </ul>
+    </>
+  );
+}
+
+interface ChallengeProgressProps {
+  done: number;
+  total: number;
+}
+
+function ChallengeProgress({ done, total }: ChallengeProgressProps) {
+  const completedPercent = total === 0 ? 0 : Math.round((done * 100) / total);
+
+  return (
+    <>
+      <LinearProgress
+        variant="buffer"
+        color="success"
+        value={completedPercent}
+      />
+      <Typography component="span" sx={{ mr: 1 }}>
+        {completedPercent}% complete,
+      </Typography>
+      <Typography component="span" sx={{ mr: 1 }}>
+        {done} done,
+      </Typography>
+      <Typography component="span" sx={{ mr: 1 }}>
+        {total - done} remained.
+      </Typography>
     </>
   );
 }

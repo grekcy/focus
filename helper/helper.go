@@ -1,11 +1,11 @@
 package helper
 
-func PP[T uint64, R uint](v *R) *T {
+func PP[T uint64 | uint, R uint64 | uint](v *T) *R {
 	if v == nil {
 		return nil
 	}
 
-	var vv T = T(*v)
+	var vv R = R(*v)
 	return &vv
 }
 

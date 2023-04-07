@@ -191,7 +191,7 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 func cardModelToProto(in *CardWithDepth) *proto.Card {
 	return &proto.Card{
 		CardNo:           uint64(in.CardNo),
-		ParentCardNo:     helper.PP(in.ParentCardNo),
+		ParentCardNo:     helper.PP[uint, uint64](in.ParentCardNo),
 		Depth:            uint32(in.Depth),
 		CreatedAt:        timestamppb.New(in.CreatedAt),
 		UpdatedAt:        timestamppb.New(in.UpdatedAt),
@@ -199,8 +199,9 @@ func cardModelToProto(in *CardWithDepth) *proto.Card {
 		DueDate:          helper.NewTimestamppb(in.DueDate),
 		CompletedAt:      helper.NewTimestamppb(in.CompletedAt),
 		CreatorId:        uint64(in.CreatorID),
-		ResponsibilityId: helper.PP(in.ResponsibilityID),
+		ResponsibilityId: helper.PP[uint, uint64](in.ResponsibilityID),
 		CardType:         in.CardType,
+		Status:           in.Status,
 		Objective:        in.Objective,
 		Content:          in.Content,
 		Labels:           helper.ArrayToProto(in.Labels),
@@ -211,8 +212,9 @@ func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCard
 	log.Debugf("ListCards(), req=%+v", req)
 
 	where := &models.Card{
-		Labels:   helper.ToArray(req.Card.Labels),
-		CardType: models.CardTypeCard.String(),
+		ParentCardNo: helper.PP[uint64, uint](req.Card.ParentCardNo),
+		Labels:       helper.ToArray(req.Card.Labels),
+		CardType:     models.CardTypeCard.String(),
 	}
 
 	r, err := s.listCards(ctx, where, ListOpt{
@@ -266,14 +268,11 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card,
 	nonRecursiveQuery := s.db.ToSQL(func(tx *gorm.DB) *gorm.DB {
 		tx = tx.Model(&models.Card{}).
 			Select("cards.*, 0 as depth").
-			Where("parent_card_no IS NULL").
 			Where("workspace_id = ?", s.defaultWorkspace(ctx).ID)
-		if where != nil {
-			if where.ParentCardNo != nil && *where.ParentCardNo > 0 {
-				tx = tx.Where("parent_card_no = ?", where.ParentCardNo)
-			} else {
-				tx = tx.Where("parent_card_no IS NULL")
-			}
+		if where != nil && where.ParentCardNo != nil && *where.ParentCardNo > 0 {
+			tx = tx.Where("parent_card_no = ?", where.ParentCardNo)
+		} else {
+			tx = tx.Where("parent_card_no IS NULL")
 		}
 
 		tx = tx.Find(&[]models.Card{})
@@ -473,6 +472,7 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 
 		case proto.CardField_CARD_TYPE:
 			updates["card_type"] = req.Card.CardType
+			updates["parent_card_no"] = gorm.Expr("NULL")
 
 		default:
 			log.Warnf("unknown field: %v", field)
@@ -500,4 +500,23 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 	}
 
 	return cardModelToProto(card), nil
+}
+
+func (s *v1alpha1ServiceImpl) getCardProgressSummary(ctx context.Context, cardNo uint) (uint64, uint64) {
+	var totalCards int64
+	s.db.Model(&models.Card{}).Where("parent_card_no = ?", cardNo).Count(&totalCards)
+
+	var completedCards int64
+	s.db.Model(&models.Card{}).Where("parent_card_no = ? AND completed_at IS NOT NULL", cardNo).Count(&completedCards)
+
+	return uint64(totalCards), uint64(completedCards)
+}
+
+func (s *v1alpha1ServiceImpl) GetCardProgressSummary(ctx context.Context, req *wrapperspb.UInt64Value) (*proto.CardProgressSummaryResp, error) {
+	total, completed := s.getCardProgressSummary(ctx, uint(req.Value))
+
+	return &proto.CardProgressSummaryResp{
+		Total: total,
+		Done:  completed,
+	}, nil
 }

@@ -299,6 +299,49 @@ export class V1Alpha1Client {
     this.methodDescriptorgetCards);
   }
 
+  methodDescriptorgetCardProgressSummary = new grpcWeb.MethodDescriptor(
+    '/api.V1Alpha1/getCardProgressSummary',
+    grpcWeb.MethodType.UNARY,
+    google_protobuf_wrappers_pb.UInt64Value,
+    focus_pb.CardProgressSummaryResp,
+    (request: google_protobuf_wrappers_pb.UInt64Value) => {
+      return request.serializeBinary();
+    },
+    focus_pb.CardProgressSummaryResp.deserializeBinary
+  );
+
+  getCardProgressSummary(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null): Promise<focus_pb.CardProgressSummaryResp>;
+
+  getCardProgressSummary(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: focus_pb.CardProgressSummaryResp) => void): grpcWeb.ClientReadableStream<focus_pb.CardProgressSummaryResp>;
+
+  getCardProgressSummary(
+    request: google_protobuf_wrappers_pb.UInt64Value,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: focus_pb.CardProgressSummaryResp) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/api.V1Alpha1/getCardProgressSummary',
+        request,
+        metadata || {},
+        this.methodDescriptorgetCardProgressSummary,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/api.V1Alpha1/getCardProgressSummary',
+    request,
+    metadata || {},
+    this.methodDescriptorgetCardProgressSummary);
+  }
+
   methodDescriptorpatchCard = new grpcWeb.MethodDescriptor(
     '/api.V1Alpha1/patchCard',
     grpcWeb.MethodType.UNARY,

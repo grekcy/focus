@@ -1,4 +1,3 @@
-import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
@@ -14,6 +13,7 @@ import {
   TableCell,
   TableContainer,
   TableRow,
+  TextField,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -57,6 +57,26 @@ export function CardPage() {
     else setResponsibility(newEmptyUser());
   }, [card]);
 
+  const [cards, setCards] = useState<Card.AsObject[]>([]);
+  const [totalCards, setTotalCards] = useState(0);
+  const [completedCards, setCompletedCards] = useState(0);
+  useEffect(() => {
+    if (!card) return;
+
+    api
+      .listCards({ parentCardNo: card.cardNo, excludeCompleted: false })
+      .then((r) => setCards(r))
+      .catch((e) => app.toast(e.message, "error"));
+
+    api
+      .getCardProgressSummary(card.cardNo)
+      .then((r) => {
+        setTotalCards(r.total);
+        setCompletedCards(r.done);
+      })
+      .catch((e) => app.toast(e.message, "error"));
+  }, [card]);
+
   function handleDescriptionChanged(content: string) {
     if (!card) return;
 
@@ -82,7 +102,7 @@ export function CardPage() {
 
         <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h6">Status:</Typography>
+            <Typography variant="h6">Status</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <TableContainer>
@@ -118,7 +138,7 @@ export function CardPage() {
                   </TableCell>
                   <TableCell variant="head">Status</TableCell>
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    In progress
+                    {card.status ? card.status : "None"}
                   </TableCell>
                   <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
                     Created at
@@ -199,28 +219,29 @@ export function CardPage() {
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h6">Cards</Typography>
             <LinearProgressWithLabel
-              value={20}
-              valueBuffer={30}
+              value={totalCards > 0 ? (completedCards * 100) / totalCards : 0}
               color="success"
-              sx={{ width: "20rem", ml: "1rem" }}
+              sx={{ width: "30rem", ml: "1rem" }}
             />
           </AccordionSummary>
           <AccordionDetails>
-            <CardListView cards={[]}></CardListView>
+            <CardListView cards={cards} />
           </AccordionDetails>
           <AccordionActions>
+            <TextField
+              variant="standard"
+              placeholder="add card...."
+              sx={{ width: { md: 400 } }}
+            />
             <IconButton
               onClick={(e) => {
-                e.preventDefault();
-                alert("xx");
+                app.toast("add card not implemented", "error");
               }}
-            >
-              <AddIcon />
-            </IconButton>
+            ></IconButton>
           </AccordionActions>
         </Accordion>
 
-        <Accordion defaultExpanded>
+        <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h6">Update history</Typography>
           </AccordionSummary>

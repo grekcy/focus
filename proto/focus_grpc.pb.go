@@ -21,20 +21,21 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	V1Alpha1_Version_FullMethodName        = "/api.V1Alpha1/version"
-	V1Alpha1_GetUser_FullMethodName        = "/api.V1Alpha1/getUser"
-	V1Alpha1_QuickAddCard_FullMethodName   = "/api.V1Alpha1/quickAddCard"
-	V1Alpha1_ListCards_FullMethodName      = "/api.V1Alpha1/listCards"
-	V1Alpha1_GetCard_FullMethodName        = "/api.V1Alpha1/getCard"
-	V1Alpha1_GetCards_FullMethodName       = "/api.V1Alpha1/getCards"
-	V1Alpha1_PatchCard_FullMethodName      = "/api.V1Alpha1/patchCard"
-	V1Alpha1_RerankCard_FullMethodName     = "/api.V1Alpha1/rerankCard"
-	V1Alpha1_DeleteCard_FullMethodName     = "/api.V1Alpha1/deleteCard"
-	V1Alpha1_ListLabels_FullMethodName     = "/api.V1Alpha1/listLabels"
-	V1Alpha1_UpdateLabel_FullMethodName    = "/api.V1Alpha1/updateLabel"
-	V1Alpha1_DeleteLabel_FullMethodName    = "/api.V1Alpha1/deleteLabel"
-	V1Alpha1_ListChallenges_FullMethodName = "/api.V1Alpha1/listChallenges"
-	V1Alpha1_GetChallenge_FullMethodName   = "/api.V1Alpha1/getChallenge"
+	V1Alpha1_Version_FullMethodName                = "/api.V1Alpha1/version"
+	V1Alpha1_GetUser_FullMethodName                = "/api.V1Alpha1/getUser"
+	V1Alpha1_QuickAddCard_FullMethodName           = "/api.V1Alpha1/quickAddCard"
+	V1Alpha1_ListCards_FullMethodName              = "/api.V1Alpha1/listCards"
+	V1Alpha1_GetCard_FullMethodName                = "/api.V1Alpha1/getCard"
+	V1Alpha1_GetCards_FullMethodName               = "/api.V1Alpha1/getCards"
+	V1Alpha1_GetCardProgressSummary_FullMethodName = "/api.V1Alpha1/getCardProgressSummary"
+	V1Alpha1_PatchCard_FullMethodName              = "/api.V1Alpha1/patchCard"
+	V1Alpha1_RerankCard_FullMethodName             = "/api.V1Alpha1/rerankCard"
+	V1Alpha1_DeleteCard_FullMethodName             = "/api.V1Alpha1/deleteCard"
+	V1Alpha1_ListLabels_FullMethodName             = "/api.V1Alpha1/listLabels"
+	V1Alpha1_UpdateLabel_FullMethodName            = "/api.V1Alpha1/updateLabel"
+	V1Alpha1_DeleteLabel_FullMethodName            = "/api.V1Alpha1/deleteLabel"
+	V1Alpha1_ListChallenges_FullMethodName         = "/api.V1Alpha1/listChallenges"
+	V1Alpha1_GetChallenge_FullMethodName           = "/api.V1Alpha1/getChallenge"
 )
 
 // V1Alpha1Client is the client API for V1Alpha1 service.
@@ -47,6 +48,7 @@ type V1Alpha1Client interface {
 	ListCards(ctx context.Context, in *ListCardReq, opts ...grpc.CallOption) (*ListCardResp, error)
 	GetCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*Card, error)
 	GetCards(ctx context.Context, in *GetCardReq, opts ...grpc.CallOption) (*GetCardResp, error)
+	GetCardProgressSummary(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*CardProgressSummaryResp, error)
 	PatchCard(ctx context.Context, in *PatchCardReq, opts ...grpc.CallOption) (*Card, error)
 	RerankCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -113,6 +115,15 @@ func (c *v1Alpha1Client) GetCard(ctx context.Context, in *wrapperspb.UInt64Value
 func (c *v1Alpha1Client) GetCards(ctx context.Context, in *GetCardReq, opts ...grpc.CallOption) (*GetCardResp, error) {
 	out := new(GetCardResp)
 	err := c.cc.Invoke(ctx, V1Alpha1_GetCards_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *v1Alpha1Client) GetCardProgressSummary(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*CardProgressSummaryResp, error) {
+	out := new(CardProgressSummaryResp)
+	err := c.cc.Invoke(ctx, V1Alpha1_GetCardProgressSummary_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -201,6 +212,7 @@ type V1Alpha1Server interface {
 	ListCards(context.Context, *ListCardReq) (*ListCardResp, error)
 	GetCard(context.Context, *wrapperspb.UInt64Value) (*Card, error)
 	GetCards(context.Context, *GetCardReq) (*GetCardResp, error)
+	GetCardProgressSummary(context.Context, *wrapperspb.UInt64Value) (*CardProgressSummaryResp, error)
 	PatchCard(context.Context, *PatchCardReq) (*Card, error)
 	RerankCard(context.Context, *RankCardReq) (*emptypb.Empty, error)
 	DeleteCard(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error)
@@ -233,6 +245,9 @@ func (UnimplementedV1Alpha1Server) GetCard(context.Context, *wrapperspb.UInt64Va
 }
 func (UnimplementedV1Alpha1Server) GetCards(context.Context, *GetCardReq) (*GetCardResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCards not implemented")
+}
+func (UnimplementedV1Alpha1Server) GetCardProgressSummary(context.Context, *wrapperspb.UInt64Value) (*CardProgressSummaryResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCardProgressSummary not implemented")
 }
 func (UnimplementedV1Alpha1Server) PatchCard(context.Context, *PatchCardReq) (*Card, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PatchCard not implemented")
@@ -375,6 +390,24 @@ func _V1Alpha1_GetCards_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(V1Alpha1Server).GetCards(ctx, req.(*GetCardReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _V1Alpha1_GetCardProgressSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(wrapperspb.UInt64Value)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(V1Alpha1Server).GetCardProgressSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: V1Alpha1_GetCardProgressSummary_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(V1Alpha1Server).GetCardProgressSummary(ctx, req.(*wrapperspb.UInt64Value))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -553,6 +586,10 @@ var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "getCards",
 			Handler:    _V1Alpha1_GetCards_Handler,
+		},
+		{
+			MethodName: "getCardProgressSummary",
+			Handler:    _V1Alpha1_GetCardProgressSummary_Handler,
 		},
 		{
 			MethodName: "patchCard",

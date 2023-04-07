@@ -79,6 +79,9 @@ export class Card extends jspb.Message {
   getCardType(): string;
   setCardType(value: string): Card;
 
+  getStatus(): string;
+  setStatus(value: string): Card;
+
   getObjective(): string;
   setObjective(value: string): Card;
 
@@ -111,6 +114,7 @@ export namespace Card {
     creatorId: number,
     responsibilityId?: number,
     cardType: string,
+    status: string,
     objective: string,
     content: string,
     labelsList: Array<number>,
@@ -320,6 +324,28 @@ export namespace Label {
   }
 }
 
+export class CardProgressSummaryResp extends jspb.Message {
+  getTotal(): number;
+  setTotal(value: number): CardProgressSummaryResp;
+
+  getDone(): number;
+  setDone(value: number): CardProgressSummaryResp;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CardProgressSummaryResp.AsObject;
+  static toObject(includeInstance: boolean, msg: CardProgressSummaryResp): CardProgressSummaryResp.AsObject;
+  static serializeBinaryToWriter(message: CardProgressSummaryResp, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CardProgressSummaryResp;
+  static deserializeBinaryFromReader(message: CardProgressSummaryResp, reader: jspb.BinaryReader): CardProgressSummaryResp;
+}
+
+export namespace CardProgressSummaryResp {
+  export type AsObject = {
+    total: number,
+    done: number,
+  }
+}
+
 export class ListLabelsReq extends jspb.Message {
   getLabelsList(): Array<string>;
   setLabelsList(value: Array<string>): ListLabelsReq;
@@ -383,9 +409,6 @@ export class Challenge extends jspb.Message {
   getTotalcards(): number;
   setTotalcards(value: number): Challenge;
 
-  getInprogressCards(): number;
-  setInprogressCards(value: number): Challenge;
-
   getCompletedcards(): number;
   setCompletedcards(value: number): Challenge;
 
@@ -401,7 +424,6 @@ export namespace Challenge {
   export type AsObject = {
     card?: Card.AsObject,
     totalcards: number,
-    inprogressCards: number,
     completedcards: number,
   }
 }

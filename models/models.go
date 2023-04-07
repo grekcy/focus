@@ -55,16 +55,17 @@ func (s CardType) String() string { return string(s) }
 type Card struct {
 	*gorm.Model
 
-	WorkspaceID      uint       `gorm:"not null;uniqueIndex:idx_card_no"`
-	CreatorID        uint       `gorm:"not null;index"`
-	ResponsibilityID *uint      `gorm:"index"`
-	CardNo           uint       `gorm:"not null;uniqueIndex:idx_card_no"`
-	Rank             uint       `gorm:"not null;default:0"`
-	ParentCardNo     *uint      `grom:"index"`
+	WorkspaceID      uint  `gorm:"not null;uniqueIndex:idx_card_no"`
+	CreatorID        uint  `gorm:"not null;index"`
+	ResponsibilityID *uint `gorm:"index"`
+	CardNo           uint  `gorm:"not null;uniqueIndex:idx_card_no"`
+	Rank             uint  `gorm:"not null;default:0"`
+	ParentCardNo     *uint `grom:"index"`
 	DeferUntil       *time.Time `gorm:"index"`
 	DueDate          *time.Time `gorm:"index"`
 	CompletedAt      *time.Time `gorm:"index"`
 	CardType         string     `gorm:"type:varchar(50);not null;default:'card';check:card_type in ('card','challenge')"`
+	Status           string
 	Objective        string     `gorm:"type:varchar(500);not null;default:''"`
 	Content          string     `gorm:"type:text;not null;default:''"`
 	//

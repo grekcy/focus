@@ -84,19 +84,22 @@ export class FocusAPI {
   };
 
   listCards = ({
+    parentCardNo,
     excludeCompleted = true,
     excludeChallenges = true,
     includeDeferred = false,
     labels = [],
   }: listCardsParams = {}) => {
     const req = new ListCardReq();
+
+    const card = new Card();
+    parentCardNo && card.setParentCardNo(parentCardNo);
+    labels && card.setLabelsList(labels);
+    req.setCard(card);
+
     req.setExcludeCompleted(excludeCompleted);
     req.setExcludeChallenges(excludeChallenges);
     req.setIncludeDeferred(includeDeferred);
-
-    const card = new Card();
-    labels && card.setLabelsList(labels);
-    req.setCard(card);
 
     return this.s.listCards(req, null).then((r) => r.toObject().itemsList);
   };
@@ -111,6 +114,12 @@ export class FocusAPI {
     return this.s
       .getCards(req, null)
       .then((r) => Object.fromEntries(r.toObject().itemsMap));
+  };
+
+  getCardProgressSummary = (cardNo: number) => {
+    const req = new UInt64Value();
+    req.setValue(cardNo);
+    return this.s.getCardProgressSummary(req, null).then((r) => r.toObject());
   };
 
   completeCard = (cardNo: number, complete: boolean) => {
@@ -322,8 +331,10 @@ export enum Event {
 type EventListener = (resId: number) => void;
 
 interface listCardsParams {
+  parentCardNo?: number;
+  labels?: number[];
+
   excludeCompleted?: boolean;
   excludeChallenges?: boolean;
   includeDeferred?: boolean;
-  labels?: number[];
 }

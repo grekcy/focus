@@ -18,6 +18,8 @@ service V1Alpha1 {
   rpc listCards(ListCardReq) returns (ListCardResp) {}
   rpc getCard(google.protobuf.UInt64Value) returns (Card) {}
   rpc getCards(GetCardReq) returns (GetCardResp) {}
+  rpc getCardProgressSummary(google.protobuf.UInt64Value)
+      returns (CardProgressSummaryResp) {}
   rpc patchCard(PatchCardReq) returns (Card) {}
   rpc rerankCard(RankCardReq) returns (google.protobuf.Empty) {}
   rpc deleteCard(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {}
@@ -49,9 +51,10 @@ message Card {
   uint64 creator_id = 9;
   optional uint64 responsibility_id = 10;
   string card_type = 11;
-  string objective = 12;
-  string content = 13;
-  repeated uint64 labels = 14;
+  string status = 12;
+  string objective = 13;
+  string content = 14;
+  repeated uint64 labels = 15;
 }
 
 message ListCardReq {
@@ -97,6 +100,11 @@ message Label {
   google.protobuf.Timestamp created_at = 6;
 }
 
+message CardProgressSummaryResp {
+  uint64 total = 1;
+  uint64 done = 2;
+}
+
 message ListLabelsReq { repeated string labels = 1; }
 
 message ListLabelsResp { repeated Label labels = 1; }
@@ -105,9 +113,9 @@ message ListChallengesReq {}
 
 message Challenge {
   Card card = 1; // card informations
+  // progress
   uint64 totalCards = 2;
-  uint64 inprogress_cards = 3;
-  uint64 completedCards = 4;
+  uint64 completedCards = 3;
 }
 
 message ListChallengesResp { repeated Challenge items = 1; }
