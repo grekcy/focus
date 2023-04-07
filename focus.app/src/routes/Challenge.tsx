@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
+import { DatePickButton } from "../lib/components/DatePickButton";
 import { Challenge } from "../lib/proto/focus_pb";
 import { newChallenge } from "../lib/proto/helper";
 
@@ -76,6 +77,7 @@ function ChallengeList() {
           <TableHead>
             <TableRow>
               <TableCell></TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -113,7 +115,7 @@ function ChallengeList() {
                       {completedPercent}% complete,
                     </Typography>
                     <Typography component="span" sx={{ mr: 1 }}>
-                      {ch.completedcards} cards completed,
+                      {ch.completedcards} done,
                     </Typography>
                     <Typography component="span" sx={{ mr: 1 }}>
                       {ch.totalcards - ch.completedcards} cards are remained.

@@ -27,7 +27,7 @@ import { DrawerHeader } from "../../SideBar";
 import { arrayContentEquals } from "../lib";
 import { Card, Label } from "../proto/focus_pb";
 import { useAction } from "./Action";
-import { DatePickerEx } from "./DatePickerEx";
+import { DatePickButton } from "./DatePickButton";
 import { InlineEdit } from "./InlineEdit";
 import { LabelSelector } from "./LabelSelector";
 
@@ -188,7 +188,7 @@ export const CardBar = forwardRef(
             <Box>
               {/* TODO 가로 정렬이 약간 안맞군 */}
               Deferred until:
-              <DatePickerEx
+              <DatePickButton
                 value={
                   card!.deferUntil
                     ? dayjs(card!.deferUntil.seconds * 1000)
@@ -200,7 +200,7 @@ export const CardBar = forwardRef(
             </Box>
             <Box>
               Due date:
-              <DatePickerEx
+              <DatePickButton
                 value={
                   card!.dueDate ? dayjs(card!.dueDate.seconds * 1000) : null
                 }

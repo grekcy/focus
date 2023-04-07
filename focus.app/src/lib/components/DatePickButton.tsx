@@ -5,17 +5,17 @@ import { DateCalendar } from "@mui/x-date-pickers";
 import dayjs, { Dayjs } from "dayjs";
 import { useRef, useState } from "react";
 
-interface DatePickerExProp {
+interface DatePickButtonProp {
   value?: Dayjs | null;
   onChange?: (value: Dayjs | null) => void;
   sx?: SxProps<Theme>;
 }
 
-export function DatePickerEx({
+export function DatePickButton({
   value: inValue,
   sx,
   onChange,
-}: DatePickerExProp) {
+}: DatePickButtonProp) {
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState<Element | null>(null);
   const ref = useRef<HTMLDivElement>(null);

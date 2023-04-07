@@ -498,6 +498,9 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 				updates["due_date"] = req.Card.DueDate.AsTime()
 			}
 
+		case proto.CardField_CARD_TYPE:
+			updates["card_type"] = req.Card.CardType
+
 		default:
 			log.Warnf("unknown field: %v", field)
 		}

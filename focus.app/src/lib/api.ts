@@ -191,7 +191,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setCardType(cardType);
 
-    return this.patchCard(card.toObject(), CardField.DUE_DATE).then((r) =>
+    return this.patchCard(card.toObject(), CardField.CARD_TYPE).then((r) =>
       r.toObject()
     );
   };
@@ -231,6 +231,9 @@ export class FocusAPI {
             );
             c.setDueDate(defer);
           }
+          break;
+        case CardField.CARD_TYPE:
+          c.setCardType(card.cardType);
           break;
         default:
           throw new Error(`not implemented patch: ${field}`);

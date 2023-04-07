@@ -8,7 +8,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Dayjs } from "dayjs";
 import { useRef, useState } from "react";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
-import { DatePickerEx } from "../lib/components/DatePickerEx";
+import { DatePickButton } from "../lib/components/DatePickButton";
 
 export function PlayCardBar() {
   const ref = useRef<ICardBar>(null);
@@ -32,7 +32,10 @@ function PlayDatePickerEx() {
   const [value, setValue] = useState<Dayjs | null>(null);
   return (
     <>
-      <DatePickerEx value={value} onChange={(v: Dayjs | null) => setValue(v)} />
+      <DatePickButton
+        value={value}
+        onChange={(v: Dayjs | null) => setValue(v)}
+      />
       Selected: {value ? value.toDate().toLocaleString() : "null"}
     </>
   );
