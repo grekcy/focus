@@ -17,6 +17,11 @@ import {
   RankCardReq,
 } from "./proto/focus_pb";
 
+export enum Event {
+  CARD_CREATED,
+  CARD_UPDATED,
+}
+
 export class FocusAPI {
   s: V1Alpha1Client;
   listeners: { [event: string]: EventListener[] };
@@ -84,21 +89,24 @@ export class FocusAPI {
   };
 
   listCards = ({
+    startCardType = "card",
     parentCardNo,
     excludeCompleted = true,
-    excludeChallenges = true,
     includeDeferred = false,
     labels = [],
   }: listCardsParams = {}) => {
     const req = new ListCardReq();
 
-    const card = new Card();
-    parentCardNo && card.setParentCardNo(parentCardNo);
-    labels && card.setLabelsList(labels);
-    req.setCard(card);
+    const startCond = new Card();
+    startCond.setCardType(startCardType);
+    parentCardNo && startCond.setParentCardNo(parentCardNo);
+    req.setStartCond(startCond);
+
+    const cond = new Card();
+    labels && cond.setLabelsList(labels);
+    req.setCond(cond);
 
     req.setExcludeCompleted(excludeCompleted);
-    req.setExcludeChallenges(excludeChallenges);
     req.setIncludeDeferred(includeDeferred);
 
     return this.s.listCards(req, null).then((r) => r.toObject().itemsList);
@@ -323,18 +331,13 @@ class AuthInterceptor {
   };
 }
 
-export enum Event {
-  CARD_CREATED,
-  CARD_UPDATED,
-}
-
 type EventListener = (resId: number) => void;
 
 interface listCardsParams {
+  startCardType?: string;
   parentCardNo?: number;
   labels?: number[];
 
   excludeCompleted?: boolean;
-  excludeChallenges?: boolean;
   includeDeferred?: boolean;
 }

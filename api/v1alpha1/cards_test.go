@@ -73,8 +73,9 @@ func TestListCards(t *testing.T) {
 	}()
 
 	type args struct {
-		where *models.Card
-		opts  ListOpt
+		startWhere *models.Card
+		where      *models.Card
+		opts       ListOpt
 	}
 	tests := [...]struct {
 		name    string
@@ -87,10 +88,12 @@ func TestListCards(t *testing.T) {
 		{`with label`, args{
 			where: &models.Card{Labels: helper.ToArray(fx.Of(1))},
 			opts:  ListOpt{excludeCompleted: true}}, false},
+		{`inbox`, args{&models.Card{CardType: models.CardTypeCard.String()}, &models.Card{}, ListOpt{excludeCompleted: true}}, false},
+		{`challenge list`, args{&models.Card{CardType: models.CardTypeChallenge.String()}, &models.Card{CardType: models.CardTypeChallenge.String()}, ListOpt{excludeCompleted: true}}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := service.listCards(ctx, tt.args.where, tt.args.opts)
+			got, err := service.listCards(ctx, tt.args.startWhere, tt.args.where, tt.args.opts)
 			require.Truef(t, (err != nil) == tt.wantErr, `listCards() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
 			if tt.wantErr {
 				return
@@ -102,18 +105,14 @@ func TestListCards(t *testing.T) {
 				fx.Each(got, func(_ int, c *CardWithDepth) { require.Nil(t, c.CompletedAt) })
 			}
 
-			if !tt.args.opts.excludeDeferred && tt.args.where == nil {
+			if tt.args.opts.excludeDeferred && tt.args.where == nil {
 				require.NotEmpty(t, got)
-				require.Contains(t,
+				require.NotContains(t,
 					fx.Map(got, func(e *CardWithDepth) uint64 { return uint64(e.CardNo) }), deferredCard.CardNo)
 				fx.Each(got, func(_ int, c *CardWithDepth) {
 					if c.DeferUntil != nil {
-						require.True(t, c.DeferUntil.After(time.Now()))
+						require.True(t, c.DeferUntil.Before(time.Now()))
 					}
-				})
-			} else {
-				fx.Each(got, func(_ int, c *CardWithDepth) {
-					require.Nil(t, c.DeferUntil)
 				})
 			}
 
@@ -124,6 +123,21 @@ func TestListCards(t *testing.T) {
 					}
 				})
 			}
+
+			if tt.args.startWhere != nil && tt.args.startWhere.CardType != "" {
+				fx.Each(got, func(_ int, card *CardWithDepth) {
+					if card.Depth == 0 {
+						require.Equalf(t, tt.args.startWhere.CardType, card.CardType, "start with type %s, but got %v", tt.args.startWhere.CardType, card.CardType)
+					}
+				})
+			}
+
+			if tt.args.where != nil && tt.args.where.CardType != "" {
+				fx.Each(got, func(_ int, card *CardWithDepth) {
+					require.Equalf(t, tt.args.startWhere.CardType, card.CardType, "limit to type %s, but got %v", tt.args.startWhere.CardType, card.CardType)
+				})
+			}
+
 		})
 	}
 }
@@ -140,7 +154,7 @@ func TestGetCard(t *testing.T) {
 	_, err = service.GetCards(ctx, &proto.GetCardReq{CardNos: []uint64{1, 9999999999999999999}})
 	require.Error(t, err, "not exists")
 
-	items, err := service.listCards(ctx, nil, ListOpt{excludeCompleted: true})
+	items, err := service.listCards(ctx, nil, nil, ListOpt{excludeCompleted: true})
 	require.NoError(t, err)
 	require.NotEmpty(t, items)
 	cardNo := fx.Map(items, func(x *CardWithDepth) uint64 { return uint64(x.CardNo) })

@@ -36,6 +36,7 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 	newCard := &CardWithDepth{
 		Card: &models.Card{
 			Objective:   in.Value,
+			CardType:    models.CardTypeCard.String(),
 			CreatorID:   s.currentUser(ctx).ID,
 			WorkspaceID: s.defaultWorkspace(ctx).ID,
 		},
@@ -208,19 +209,36 @@ func cardModelToProto(in *CardWithDepth) *proto.Card {
 	}
 }
 
+func protoCardToModel(in *proto.Card) *models.Card {
+	if in == nil {
+		return nil
+	}
+
+	r := &models.Card{
+		CreatorID:        uint(in.CreatorId),
+		ResponsibilityID: helper.PP[uint64, uint](in.ResponsibilityId),
+		CardNo:           uint(in.CardNo),
+		ParentCardNo:     helper.PP[uint64, uint](in.ParentCardNo),
+		DeferUntil:       helper.TimestampToTimeP(in.DeferUntil),
+		DueDate:          helper.TimestampToTimeP(in.DueDate),
+		CompletedAt:      helper.TimestampToTimeP(in.CompletedAt),
+		CardType:         in.CardType,
+		Status:           in.Status,
+		Labels:           helper.ToArray(in.Labels),
+	}
+
+	return r
+}
+
 func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCardReq) (*proto.ListCardResp, error) {
 	log.Debugf("ListCards(), req=%+v", req)
 
-	where := &models.Card{
-		ParentCardNo: helper.PP[uint64, uint](req.Card.ParentCardNo),
-		Labels:       helper.ToArray(req.Card.Labels),
-		CardType:     models.CardTypeCard.String(),
-	}
+	start := protoCardToModel(req.StartCond)
+	where := protoCardToModel(req.Cond)
 
-	r, err := s.listCards(ctx, where, ListOpt{
-		excludeCompleted:  req.ExcludeCompleted,
-		excludeChallenges: req.ExcludeChallenges,
-		excludeDeferred:   !req.IncludeDeferred,
+	r, err := s.listCards(ctx, start, where, ListOpt{
+		excludeCompleted: req.ExcludeCompleted,
+		excludeDeferred:  !req.IncludeDeferred,
 	})
 	if err != nil {
 		return nil, err
@@ -232,10 +250,9 @@ func (s *v1alpha1ServiceImpl) ListCards(ctx context.Context, req *proto.ListCard
 }
 
 type ListOpt struct {
-	CardNo            []uint
-	excludeCompleted  bool
-	excludeChallenges bool
-	excludeDeferred   bool
+	CardNo           []uint
+	excludeCompleted bool
+	excludeDeferred  bool
 }
 
 type CardWithDepth struct {
@@ -263,16 +280,24 @@ SEARCH DEPTH FIRST BY rank SET ordercol
 SELECT * FROM cte
 ORDER BY ordercol
 */
-func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card, opt ListOpt) ([]*CardWithDepth, error) {
+func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, startWhere *models.Card, where *models.Card, opt ListOpt) ([]*CardWithDepth, error) {
+	log.Debugf("listCards(): start=%+v, where=%+v, opt=%+v", startWhere, where, opt)
+
 	// non recursive query는 시작할 카드를 지정함
 	nonRecursiveQuery := s.db.ToSQL(func(tx *gorm.DB) *gorm.DB {
 		tx = tx.Model(&models.Card{}).
 			Select("cards.*, 0 as depth").
 			Where("workspace_id = ?", s.defaultWorkspace(ctx).ID)
-		if where != nil && where.ParentCardNo != nil && *where.ParentCardNo > 0 {
-			tx = tx.Where("parent_card_no = ?", where.ParentCardNo)
+		if startWhere != nil && startWhere.ParentCardNo != nil && *startWhere.ParentCardNo > 0 {
+			tx = tx.Where("parent_card_no = ?", startWhere.ParentCardNo)
 		} else {
 			tx = tx.Where("parent_card_no IS NULL")
+		}
+
+		if startWhere != nil {
+			if startWhere.CardType != "" {
+				tx = tx.Where("card_type = ?", startWhere.CardType)
+			}
 		}
 
 		tx = tx.Find(&[]models.Card{})
@@ -298,6 +323,7 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, where *models.Card,
 			if len(where.Labels) > 0 {
 				tx = tx.Where("? <@ labels", where.Labels)
 			}
+
 			if where.CardType != "" {
 				tx = tx.Where("card_type = ?", where.CardType)
 			}
@@ -361,7 +387,7 @@ func (s *v1alpha1ServiceImpl) GetCards(ctx context.Context, req *proto.GetCardRe
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	r, err := s.listCards(ctx, nil, ListOpt{
+	r, err := s.listCards(ctx, nil, nil, ListOpt{
 		CardNo: fx.Map(req.CardNos, func(n uint64) uint { return uint(n) }),
 	})
 	if err != nil {
@@ -388,7 +414,7 @@ func (s *v1alpha1ServiceImpl) GetCards(ctx context.Context, req *proto.GetCardRe
 }
 
 func (s *v1alpha1ServiceImpl) getCard(ctx context.Context, cardNo uint) (*CardWithDepth, error) {
-	r, err := s.listCards(ctx, &models.Card{CardNo: cardNo}, ListOpt{})
+	r, err := s.listCards(ctx, nil, &models.Card{CardNo: cardNo}, ListOpt{})
 	if err != nil {
 		return nil, err
 	}

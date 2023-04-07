@@ -1,3 +1,4 @@
+import AddIcon from "@mui/icons-material/Add";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
@@ -16,12 +17,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
+import { ReactMarkdown } from "react-markdown/lib/react-markdown";
 import { Link, useParams } from "react-router-dom";
+import remarkGfm from "remark-gfm";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardListView } from "../lib/components/CardList";
 import { InlineEdit } from "../lib/components/InlineEdit";
 import { LabelSelector } from "../lib/components/LabelSelector";
+import { loerm } from "../lib/lib";
 import { Card, User } from "../lib/proto/focus_pb";
 import { newEmptyUser } from "../lib/proto/helper";
 
@@ -64,7 +68,7 @@ export function CardPage() {
     if (!card) return;
 
     api
-      .listCards({ parentCardNo: card.cardNo, excludeCompleted: false })
+      .listCards({ parentCardNo: card.cardNo, excludeCompleted: true })
       .then((r) => setCards(r))
       .catch((e) => app.toast(e.message, "error"));
 
@@ -76,30 +80,35 @@ export function CardPage() {
       })
       .catch((e) => app.toast(e.message, "error"));
   }, [card]);
+  const [expandCards, setExpandCards] = useState(true);
 
-  function handleDescriptionChanged(content: string) {
-    if (!card) return;
-
-    api
-      .updateCardContent(card.cardNo, content)
-      .then((r) => setCard(r))
-      .catch((e) => app.toast(e.message, "error"));
-  }
-
-  function renderCard() {
-    if (!card) return;
-
+  function RenderCard() {
     return (
       <>
         <Box display="flex">
           <Typography variant="h5" sx={{ pr: 1 }}>
             CARD-#{cardNo}
           </Typography>
-          <Box sx={{ flexGrow: 1, pt: 0.5 }}>
-            <InlineEdit value={card.objective} />
-          </Box>
+          {card && (
+            <Box sx={{ flexGrow: 1, pt: 0.5 }}>
+              <InlineEdit value={card.objective} />
+            </Box>
+          )}
         </Box>
 
+        {card && (
+          <>
+            <RenderStatus />
+            <RenderDescription />
+            <RenderChildCards />
+            <RenderUpdateHistory />
+          </>
+        )}
+      </>
+    );
+
+    function RenderStatus() {
+      return (
         <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h6">Status</Typography>
@@ -138,20 +147,22 @@ export function CardPage() {
                   </TableCell>
                   <TableCell variant="head">Status</TableCell>
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {card.status ? card.status : "None"}
+                    {card!.status ? card!.status : "None"}
                   </TableCell>
                   <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
                     Created at
                   </TableCell>
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {new Date(card.createdAt!.seconds * 1000).toLocaleString()}
+                    {new Date(card!.createdAt!.seconds * 1000).toLocaleString()}
                   </TableCell>
                   <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
                     Completed at
                   </TableCell>
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {card.completedAt ? (
-                      new Date(card.completedAt.seconds * 1000).toLocaleString()
+                    {card!.completedAt ? (
+                      new Date(
+                        card!.completedAt.seconds * 1000
+                      ).toLocaleString()
                     ) : (
                       <Button
                         onClick={() =>
@@ -168,9 +179,9 @@ export function CardPage() {
                     Belongs to
                   </TableCell>
                   <TableCell>
-                    {card.parentCardNo! > 0 ? (
-                      <Link to={`/cards/${card.parentCardNo}`}>
-                        {card.parentCardNo}
+                    {card!.parentCardNo! > 0 ? (
+                      <Link to={`/cards/${card!.parentCardNo}`}>
+                        {card!.parentCardNo}
                       </Link>
                     ) : (
                       "None"
@@ -180,8 +191,8 @@ export function CardPage() {
                     Due to
                   </TableCell>
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {card.dueDate ? (
-                      new Date(card.dueDate.seconds * 1000).toLocaleString()
+                    {card!.dueDate ? (
+                      new Date(card!.dueDate.seconds * 1000).toLocaleString()
                     ) : (
                       <Button
                         onClick={() =>
@@ -201,28 +212,60 @@ export function CardPage() {
             </TableContainer>
           </AccordionDetails>
         </Accordion>
+      );
+    }
 
+    function handleDescriptionChanged(content: string) {
+      if (!card) return;
+
+      api
+        .updateCardContent(card.cardNo, content)
+        .then((r) => setCard(r))
+        .catch((e) => app.toast(e.message, "error"));
+    }
+
+    function RenderDescription() {
+      return (
         <Accordion defaultExpanded>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h6">Description</Typography>
           </AccordionSummary>
           <AccordionDetails>
             <InlineEdit
-              value={card.content}
+              value={card!.content}
               multiline
               onSubmit={(target, value) => handleDescriptionChanged(value)}
             />
+            <ReactMarkdown
+              children={card!.content}
+              remarkPlugins={[remarkGfm]}
+            />
           </AccordionDetails>
         </Accordion>
+      );
+    }
 
-        <Accordion defaultExpanded>
+    function RenderChildCards() {
+      function onKeyUp(e: SyntheticEvent) {
+        if ((e.nativeEvent as KeyboardEvent).key === "Enter") {
+          app.toast("add card not implemented", "error");
+        }
+      }
+
+      return (
+        <Accordion
+          expanded={expandCards}
+          onChange={() => setExpandCards((p) => !p)}
+        >
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h6">Cards</Typography>
-            <LinearProgressWithLabel
-              value={totalCards > 0 ? (completedCards * 100) / totalCards : 0}
-              color="success"
-              sx={{ width: "30rem", ml: "1rem" }}
-            />
+            {totalCards > 0 && (
+              <LinearProgressWithLabel
+                value={(completedCards * 100) / totalCards}
+                color="success"
+                sx={{ width: "30rem", ml: "1rem" }}
+              />
+            )}
           </AccordionSummary>
           <AccordionDetails>
             <CardListView cards={cards} />
@@ -232,32 +275,33 @@ export function CardPage() {
               variant="standard"
               placeholder="add card...."
               sx={{ width: { md: 400 } }}
+              onKeyUp={onKeyUp}
             />
             <IconButton
-              onClick={(e) => {
-                app.toast("add card not implemented", "error");
-              }}
-            ></IconButton>
+              onClick={(e) => app.toast("add card not implemented", "error")}
+            >
+              <AddIcon />
+            </IconButton>
           </AccordionActions>
         </Accordion>
+      );
+    }
 
+    function RenderUpdateHistory() {
+      return (
         <Accordion>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h6">Update history</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Typography>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Suspendisse malesuada lacus ex, sit amet blandit leo lobortis
-              eget.
-            </Typography>
+            <Typography>{loerm}</Typography>
           </AccordionDetails>
         </Accordion>
-      </>
-    );
+      );
+    }
   }
 
-  return <>{renderCard()}</>;
+  return <>{RenderCard()}</>;
 }
 
 function LinearProgressWithLabel(

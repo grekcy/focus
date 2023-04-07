@@ -57,6 +57,14 @@ describe("focus API", () => {
       .catch((e) => expect(e.message).toMatch("already completed"));
   });
 
+  test("list cards: for sub card", async () => {
+    const got = await service.listCards({
+      parentCardNo: 2017,
+      excludeCompleted: false,
+    });
+    expect(got.length).not.toEqual(0);
+  });
+
   test("labels: list", async () => {
     const got = await service.listLabels();
     expect(got.length).not.toEqual(0);

@@ -147,16 +147,18 @@ export namespace Card {
 }
 
 export class ListCardReq extends jspb.Message {
-  getCard(): Card | undefined;
-  setCard(value?: Card): ListCardReq;
-  hasCard(): boolean;
-  clearCard(): ListCardReq;
+  getStartCond(): Card | undefined;
+  setStartCond(value?: Card): ListCardReq;
+  hasStartCond(): boolean;
+  clearStartCond(): ListCardReq;
+
+  getCond(): Card | undefined;
+  setCond(value?: Card): ListCardReq;
+  hasCond(): boolean;
+  clearCond(): ListCardReq;
 
   getExcludeCompleted(): boolean;
   setExcludeCompleted(value: boolean): ListCardReq;
-
-  getExcludeChallenges(): boolean;
-  setExcludeChallenges(value: boolean): ListCardReq;
 
   getIncludeDeferred(): boolean;
   setIncludeDeferred(value: boolean): ListCardReq;
@@ -171,9 +173,9 @@ export class ListCardReq extends jspb.Message {
 
 export namespace ListCardReq {
   export type AsObject = {
-    card?: Card.AsObject,
+    startCond?: Card.AsObject,
+    cond?: Card.AsObject,
     excludeCompleted: boolean,
-    excludeChallenges: boolean,
     includeDeferred: boolean,
   }
 }

@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   LinearProgress,
   Table,
   TableBody,
@@ -70,6 +71,10 @@ function ChallengeList() {
         <Typography variant="h5" flexGrow={1}>
           Challenges
         </Typography>
+        <Box flexGrow={1}></Box>
+        <Box flexGrow={0}>
+          <Button onClick={() => app.toast("new challenge: not implemented", "error")}>New Challenge</Button>
+        </Box>
       </Box>
 
       <TableContainer>
@@ -152,8 +157,9 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
   return (
     <>
       <Box>
-        <Typography variant="h5" flexGrow={1}>
-          Challenge #{challengeId}: {challenge.card?.objective}
+        <Typography variant="h5">
+          Challenge <Link to={`/cards/${challengeId}`}>#{challengeId}</Link>:{" "}
+          {challenge.card?.objective}
         </Typography>
       </Box>
 
@@ -175,10 +181,6 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
       </Box>
 
       <CardListView cards={cards} />
-
-      <ul>
-        <li>Objective</li>
-      </ul>
     </>
   );
 }

@@ -54,7 +54,7 @@ export function AppBar({ open }: AppBarProps) {
   const app = useFocusApp();
   const api = useFocusClient();
 
-  const onQuickAddKeyUp = (e: SyntheticEvent) => {
+  function onQuickAddKeyUp(e: SyntheticEvent) {
     if ((e.nativeEvent as KeyboardEvent).key === "Enter") {
       if (adding) return; // NOTE 한글의 경우 글을 조합하는 도중에 Enter를 누르면 2번 호출됨
       const objective = qucikAddObjective.trim();
@@ -72,7 +72,7 @@ export function AppBar({ open }: AppBarProps) {
         .catch((e) => app.toast(e.message, "error"))
         .finally(() => setAdding(false));
     }
-  };
+  }
 
   useAction({
     label: "Quick add card",

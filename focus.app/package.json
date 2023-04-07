@@ -30,11 +30,13 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-hotkeys-hook": "^4.3.8",
+    "react-markdown": "^8.0.6",
     "react-router-dom": "^6.9.0",
     "react-scripts": "5.0.1",
+    "remark-gfm": "^3.0.1",
     "sort-by": "^1.2.0",
     "ts-key-enum": "^2.0.12",
-    "typescript": "^5.0.3",
+    "typescript": "^5.0.4",
     "web-vitals": "^3.3.1"
   },
   "scripts": {

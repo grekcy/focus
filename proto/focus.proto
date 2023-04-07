@@ -58,9 +58,9 @@ message Card {
 }
 
 message ListCardReq {
-  Card card = 1;
-  bool exclude_completed = 2;
-  bool exclude_challenges = 3;
+  Card start_cond = 1;
+  Card cond = 2;
+  bool exclude_completed = 3;
   bool include_deferred = 4;
 }
 

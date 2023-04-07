@@ -1299,9 +1299,9 @@ proto.api.ListCardReq.prototype.toObject = function(opt_includeInstance) {
  */
 proto.api.ListCardReq.toObject = function(includeInstance, msg) {
   var f, obj = {
-    card: (f = msg.getCard()) && proto.api.Card.toObject(includeInstance, f),
-    excludeCompleted: jspb.Message.getBooleanFieldWithDefault(msg, 2, false),
-    excludeChallenges: jspb.Message.getBooleanFieldWithDefault(msg, 3, false),
+    startCond: (f = msg.getStartCond()) && proto.api.Card.toObject(includeInstance, f),
+    cond: (f = msg.getCond()) && proto.api.Card.toObject(includeInstance, f),
+    excludeCompleted: jspb.Message.getBooleanFieldWithDefault(msg, 3, false),
     includeDeferred: jspb.Message.getBooleanFieldWithDefault(msg, 4, false)
   };
 
@@ -1342,15 +1342,16 @@ proto.api.ListCardReq.deserializeBinaryFromReader = function(msg, reader) {
     case 1:
       var value = new proto.api.Card;
       reader.readMessage(value,proto.api.Card.deserializeBinaryFromReader);
-      msg.setCard(value);
+      msg.setStartCond(value);
       break;
     case 2:
-      var value = /** @type {boolean} */ (reader.readBool());
-      msg.setExcludeCompleted(value);
+      var value = new proto.api.Card;
+      reader.readMessage(value,proto.api.Card.deserializeBinaryFromReader);
+      msg.setCond(value);
       break;
     case 3:
       var value = /** @type {boolean} */ (reader.readBool());
-      msg.setExcludeChallenges(value);
+      msg.setExcludeCompleted(value);
       break;
     case 4:
       var value = /** @type {boolean} */ (reader.readBool());
@@ -1385,7 +1386,7 @@ proto.api.ListCardReq.prototype.serializeBinary = function() {
  */
 proto.api.ListCardReq.serializeBinaryToWriter = function(message, writer) {
   var f = undefined;
-  f = message.getCard();
+  f = message.getStartCond();
   if (f != null) {
     writer.writeMessage(
       1,
@@ -1393,14 +1394,15 @@ proto.api.ListCardReq.serializeBinaryToWriter = function(message, writer) {
       proto.api.Card.serializeBinaryToWriter
     );
   }
-  f = message.getExcludeCompleted();
-  if (f) {
-    writer.writeBool(
+  f = message.getCond();
+  if (f != null) {
+    writer.writeMessage(
       2,
-      f
+      f,
+      proto.api.Card.serializeBinaryToWriter
     );
   }
-  f = message.getExcludeChallenges();
+  f = message.getExcludeCompleted();
   if (f) {
     writer.writeBool(
       3,
@@ -1418,10 +1420,10 @@ proto.api.ListCardReq.serializeBinaryToWriter = function(message, writer) {
 
 
 /**
- * optional Card card = 1;
+ * optional Card start_cond = 1;
  * @return {?proto.api.Card}
  */
-proto.api.ListCardReq.prototype.getCard = function() {
+proto.api.ListCardReq.prototype.getStartCond = function() {
   return /** @type{?proto.api.Card} */ (
     jspb.Message.getWrapperField(this, proto.api.Card, 1));
 };
@@ -1431,7 +1433,7 @@ proto.api.ListCardReq.prototype.getCard = function() {
  * @param {?proto.api.Card|undefined} value
  * @return {!proto.api.ListCardReq} returns this
 */
-proto.api.ListCardReq.prototype.setCard = function(value) {
+proto.api.ListCardReq.prototype.setStartCond = function(value) {
   return jspb.Message.setWrapperField(this, 1, value);
 };
 
@@ -1440,8 +1442,8 @@ proto.api.ListCardReq.prototype.setCard = function(value) {
  * Clears the message field making it undefined.
  * @return {!proto.api.ListCardReq} returns this
  */
-proto.api.ListCardReq.prototype.clearCard = function() {
-  return this.setCard(undefined);
+proto.api.ListCardReq.prototype.clearStartCond = function() {
+  return this.setStartCond(undefined);
 };
 
 
@@ -1449,34 +1451,53 @@ proto.api.ListCardReq.prototype.clearCard = function() {
  * Returns whether this field is set.
  * @return {boolean}
  */
-proto.api.ListCardReq.prototype.hasCard = function() {
+proto.api.ListCardReq.prototype.hasStartCond = function() {
   return jspb.Message.getField(this, 1) != null;
 };
 
 
 /**
- * optional bool exclude_completed = 2;
+ * optional Card cond = 2;
+ * @return {?proto.api.Card}
+ */
+proto.api.ListCardReq.prototype.getCond = function() {
+  return /** @type{?proto.api.Card} */ (
+    jspb.Message.getWrapperField(this, proto.api.Card, 2));
+};
+
+
+/**
+ * @param {?proto.api.Card|undefined} value
+ * @return {!proto.api.ListCardReq} returns this
+*/
+proto.api.ListCardReq.prototype.setCond = function(value) {
+  return jspb.Message.setWrapperField(this, 2, value);
+};
+
+
+/**
+ * Clears the message field making it undefined.
+ * @return {!proto.api.ListCardReq} returns this
+ */
+proto.api.ListCardReq.prototype.clearCond = function() {
+  return this.setCond(undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.api.ListCardReq.prototype.hasCond = function() {
+  return jspb.Message.getField(this, 2) != null;
+};
+
+
+/**
+ * optional bool exclude_completed = 3;
  * @return {boolean}
  */
 proto.api.ListCardReq.prototype.getExcludeCompleted = function() {
-  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 2, false));
-};
-
-
-/**
- * @param {boolean} value
- * @return {!proto.api.ListCardReq} returns this
- */
-proto.api.ListCardReq.prototype.setExcludeCompleted = function(value) {
-  return jspb.Message.setProto3BooleanField(this, 2, value);
-};
-
-
-/**
- * optional bool exclude_challenges = 3;
- * @return {boolean}
- */
-proto.api.ListCardReq.prototype.getExcludeChallenges = function() {
   return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 3, false));
 };
 
@@ -1485,7 +1506,7 @@ proto.api.ListCardReq.prototype.getExcludeChallenges = function() {
  * @param {boolean} value
  * @return {!proto.api.ListCardReq} returns this
  */
-proto.api.ListCardReq.prototype.setExcludeChallenges = function(value) {
+proto.api.ListCardReq.prototype.setExcludeCompleted = function(value) {
   return jspb.Message.setProto3BooleanField(this, 3, value);
 };
 

@@ -176,7 +176,6 @@ export const CardBar = forwardRef(
             selected={editingLabel}
             onSelectionChange={handleLabelChange}
           />
-
           <Typography variant="subtitle1">Description:</Typography>
           <InlineEdit
             multiline
