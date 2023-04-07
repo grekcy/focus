@@ -21,20 +21,20 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	V1Alpha1_Version_FullMethodName        = "/V1Alpha1/version"
-	V1Alpha1_GetUser_FullMethodName        = "/V1Alpha1/getUser"
-	V1Alpha1_QuickAddCard_FullMethodName   = "/V1Alpha1/quickAddCard"
-	V1Alpha1_ListCards_FullMethodName      = "/V1Alpha1/listCards"
-	V1Alpha1_GetCard_FullMethodName        = "/V1Alpha1/getCard"
-	V1Alpha1_GetCards_FullMethodName       = "/V1Alpha1/getCards"
-	V1Alpha1_PatchCard_FullMethodName      = "/V1Alpha1/patchCard"
-	V1Alpha1_RerankCard_FullMethodName     = "/V1Alpha1/rerankCard"
-	V1Alpha1_DeleteCard_FullMethodName     = "/V1Alpha1/deleteCard"
-	V1Alpha1_ListLabels_FullMethodName     = "/V1Alpha1/listLabels"
-	V1Alpha1_UpdateLabel_FullMethodName    = "/V1Alpha1/updateLabel"
-	V1Alpha1_DeleteLabel_FullMethodName    = "/V1Alpha1/deleteLabel"
-	V1Alpha1_ListChallenges_FullMethodName = "/V1Alpha1/listChallenges"
-	V1Alpha1_GetChallenge_FullMethodName   = "/V1Alpha1/getChallenge"
+	V1Alpha1_Version_FullMethodName        = "/api.V1Alpha1/version"
+	V1Alpha1_GetUser_FullMethodName        = "/api.V1Alpha1/getUser"
+	V1Alpha1_QuickAddCard_FullMethodName   = "/api.V1Alpha1/quickAddCard"
+	V1Alpha1_ListCards_FullMethodName      = "/api.V1Alpha1/listCards"
+	V1Alpha1_GetCard_FullMethodName        = "/api.V1Alpha1/getCard"
+	V1Alpha1_GetCards_FullMethodName       = "/api.V1Alpha1/getCards"
+	V1Alpha1_PatchCard_FullMethodName      = "/api.V1Alpha1/patchCard"
+	V1Alpha1_RerankCard_FullMethodName     = "/api.V1Alpha1/rerankCard"
+	V1Alpha1_DeleteCard_FullMethodName     = "/api.V1Alpha1/deleteCard"
+	V1Alpha1_ListLabels_FullMethodName     = "/api.V1Alpha1/listLabels"
+	V1Alpha1_UpdateLabel_FullMethodName    = "/api.V1Alpha1/updateLabel"
+	V1Alpha1_DeleteLabel_FullMethodName    = "/api.V1Alpha1/deleteLabel"
+	V1Alpha1_ListChallenges_FullMethodName = "/api.V1Alpha1/listChallenges"
+	V1Alpha1_GetChallenge_FullMethodName   = "/api.V1Alpha1/getChallenge"
 )
 
 // V1Alpha1Client is the client API for V1Alpha1 service.
@@ -527,7 +527,7 @@ func _V1Alpha1_GetChallenge_Handler(srv interface{}, ctx context.Context, dec fu
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var V1Alpha1_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "V1Alpha1",
+	ServiceName: "api.V1Alpha1",
 	HandlerType: (*V1Alpha1Server)(nil),
 	Methods: []grpc.MethodDesc{
 		{
