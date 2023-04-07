@@ -10,15 +10,13 @@ import (
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/whitekid/goxp/log"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	_ "google.golang.org/grpc/encoding/gzip"
 	"google.golang.org/grpc/keepalive"
-	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
 
+	"focus/api/v1alpha1"
 	"focus/config"
 	"focus/databases"
-	"focus/models"
 	"focus/proto"
 )
 
@@ -67,19 +65,10 @@ func Serve(ctx context.Context, ln net.Listener) error {
 		grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(authInterceptor(db))),
 	)
 
-	proto.RegisterV1Alpha1Server(g, newV1Alpha1Service(db))
+	proto.RegisterV1Alpha1Server(g, v1alpha1.New(db))
 
 	return g.Serve(ln)
 }
-
-type key string
-
-const (
-	keyDB            key = "focus.db"
-	keyToken         key = "focus.token"
-	keyUser          key = "focus.user"
-	keyUserWorkspace key = "focus.user.workspace"
-)
 
 func authInterceptor(db *gorm.DB) func(ctx context.Context) (context.Context, error) {
 	return func(ctx context.Context) (context.Context, error) {
@@ -87,7 +76,7 @@ func authInterceptor(db *gorm.DB) func(ctx context.Context) (context.Context, er
 		if err != nil {
 			return nil, err
 		}
-		ctx = context.WithValue(ctx, keyToken, token)
+		ctx = context.WithValue(ctx, v1alpha1.KeyToken, token)
 
 		// tokenInfo, err := parseToken(token)
 		// if err != nil {
@@ -97,8 +86,8 @@ func authInterceptor(db *gorm.DB) func(ctx context.Context) (context.Context, er
 		// grpc_ctxtags.Extract(ctx).Set("auth.sub", userClaimFromToken(tokenInfo))
 		// ctx = context.WithValue(ctx, "tokenInfo", tokenInfo)
 
-		ctx = context.WithValue(ctx, keyDB, db)
-		return extractUserInfo(ctx)
+		ctx = context.WithValue(ctx, v1alpha1.KeyDB, db)
+		return v1alpha1.ExtractUserInfo(ctx)
 	}
 }
 
@@ -108,30 +97,4 @@ func parseToken(token string) (struct{}, error) {
 
 func userClaimFromToken(struct{}) string {
 	return "foobar"
-}
-
-// extractUserInfo extract user info and set to context
-// context.WithValue(keyUser): *models.User; current user
-// context.WithValue(keyUserWorkspace): *models.Workspace; default workspace for current user
-func extractUserInfo(ctx context.Context) (context.Context, error) {
-	db := ctx.Value(keyDB).(*gorm.DB)
-	token := ctx.Value(keyToken).(string) // TODO use jwt token
-
-	user := &models.User{}
-	if tx := db.First(user, &models.User{Email: token}); tx.Error != nil {
-		return nil, status.Error(codes.Unauthenticated, "user not found")
-	}
-	ctx = context.WithValue(ctx, keyUser, user)
-
-	userWorkspace := &models.UserWorkspace{}
-	if tx := db.Preload("Workspace").Where(&models.UserWorkspace{
-		UserID: user.ID,
-		Role:   models.RoleDefault,
-	}).First(userWorkspace); tx.Error != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "user workspace not found: %v", tx.Error)
-	}
-
-	ctx = context.WithValue(ctx, keyUserWorkspace, userWorkspace.Workspace)
-
-	return ctx, nil
 }

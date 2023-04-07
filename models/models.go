@@ -43,6 +43,15 @@ type UserWorkspace struct {
 	Workspace *Workspace `gorm:"foreignKey:WorkspaceID"`
 }
 
+type CardType string
+
+const (
+	CardTypeCard      CardType = "card"
+	CardTypeChallenge CardType = "challenge"
+)
+
+func (s CardType) String() string { return string(s) }
+
 type Card struct {
 	*gorm.Model
 
@@ -58,11 +67,6 @@ type Card struct {
 	CardType         string     `gorm:"type:varchar(50);not null;default:'card';check:card_type in ('card','challenge')"`
 	Objective        string     `gorm:"type:varchar(500);not null;default:''"`
 	Content          string     `gorm:"type:text;not null;default:''"`
-
-	Creator        *User      `gorm:"foreignKey:CreatorID"`
-	Responsibility *User      `gorm:"foreignKey:ResponsibilityID"`
-	Workspace      *Workspace `gorm:"foreignKey:WorkspaceID"`
-
 	//
 	// alter table cards add labels bigint[];
 	// create index idx_cards_labels ON cards using gin(labels)
@@ -72,6 +76,10 @@ type Card struct {
 	// SELECT card_no, objective, labels FROM cards WHERE ARRAY[1,6]::bigint[] <@ labels
 	//
 	Labels pq.Int64Array `gorm:"type:bigint[];index:,type:gin"`
+
+	Creator        *User      `gorm:"foreignKey:CreatorID"`
+	Responsibility *User      `gorm:"foreignKey:ResponsibilityID"`
+	Workspace      *Workspace `gorm:"foreignKey:WorkspaceID"`
 }
 
 type Label struct {
