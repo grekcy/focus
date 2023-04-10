@@ -71,35 +71,29 @@ function ChallengeList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {challenges.map((ch) => {
-              const completedPercent =
-                ch.totalcards === 0
-                  ? 0
-                  : Math.round((ch.completedcards * 100) / ch.totalcards);
-              return (
-                <TableRow>
-                  <TableCell>
-                    <Link to={ch.card!.cardNo.toString()}>
-                      <Typography variant="h6">{ch.card!.objective}</Typography>
-                    </Link>
-                    <Typography>
-                      Due:{" "}
-                      {ch.card!.dueDate
-                        ? new Date(
-                            ch.card!.dueDate!.seconds * 1000
-                          ).toLocaleDateString()
-                        : "None"}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <ChallengeProgress
-                      done={ch.completedcards}
-                      total={ch.totalcards}
-                    />
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            {challenges.map((ch) => (
+              <TableRow>
+                <TableCell>
+                  <Link to={ch.card!.cardNo.toString()}>
+                    <Typography variant="h6">{ch.card!.objective}</Typography>
+                  </Link>
+                  <Typography>
+                    Due:{" "}
+                    {ch.card!.dueDate
+                      ? new Date(
+                          ch.card!.dueDate!.seconds * 1000
+                        ).toLocaleDateString()
+                      : "None"}
+                  </Typography>
+                </TableCell>
+                <TableCell>
+                  <ChallengeProgress
+                    done={ch.completedcards}
+                    total={ch.totalcards}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>

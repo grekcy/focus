@@ -16,7 +16,7 @@ import (
 	"focus/proto"
 )
 
-func TestQuickAdd(t *testing.T) {
+func TestAddCard(t *testing.T) {
 	type args struct {
 		objective string
 	}
@@ -34,8 +34,8 @@ func TestQuickAdd(t *testing.T) {
 
 			ctx, service := newTestClient(ctx, t)
 
-			got, err := service.QuickAddCard(ctx, wrapperspb.String(tt.args.objective))
-			require.Truef(t, (err != nil) == tt.wantErr, `QuickAddCard() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
+			got, err := service.AddCard(ctx, &proto.AddCardReq{Objective: tt.args.objective})
+			require.Truef(t, (err != nil) == tt.wantErr, `AddCardReq() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
 			if tt.wantErr {
 				return
 			}
@@ -61,7 +61,7 @@ func TestListCards(t *testing.T) {
 	ctx, service := newTestClient(ctx, t)
 
 	// set deferred cards
-	deferredCard, err := service.QuickAddCard(ctx, wrapperspb.String("test defer card"))
+	deferredCard, err := service.AddCard(ctx, &proto.AddCardReq{Objective: "test defer card"})
 	require.NoError(t, err)
 	service.PatchCard(ctx, &proto.PatchCardReq{Card: &proto.Card{
 		CardNo:     deferredCard.CardNo,
@@ -221,7 +221,7 @@ func TestCompleteCard(t *testing.T) {
 }
 
 func newCardForTest(ctx context.Context, t *testing.T, service *v1alpha1ServiceImpl, objective string) (*proto.Card, fixtures.Teardown) {
-	card, err := service.QuickAddCard(ctx, wrapperspb.String(objective))
+	card, err := service.AddCard(ctx, &proto.AddCardReq{Objective:objective})
 	require.NoError(t, err, "fail to create card")
 
 	return card, func() {

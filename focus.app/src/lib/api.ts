@@ -1,9 +1,6 @@
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
-import {
-  StringValue,
-  UInt64Value,
-} from "google-protobuf/google/protobuf/wrappers_pb";
+import { UInt64Value } from "google-protobuf/google/protobuf/wrappers_pb";
 import { V1Alpha1Client } from "./proto/FocusServiceClientPb";
 import {
   AddCardReq,
@@ -76,20 +73,7 @@ export class FocusAPI {
     return this.s.getUser(userId, null).then((r) => r.toObject());
   };
 
-  quickAddCard = (objective: string) => {
-    const s = new StringValue();
-    s.setValue(objective);
-
-    return this.s
-      .quickAddCard(s, null)
-      .then((r) => r.toObject())
-      .then((r) => {
-        this.notify(r, Event.CARD_CREATED, r.cardNo);
-        return r;
-      });
-  };
-
-  addCard = (objective: string, addAfter: number | undefined) => {
+  addCard = (objective: string, addAfter?: number) => {
     const req = new AddCardReq();
     req.setObjective(objective);
     if (addAfter) req.setAddAfter(addAfter);

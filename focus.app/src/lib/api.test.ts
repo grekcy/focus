@@ -26,12 +26,12 @@ describe("focus API", () => {
   });
 
   test("quick add: empty objective", async () => {
-    const got = await service.quickAddCard("").catch((e) => e);
+    const got = await service.addCard("").catch((e) => e);
     expect(got.code).toEqual(Status.InvalidArgument);
   });
 
   test("quick add", async () => {
-    const got = await service.quickAddCard("test objective for quick add");
+    const got = await service.addCard("test objective for quick add");
     teardownCards.push(got.cardNo);
     expect(got.cardNo).not.toEqual(0);
     expect(got.objective).toEqual("test objective for quick add");
@@ -42,7 +42,7 @@ describe("focus API", () => {
     const card = new Card();
     card.setObjective("test objective for completed");
 
-    const got = await service.quickAddCard("test objective for completed");
+    const got = await service.addCard("test objective for completed");
     teardownCards.push(got.cardNo);
 
     // set completed

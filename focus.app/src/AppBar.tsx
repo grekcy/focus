@@ -63,11 +63,10 @@ export function AppBar({ open }: AppBarProps) {
       setAdding(true);
 
       api
-        .quickAddCard(objective)
+        .addCard(objective)
         .then((r) => {
           setQucikAddObjective("");
           app.toast(`added: ${objective}`, "success");
-          return r;
         })
         .catch((e) => app.toast(e.message, "error"))
         .finally(() => setAdding(false));

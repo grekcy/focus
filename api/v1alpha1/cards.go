@@ -22,52 +22,6 @@ import (
 	"focus/proto"
 )
 
-func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.StringValue) (*proto.Card, error) {
-	log.Debugf("quickAdd: objective=%v", in)
-
-	if err := validate.Struct(&struct {
-		Objective string `validate:"required"`
-	}{
-		Objective: in.Value,
-	}); err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-
-	newCard := &CardWithDepth{
-		Card: &models.Card{
-			Objective:   in.Value,
-			CardType:    models.CardTypeCard.String(),
-			CreatorID:   s.currentUser(ctx).ID,
-			WorkspaceID: s.currentWorkspace(ctx).ID,
-		},
-	}
-
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		if err := s.db.Unscoped().Model(&models.Card{}).
-			Where(&models.Card{WorkspaceID: s.currentWorkspace(ctx).ID}).
-			Select("COALESCE(max(card_no), 0, max(card_no)) + 1").Row().Scan(&newCard.CardNo); err != nil {
-			log.Errorf("%v", err)
-			return status.Errorf(codes.Internal, "fail to get card_no")
-		}
-
-		if err := s.db.Model(&models.Card{}).Unscoped().
-			Where(&models.Card{WorkspaceID: s.currentWorkspace(ctx).ID}).
-			Select("COALESCE(max(rank), 0, max(rank)) +1").Row().Scan(&newCard.Rank); err != nil {
-			return status.Errorf(codes.Internal, "fail to get rank")
-		}
-
-		if tx := s.db.Save(newCard.Card); tx.Error != nil {
-			return status.Errorf(codes.Internal, "fail to save card")
-		}
-
-		return nil
-	}); err != nil {
-		return nil, err
-	}
-
-	return cardModelToProto(newCard), nil
-}
-
 func (s *v1alpha1ServiceImpl) AddCard(ctx context.Context, req *proto.AddCardReq) (*proto.Card, error) {
 	log.Debugf("addCard(): req=%v", req)
 

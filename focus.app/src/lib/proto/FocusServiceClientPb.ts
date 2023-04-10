@@ -127,49 +127,6 @@ export class V1Alpha1Client {
     this.methodDescriptorgetUser);
   }
 
-  methodDescriptorquickAddCard = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/quickAddCard',
-    grpcWeb.MethodType.UNARY,
-    google_protobuf_wrappers_pb.StringValue,
-    focus_pb.Card,
-    (request: google_protobuf_wrappers_pb.StringValue) => {
-      return request.serializeBinary();
-    },
-    focus_pb.Card.deserializeBinary
-  );
-
-  quickAddCard(
-    request: google_protobuf_wrappers_pb.StringValue,
-    metadata: grpcWeb.Metadata | null): Promise<focus_pb.Card>;
-
-  quickAddCard(
-    request: google_protobuf_wrappers_pb.StringValue,
-    metadata: grpcWeb.Metadata | null,
-    callback: (err: grpcWeb.RpcError,
-               response: focus_pb.Card) => void): grpcWeb.ClientReadableStream<focus_pb.Card>;
-
-  quickAddCard(
-    request: google_protobuf_wrappers_pb.StringValue,
-    metadata: grpcWeb.Metadata | null,
-    callback?: (err: grpcWeb.RpcError,
-               response: focus_pb.Card) => void) {
-    if (callback !== undefined) {
-      return this.client_.rpcCall(
-        this.hostname_ +
-          '/api.V1Alpha1/quickAddCard',
-        request,
-        metadata || {},
-        this.methodDescriptorquickAddCard,
-        callback);
-    }
-    return this.client_.unaryCall(
-    this.hostname_ +
-      '/api.V1Alpha1/quickAddCard',
-    request,
-    metadata || {},
-    this.methodDescriptorquickAddCard);
-  }
-
   methodDescriptoraddCard = new grpcWeb.MethodDescriptor(
     '/api.V1Alpha1/addCard',
     grpcWeb.MethodType.UNARY,

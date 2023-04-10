@@ -14,7 +14,6 @@ service V1Alpha1 {
 
   rpc getUser(google.protobuf.UInt64Value) returns (User);
 
-  rpc quickAddCard(google.protobuf.StringValue) returns (Card);
   rpc addCard(AddCardReq) returns (Card);
   rpc listCards(ListCardReq) returns (ListCardResp) {}
   rpc getCard(google.protobuf.UInt64Value) returns (Card) {}
