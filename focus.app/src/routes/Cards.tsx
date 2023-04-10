@@ -274,7 +274,7 @@ export function CardPage() {
             )}
           </AccordionSummary>
           <AccordionDetails>
-            <CardListView cards={cards} />
+            <CardListView cards={cards} depth={card!.depth + 1} />
           </AccordionDetails>
           <AccordionActions>
             <TextField

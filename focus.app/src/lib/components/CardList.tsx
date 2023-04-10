@@ -51,6 +51,7 @@ interface CardListViewProp {
   showCardNo?: boolean;
   onDoubleClick?: () => void;
   onSelect?: (cardNo: number) => void;
+  onChange?: (cardNo: number) => void;
   onContextMenu?: (e: MouseEvent) => void;
   onLabelClick?: (index: number) => void;
 }
@@ -67,6 +68,7 @@ export const CardListView = forwardRef(
       showCardNo = true,
       onDoubleClick,
       onSelect,
+      onChange,
       onContextMenu,
       onLabelClick,
     }: CardListViewProp,
@@ -153,6 +155,7 @@ export const CardListView = forwardRef(
                 ],
               })
             );
+            onChange && onChange(r.cardNo);
           })
           .catch((e) => app.toast(e.message, "error"));
 
@@ -569,6 +572,7 @@ export const CardListView = forwardRef(
           complete
             ? app.toast(`card completed: ${card.objective}`)
             : app.toast(`card set to in progress: ${card.objective}`);
+          onChange && onChange(card.cardNo);
         })
         .catch((e) => app.toast(e.message));
     }
@@ -584,7 +588,10 @@ export const CardListView = forwardRef(
       api
         .deleteCard(card.cardNo)
         .then(() => setCards((p) => p.filter((c) => c.cardNo !== card.cardNo)))
-        .then(() => app.toast(`card deleted: ${card.objective}`))
+        .then(() => {
+          app.toast(`card deleted: ${card.objective}`);
+          onChange && onChange(card.cardNo);
+        })
         .catch((e) => app.toast(e.message, "error"))
         .finally(() => setDeletingCard(false));
     }

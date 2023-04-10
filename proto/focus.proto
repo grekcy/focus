@@ -117,10 +117,10 @@ message ListLabelsResp { repeated Label labels = 1; }
 message ListChallengesReq {}
 
 message Challenge {
-  Card card = 1; // card informations
+  Card card = 1; // card information
   // progress
-  uint64 totalCards = 2;
-  uint64 completedCards = 3;
+  uint64 total_cards = 2;
+  uint64 completed_cards = 3;
 }
 
 message ListChallengesResp { repeated Challenge items = 1; }

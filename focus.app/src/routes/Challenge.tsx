@@ -88,8 +88,8 @@ function ChallengeList() {
                 </TableCell>
                 <TableCell>
                   <ChallengeProgress
-                    done={ch.completedcards}
-                    total={ch.totalcards}
+                    done={ch.completedCards}
+                    total={ch.totalCards}
                   />
                 </TableCell>
               </TableRow>
@@ -114,12 +114,19 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
     if (challengeId) {
       api
         .getChallenge(challengeId)
-        .then((r) => setChallenge(r))
+        .then((r) => {
+          setChallenge(r);
+          setCompletedCards(r.completedCards);
+          setTotalCards(r.totalCards);
+        })
         .catch((e) => app.toast(e.message, "error"));
     } else {
       setChallenge(newChallenge());
     }
   }, [challengeId]);
+
+  const [totalCards, setTotalCards] = useState(0);
+  const [completedCards, setCompletedCards] = useState(0);
 
   const [cards, setCards] = useState<Card.AsObject[]>([]);
   useEffect(() => {
@@ -132,6 +139,17 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
   }, [challenge]);
 
   if (!challenge) return <></>;
+
+  function handleCardChange(cardNo: number) {
+    if (!challengeId) return;
+    api
+      .getCardProgressSummary(challengeId)
+      .then((r) => {
+        setCompletedCards(r.done);
+        setTotalCards(r.total);
+      })
+      .catch((e) => app.toast(e.message, "error"));
+  }
 
   return (
     <>
@@ -152,14 +170,15 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
             : "None"}
         </Typography>
         <Box sx={{ flexGrow: "1" }}>
-          <ChallengeProgress
-            done={challenge.completedcards}
-            total={challenge.totalcards}
-          />
+          <ChallengeProgress done={completedCards} total={totalCards} />
         </Box>
       </Box>
 
-      <CardListView cards={cards} depth={challenge.card!.depth + 1} />
+      <CardListView
+        cards={cards}
+        depth={challenge.card!.depth + 1}
+        onChange={handleCardChange}
+      />
     </>
   );
 }

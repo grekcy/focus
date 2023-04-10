@@ -3461,8 +3461,8 @@ proto.api.Challenge.prototype.toObject = function(opt_includeInstance) {
 proto.api.Challenge.toObject = function(includeInstance, msg) {
   var f, obj = {
     card: (f = msg.getCard()) && proto.api.Card.toObject(includeInstance, f),
-    totalcards: jspb.Message.getFieldWithDefault(msg, 2, 0),
-    completedcards: jspb.Message.getFieldWithDefault(msg, 3, 0)
+    totalCards: jspb.Message.getFieldWithDefault(msg, 2, 0),
+    completedCards: jspb.Message.getFieldWithDefault(msg, 3, 0)
   };
 
   if (includeInstance) {
@@ -3506,11 +3506,11 @@ proto.api.Challenge.deserializeBinaryFromReader = function(msg, reader) {
       break;
     case 2:
       var value = /** @type {number} */ (reader.readUint64());
-      msg.setTotalcards(value);
+      msg.setTotalCards(value);
       break;
     case 3:
       var value = /** @type {number} */ (reader.readUint64());
-      msg.setCompletedcards(value);
+      msg.setCompletedCards(value);
       break;
     default:
       reader.skipField();
@@ -3549,14 +3549,14 @@ proto.api.Challenge.serializeBinaryToWriter = function(message, writer) {
       proto.api.Card.serializeBinaryToWriter
     );
   }
-  f = message.getTotalcards();
+  f = message.getTotalCards();
   if (f !== 0) {
     writer.writeUint64(
       2,
       f
     );
   }
-  f = message.getCompletedcards();
+  f = message.getCompletedCards();
   if (f !== 0) {
     writer.writeUint64(
       3,
@@ -3604,10 +3604,10 @@ proto.api.Challenge.prototype.hasCard = function() {
 
 
 /**
- * optional uint64 totalCards = 2;
+ * optional uint64 total_cards = 2;
  * @return {number}
  */
-proto.api.Challenge.prototype.getTotalcards = function() {
+proto.api.Challenge.prototype.getTotalCards = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
 };
 
@@ -3616,16 +3616,16 @@ proto.api.Challenge.prototype.getTotalcards = function() {
  * @param {number} value
  * @return {!proto.api.Challenge} returns this
  */
-proto.api.Challenge.prototype.setTotalcards = function(value) {
+proto.api.Challenge.prototype.setTotalCards = function(value) {
   return jspb.Message.setProto3IntField(this, 2, value);
 };
 
 
 /**
- * optional uint64 completedCards = 3;
+ * optional uint64 completed_cards = 3;
  * @return {number}
  */
-proto.api.Challenge.prototype.getCompletedcards = function() {
+proto.api.Challenge.prototype.getCompletedCards = function() {
   return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 3, 0));
 };
 
@@ -3634,7 +3634,7 @@ proto.api.Challenge.prototype.getCompletedcards = function() {
  * @param {number} value
  * @return {!proto.api.Challenge} returns this
  */
-proto.api.Challenge.prototype.setCompletedcards = function(value) {
+proto.api.Challenge.prototype.setCompletedCards = function(value) {
   return jspb.Message.setProto3IntField(this, 3, value);
 };
 

@@ -437,11 +437,11 @@ export class Challenge extends jspb.Message {
   hasCard(): boolean;
   clearCard(): Challenge;
 
-  getTotalcards(): number;
-  setTotalcards(value: number): Challenge;
+  getTotalCards(): number;
+  setTotalCards(value: number): Challenge;
 
-  getCompletedcards(): number;
-  setCompletedcards(value: number): Challenge;
+  getCompletedCards(): number;
+  setCompletedCards(value: number): Challenge;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Challenge.AsObject;
@@ -454,8 +454,8 @@ export class Challenge extends jspb.Message {
 export namespace Challenge {
   export type AsObject = {
     card?: Card.AsObject,
-    totalcards: number,
-    completedcards: number,
+    totalCards: number,
+    completedCards: number,
   }
 }
 
