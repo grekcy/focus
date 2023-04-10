@@ -15,6 +15,7 @@ service V1Alpha1 {
   rpc getUser(google.protobuf.UInt64Value) returns (User);
 
   rpc quickAddCard(google.protobuf.StringValue) returns (Card);
+  rpc addCard(AddCardReq) returns (Card);
   rpc listCards(ListCardReq) returns (ListCardResp) {}
   rpc getCard(google.protobuf.UInt64Value) returns (Card) {}
   rpc getCards(GetCardReq) returns (GetCardResp) {}
@@ -55,6 +56,11 @@ message Card {
   string objective = 13;
   string content = 14;
   repeated uint64 labels = 15;
+}
+
+message AddCardReq {
+  string objective = 1;
+  optional uint64 add_after = 2;
 }
 
 message ListCardReq {

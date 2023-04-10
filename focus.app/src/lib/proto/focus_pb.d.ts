@@ -146,6 +146,35 @@ export namespace Card {
   }
 }
 
+export class AddCardReq extends jspb.Message {
+  getObjective(): string;
+  setObjective(value: string): AddCardReq;
+
+  getAddAfter(): number;
+  setAddAfter(value: number): AddCardReq;
+  hasAddAfter(): boolean;
+  clearAddAfter(): AddCardReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): AddCardReq.AsObject;
+  static toObject(includeInstance: boolean, msg: AddCardReq): AddCardReq.AsObject;
+  static serializeBinaryToWriter(message: AddCardReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AddCardReq;
+  static deserializeBinaryFromReader(message: AddCardReq, reader: jspb.BinaryReader): AddCardReq;
+}
+
+export namespace AddCardReq {
+  export type AsObject = {
+    objective: string,
+    addAfter?: number,
+  }
+
+  export enum AddAfterCase { 
+    _ADD_AFTER_NOT_SET = 0,
+    ADD_AFTER = 2,
+  }
+}
+
 export class ListCardReq extends jspb.Message {
   getStartCond(): Card | undefined;
   setStartCond(value?: Card): ListCardReq;

@@ -5,7 +5,6 @@ import {
   LocalizationProvider,
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { Dayjs } from "dayjs";
 import { ChangeEvent, useRef, useState } from "react";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { DatePickButton } from "../lib/components/DatePickButton";
@@ -40,14 +39,14 @@ export function PlayCardBar() {
 }
 
 function PlayDatePickerEx() {
-  const [value, setValue] = useState<Dayjs | null>(null);
+  const [value, setValue] = useState<Date | null>(null);
   return (
     <>
       <DatePickButton
         value={value}
-        onChange={(v: Dayjs | null) => setValue(v)}
+        onChange={(v: Date | null) => setValue(v)}
       />
-      Selected: {value ? value.toDate().toLocaleString() : "null"}
+      Selected: {value ? value.toLocaleString() : "null"}
     </>
   );
 }

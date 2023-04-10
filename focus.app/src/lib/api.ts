@@ -6,6 +6,7 @@ import {
 } from "google-protobuf/google/protobuf/wrappers_pb";
 import { V1Alpha1Client } from "./proto/FocusServiceClientPb";
 import {
+  AddCardReq,
   Card,
   CardField,
   GetCardReq,
@@ -81,6 +82,19 @@ export class FocusAPI {
 
     return this.s
       .quickAddCard(s, null)
+      .then((r) => r.toObject())
+      .then((r) => {
+        this.notify(r, Event.CARD_CREATED, r.cardNo);
+        return r;
+      });
+  };
+
+  addCard = (objective: string, addAfter: number | undefined) => {
+    const req = new AddCardReq();
+    req.setObjective(objective);
+    if (addAfter) req.setAddAfter(addAfter);
+    return this.s
+      .addCard(req, null)
       .then((r) => r.toObject())
       .then((r) => {
         this.notify(r, Event.CARD_CREATED, r.cardNo);

@@ -1,87 +1,63 @@
-import EventIcon from "@mui/icons-material/Event";
-import { Button, Divider, IconButton, Popover, TextField } from "@mui/material";
-import { SxProps, Theme } from "@mui/material/styles";
-import { DateCalendar } from "@mui/x-date-pickers";
+import { Button, Divider, Popover } from "@mui/material";
+import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { useRef, useState } from "react";
 
 interface DatePickButtonProp {
-  value?: Dayjs | null;
-  onChange?: (value: Dayjs | null) => void;
-  sx?: SxProps<Theme>;
+  value?: Date | null;
+  emptyText?: string;
+  onChange?: (value: Date | null) => void;
 }
 
 export function DatePickButton({
-  value: inValue,
-  sx,
+  value: inValue = null,
+  emptyText = "None",
   onChange,
 }: DatePickButtonProp) {
   const [open, setOpen] = useState(false);
   const [anchor, setAnchor] = useState<Element | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
-  const [value, setValue] = useState(inValue);
+  const ref = useRef<HTMLButtonElement>(null);
+  const [value, setValue] = useState<Dayjs | null>(
+    inValue ? dayjs(inValue) : null
+  );
+
+  function onValueChange(value: Dayjs | null) {
+    setValue(value);
+    setOpen(false);
+    onChange && onChange(value ? value.set("hour", 0).set("minute", 0).set("second", 0).toDate() : null);
+  }
 
   return (
     <>
-      <TextField
-        ref={ref}
-        size="small"
-        variant="standard"
-        value={value ? value.toDate().toLocaleDateString() : "None"}
-        InputProps={{
-          disableUnderline: true,
-          readOnly: true,
-          endAdornment: (
-            <IconButton
-              size="small"
-              onClick={() => {
-                setAnchor(ref.current);
-                setOpen(true);
-              }}
-            >
-              <EventIcon color="action" fontSize="small" />
-            </IconButton>
-          ),
-        }}
-        sx={{ width: { md: 120 }, ...sx }}
-      ></TextField>
-      <Popover
-        open={open}
-        anchorEl={anchor}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
-        }}
-        onClose={() => setOpen(false)}
-      >
-        <DateCalendar
-          value={value}
-          onChange={(value: Dayjs | null) => {
-            setValue(value);
-            setOpen(false);
-            onChange && onChange(value);
-          }}
-        ></DateCalendar>
-        <Divider />
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
         <Button
+          ref={ref}
           onClick={() => {
-            setValue(dayjs());
-            setOpen(false);
-            onChange && onChange(dayjs());
+            setAnchor(ref.current);
+            setOpen(true);
           }}
         >
-          Today
+          {value ? value.toDate().toLocaleDateString() : emptyText}
         </Button>
-        <Button
-          onClick={() => {
-            setValue(null);
-            setOpen(false);
-            onChange && onChange(null);
+        <Popover
+          open={open}
+          anchorEl={anchor}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left",
           }}
+          onClose={() => setOpen(false)}
         >
-          Clear
-        </Button>
-      </Popover>
+          <DateCalendar
+            value={value}
+            onChange={onValueChange}
+          ></DateCalendar>
+          <Divider />
+          <Button onClick={() => onValueChange(dayjs())}>Today</Button>
+          <Button onClick={() => onValueChange(null)}>Clear</Button>
+        </Popover>
+      </LocalizationProvider>
     </>
   );
 }

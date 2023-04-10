@@ -35,10 +35,10 @@ func TestLabelCreate(t *testing.T) {
 		wantErr bool
 	}{
 		{`empty label`, args{&models.Label{
-			WorkspaceID: service.defaultWorkspace(ctx).ID,
+			WorkspaceID: service.currentWorkspace(ctx).ID,
 		}}, true},
 		{`default`, args{&models.Label{
-			WorkspaceID: service.defaultWorkspace(ctx).ID,
+			WorkspaceID: service.currentWorkspace(ctx).ID,
 			Label:       "hello world",
 		}}, false},
 	}

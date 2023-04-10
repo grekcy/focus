@@ -13,7 +13,6 @@ import {
 } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs, { Dayjs } from "dayjs";
 import {
   Ref,
   forwardRef,
@@ -134,30 +133,20 @@ export const CardBar = forwardRef(
         .catch((e) => app.toast(e.message, "error"));
     }
 
-    function handleDeferUntilChange(value: Dayjs | null) {
+    function handleDeferUntilChange(value: Date | null) {
       if (!card) return;
 
       api
-        .updateCardDeferUntil(
-          card.cardNo,
-          value
-            ? value.set("hour", 0).set("minute", 0).set("second", 0).toDate()
-            : null
-        )
+        .updateCardDeferUntil(card.cardNo, value)
         .then((r) => setCard(r))
         .catch((e) => app.toast(e.message, "error"));
     }
 
-    function handleDueDateChange(value: Dayjs | null) {
+    function handleDueDateChange(value: Date | null) {
       if (!card) return;
 
       api
-        .updateCardDueDate(
-          card.cardNo,
-          value
-            ? value.set("hour", 0).set("minute", 0).set("second", 0).toDate()
-            : null
-        )
+        .updateCardDueDate(card.cardNo, value)
         .then((r) => setCard(r))
         .catch((e) => app.toast(e.message, "error"));
     }
@@ -235,10 +224,9 @@ export const CardBar = forwardRef(
               <DatePickButton
                 value={
                   card!.deferUntil
-                    ? dayjs(card!.deferUntil.seconds * 1000)
+                    ? new Date(card!.deferUntil.seconds * 1000)
                     : null
                 }
-                sx={{ pl: "0.5rem" }}
                 onChange={(value) => handleDeferUntilChange(value)}
               />
             </Box>
@@ -246,9 +234,8 @@ export const CardBar = forwardRef(
               Due date:
               <DatePickButton
                 value={
-                  card!.dueDate ? dayjs(card!.dueDate.seconds * 1000) : null
+                  card!.dueDate ? new Date(card!.dueDate.seconds * 1000) : null
                 }
-                sx={{ pl: "0.5rem" }}
                 onChange={(value) => handleDueDateChange(value)}
               />
             </Box>

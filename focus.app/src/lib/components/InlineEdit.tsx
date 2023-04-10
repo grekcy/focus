@@ -16,6 +16,7 @@ interface InlineEditProp {
   multiline?: boolean;
   endAdornment?: React.ReactNode;
   onSubmit?: (target: Element, value: string) => void;
+  onCancel?: (target: Element) => void;
 }
 
 export interface IInlineEdit {
@@ -26,7 +27,13 @@ export interface IInlineEdit {
 // Ref: https://www.emgoto.com/react-inline-edit/
 export const InlineEdit = forwardRef(
   (
-    { value = "", multiline = false, endAdornment, onSubmit }: InlineEditProp,
+    {
+      value = "",
+      multiline = false,
+      endAdornment,
+      onSubmit,
+      onCancel,
+    }: InlineEditProp,
     ref: Ref<IInlineEdit>
   ) => {
     useImperativeHandle(ref, () => ({
@@ -65,6 +72,10 @@ export const InlineEdit = forwardRef(
       setEditing(false);
       if (prevValue !== editingValue && onSubmit) {
         onSubmit(e.currentTarget, editingValue);
+      }
+
+      if (prevValue === editingValue) {
+        onCancel && onCancel(e.currentTarget);
       }
     }
 

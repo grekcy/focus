@@ -42,8 +42,8 @@ func (s *v1alpha1ServiceImpl) currentUser(ctx context.Context) *models.User {
 	return user
 }
 
-// defaultWorkspace returns current user's default workspace
-func (s *v1alpha1ServiceImpl) defaultWorkspace(ctx context.Context) *models.Workspace {
+// currentWorkspace returns current user's default workspace
+func (s *v1alpha1ServiceImpl) currentWorkspace(ctx context.Context) *models.Workspace {
 	ws, _ := ctx.Value(KeyUserWorkspace).(*models.Workspace)
 	return ws
 }

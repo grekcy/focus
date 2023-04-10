@@ -23,6 +23,7 @@ import { Link, useParams } from "react-router-dom";
 import remarkGfm from "remark-gfm";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardListView } from "../lib/components/CardList";
+import { DatePickButton } from "../lib/components/DatePickButton";
 import { InlineEdit } from "../lib/components/InlineEdit";
 import { LabelSelector } from "../lib/components/LabelSelector";
 import { loerm } from "../lib/lib";
@@ -81,6 +82,14 @@ export function CardPage() {
       .catch((e) => app.toast(e.message, "error"));
   }, [card]);
   const [expandCards, setExpandCards] = useState(true);
+
+  function onDueDateChange(value: Date | null) {
+    if (!card) return;
+    api
+      .updateCardDueDate(card.cardNo, value)
+      .then((r) => setCard(r))
+      .catch((e) => app.toast(e.message, "error"));
+  }
 
   function RenderCard() {
     return (
@@ -191,17 +200,14 @@ export function CardPage() {
                     Due to
                   </TableCell>
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {card!.dueDate ? (
-                      new Date(card!.dueDate.seconds * 1000).toLocaleString()
-                    ) : (
-                      <Button
-                        onClick={() =>
-                          app.toast("set due date: not implemented", "warning")
-                        }
-                      >
-                        None
-                      </Button>
-                    )}
+                    <DatePickButton
+                      value={
+                        card!.dueDate
+                          ? new Date(card!.dueDate.seconds * 1000)
+                          : null
+                      }
+                      onChange={onDueDateChange}
+                    />
                   </TableCell>
                   <TableCell variant="head">Labels</TableCell>
                   <TableCell colSpan={5}>

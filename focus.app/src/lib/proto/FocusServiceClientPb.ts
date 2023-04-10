@@ -170,6 +170,49 @@ export class V1Alpha1Client {
     this.methodDescriptorquickAddCard);
   }
 
+  methodDescriptoraddCard = new grpcWeb.MethodDescriptor(
+    '/api.V1Alpha1/addCard',
+    grpcWeb.MethodType.UNARY,
+    focus_pb.AddCardReq,
+    focus_pb.Card,
+    (request: focus_pb.AddCardReq) => {
+      return request.serializeBinary();
+    },
+    focus_pb.Card.deserializeBinary
+  );
+
+  addCard(
+    request: focus_pb.AddCardReq,
+    metadata: grpcWeb.Metadata | null): Promise<focus_pb.Card>;
+
+  addCard(
+    request: focus_pb.AddCardReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: focus_pb.Card) => void): grpcWeb.ClientReadableStream<focus_pb.Card>;
+
+  addCard(
+    request: focus_pb.AddCardReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: focus_pb.Card) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/api.V1Alpha1/addCard',
+        request,
+        metadata || {},
+        this.methodDescriptoraddCard,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/api.V1Alpha1/addCard',
+    request,
+    metadata || {},
+    this.methodDescriptoraddCard);
+  }
+
   methodDescriptorlistCards = new grpcWeb.MethodDescriptor(
     '/api.V1Alpha1/listCards',
     grpcWeb.MethodType.UNARY,

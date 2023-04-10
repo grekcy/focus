@@ -33,25 +33,6 @@ export function ChallengeIndex() {
   );
 }
 
-const challenges = [
-  {
-    id: 1,
-    objective: "[MOCK] hello world",
-    done: 20,
-    inProgress: 10,
-    total: 200,
-    dueDate: new Date(2023, 4, 1),
-  },
-  {
-    id: 2,
-    objective: "[MOCK]: focus for personal usage",
-    done: 40,
-    inProgress: 5,
-    total: 60,
-    dueDate: new Date(2023, 3, 21),
-  },
-];
-
 // https://mui.com/material-ui/react-masonry/
 function ChallengeList() {
   const app = useFocusApp();
@@ -203,6 +184,7 @@ function ChallengeProgress({ done, total }: ChallengeProgressProps) {
         variant="buffer"
         color="success"
         value={completedPercent}
+        valueBuffer={0}
       />
       <Typography component="span" sx={{ mr: 1 }}>
         {completedPercent}% complete,

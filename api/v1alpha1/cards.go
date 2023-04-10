@@ -38,25 +38,100 @@ func (s *v1alpha1ServiceImpl) QuickAddCard(ctx context.Context, in *wrapperspb.S
 			Objective:   in.Value,
 			CardType:    models.CardTypeCard.String(),
 			CreatorID:   s.currentUser(ctx).ID,
-			WorkspaceID: s.defaultWorkspace(ctx).ID,
+			WorkspaceID: s.currentWorkspace(ctx).ID,
 		},
 	}
 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		if err := s.db.Unscoped().Model(&models.Card{}).
-			Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
+			Where(&models.Card{WorkspaceID: s.currentWorkspace(ctx).ID}).
 			Select("COALESCE(max(card_no), 0, max(card_no)) + 1").Row().Scan(&newCard.CardNo); err != nil {
 			log.Errorf("%v", err)
 			return status.Errorf(codes.Internal, "fail to get card_no")
 		}
 
 		if err := s.db.Model(&models.Card{}).Unscoped().
-			Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
+			Where(&models.Card{WorkspaceID: s.currentWorkspace(ctx).ID}).
 			Select("COALESCE(max(rank), 0, max(rank)) +1").Row().Scan(&newCard.Rank); err != nil {
 			return status.Errorf(codes.Internal, "fail to get rank")
 		}
 
 		if tx := s.db.Save(newCard.Card); tx.Error != nil {
+			return status.Errorf(codes.Internal, "fail to save card")
+		}
+
+		return nil
+	}); err != nil {
+		return nil, err
+	}
+
+	return cardModelToProto(newCard), nil
+}
+
+func (s *v1alpha1ServiceImpl) AddCard(ctx context.Context, req *proto.AddCardReq) (*proto.Card, error) {
+	log.Debugf("addCard(): req=%v", req)
+
+	if err := validate.Struct(&struct {
+		Objective string `validate:"required"`
+	}{
+		Objective: req.Objective,
+	}); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	var parentCardNo *uint
+	var rank uint
+	if req.AddAfter != nil {
+		card, err := s.getCard(ctx, uint(*req.AddAfter))
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+		parentCardNo = card.ParentCardNo
+		rank = card.Rank + 1
+	}
+
+	newCard := &CardWithDepth{
+		Card: &models.Card{
+			Objective:    req.Objective,
+			ParentCardNo: parentCardNo,
+			CardType:     models.CardTypeCard.String(),
+			CreatorID:    s.currentUser(ctx).ID,
+			WorkspaceID:  s.currentWorkspace(ctx).ID,
+			Rank:         rank,
+		},
+	}
+
+	if err := s.db.Transaction(func(txn *gorm.DB) error {
+		if err := txn.Unscoped().Model(&models.Card{}).
+			Where(&models.Card{WorkspaceID: s.currentWorkspace(ctx).ID}).
+			Select("COALESCE(max(card_no), 0, max(card_no)) + 1").Row().Scan(&newCard.CardNo); err != nil {
+			log.Errorf("%v", err)
+			return status.Errorf(codes.Internal, "fail to get card_no")
+		}
+
+		if newCard.Rank == 0 {
+			if err := txn.Model(&models.Card{}).Unscoped().
+				Where(&models.Card{WorkspaceID: s.currentWorkspace(ctx).ID}).
+				Select("COALESCE(max(rank), 0, max(rank)) +1").Row().Scan(&newCard.Rank); err != nil {
+				return status.Errorf(codes.Internal, "fail to get rank")
+			}
+		} else {
+			tx := txn.Model(&models.Card{}).
+				Where("workspace_id = ?", s.currentWorkspace(ctx).ID).
+				Where("rank >= ?", rank)
+			if newCard.ParentCardNo == nil {
+				tx = tx.Where("parent_card_no IS NULL")
+			} else {
+				tx = tx.Where("parent_card_no = ?", newCard.ParentCardNo)
+			}
+
+			// 기존 rank를 조정
+			if tx := tx.UpdateColumn("rank", gorm.Expr("rank+1")); tx.Error != nil {
+				return tx.Error
+			}
+		}
+
+		if tx := txn.Save(newCard.Card); tx.Error != nil {
 			return status.Errorf(codes.Internal, "fail to save card")
 		}
 
@@ -93,9 +168,9 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 		//  4
 		//  5   card.rank
 		//  6
-		if err := s.db.Transaction(func(tx *gorm.DB) error {
-			tx = s.db.Model(&models.Card{}).
-				Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
+		if err := s.db.Transaction(func(txn *gorm.DB) error {
+			tx := txn.Model(&models.Card{}).
+				Where("workspace_id = ?", s.currentWorkspace(ctx).ID).
 				Where("rank BETWEEN ? AND ?", targetCard.Rank, card.Rank)
 
 			if targetCard.ParentCardNo == nil {
@@ -108,7 +183,7 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 				return tx.Error
 			}
 
-			if tx := s.db.Model(card.Card).UpdateColumns(map[string]any{
+			if tx := txn.Model(card.Card).UpdateColumns(map[string]any{
 				"rank":           targetCard.Rank,
 				"parent_card_no": targetCard.ParentCardNo,
 			}); tx.Error != nil {
@@ -130,7 +205,7 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 		//
 		if err := s.db.Transaction(func(tx *gorm.DB) error {
 			tx = s.db.Model(&models.Card{}).
-				Where("workspace_id = ?", s.defaultWorkspace(ctx).ID).
+				Where("workspace_id = ?", s.currentWorkspace(ctx).ID).
 				Where("rank BETWEEN ? AND ?", card.Rank, targetCard.Rank-1)
 
 			if targetCard.ParentCardNo == nil {
@@ -171,7 +246,7 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 
 	if err := s.db.Transaction(func(tx *gorm.DB) error {
 		tx = s.db.Delete(&models.Card{}, &models.Card{
-			WorkspaceID: s.defaultWorkspace(ctx).ID,
+			WorkspaceID: s.currentWorkspace(ctx).ID,
 			CardNo:      uint(req.Value)})
 		if tx.Error != nil {
 			return errors.Wrapf(tx.Error, "fail to delete card: %+v", tx.Error)
@@ -287,7 +362,7 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, startWhere *models.
 	nonRecursiveQuery := s.db.ToSQL(func(tx *gorm.DB) *gorm.DB {
 		tx = tx.Model(&models.Card{}).
 			Select("cards.*, 0 as depth").
-			Where("workspace_id = ?", s.defaultWorkspace(ctx).ID)
+			Where("workspace_id = ?", s.currentWorkspace(ctx).ID)
 		if startWhere != nil && startWhere.ParentCardNo != nil && *startWhere.ParentCardNo > 0 {
 			tx = tx.Where("parent_card_no = ?", startWhere.ParentCardNo)
 		} else {
@@ -472,7 +547,7 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 			// get new rank
 			rank := uint(0)
 			if err := tx.Model(&models.Card{}).Unscoped().
-				Where(&models.Card{WorkspaceID: s.defaultWorkspace(ctx).ID}).
+				Where(&models.Card{WorkspaceID: s.currentWorkspace(ctx).ID}).
 				Select("COALESCE(MAX(rank), 0, MAX(rank)) + 1").Row().Scan(&rank); err != nil {
 				return nil, status.Errorf(codes.Internal, "fail to get new rank")
 			}

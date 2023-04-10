@@ -30,6 +30,7 @@ import { Key } from "ts-key-enum";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { Event } from "../api";
 import { Card, Label } from "../proto/focus_pb";
+import { newCard } from "../proto/helper";
 import { useAction } from "./Action";
 import { EmptyIcon } from "./Icons";
 import { IInlineEdit, InlineEdit } from "./InlineEdit";
@@ -138,6 +139,24 @@ export const CardListView = forwardRef(
 
     function handleSubmit(index: number, objective: string) {
       const card = cards[index];
+      if (card.cardNo === -1) {
+        api
+          .addCard(objective, cards[index - 1].cardNo)
+          .then((r) =>
+            setCards((p) =>
+              update(p, {
+                $splice: [
+                  [index, 1],
+                  [index, 0, r],
+                ],
+              })
+            )
+          )
+          .catch((e) => app.toast(e.message, "error"));
+
+        return;
+      }
+
       api
         .updateCardObjective(card.cardNo, objective)
         .then(() => {
@@ -145,6 +164,15 @@ export const CardListView = forwardRef(
           setCards((p) => update(p, { index: { $set: card } }));
         })
         .catch((e) => app.toast(e.message, "error"));
+    }
+
+    function handleCancel(index: number) {
+      const card = cards[index];
+      // Note canceled new card
+      if (card.cardNo === -1) {
+        setCards((p) => update(p, { $splice: [[index, 1]] }));
+        setSelected((p) => p - 1);
+      }
     }
 
     const [selected, setSelected] = useState(-1);
@@ -496,10 +524,21 @@ export const CardListView = forwardRef(
     });
 
     useAction({
-      label: "Insert after",
+      label: "insert after",
       hotkey: "⌘+Enter",
-      onExecute: () => app.toast("not implemented: insert after"),
+      onExecute: () => insertAfter(),
     });
+    function insertAfter() {
+      setCards((p) =>
+        update(p, {
+          $splice: [[selected + 1, 0, newCard(-1, "")]],
+        })
+      );
+      setSelected((p) => p + 1);
+      setTimeout(() => {
+        refs.current[selected + 1].edit();
+      }, 100);
+    }
 
     const refs = useRef<IInlineEdit[]>([]);
 
@@ -595,6 +634,7 @@ export const CardListView = forwardRef(
                 hasChild={hasChild}
                 onClick={(index) => handleCardClick(index)}
                 onSubmit={(v) => handleSubmit(i, v)}
+                onCancel={() => handleCancel(i)}
                 onActionClick={handleCardAction}
                 onDragOver={handleDragOver}
                 onCanDrop={handleCanDrop}
@@ -629,6 +669,7 @@ interface ItemProp {
   hasChild?: (cardNo: number) => boolean;
   onClick?: (index: number) => void;
   onSubmit?: (value: string) => void;
+  onCancel?: () => void;
   onActionClick?: (index: number, action: CardAction) => void;
   onDragOver?: (dragIndex: number, hoverIndex: number) => void;
   onCanDrop?: (dragIndex: number, hoverIndex: number) => boolean;
@@ -648,6 +689,7 @@ export const CardItem = forwardRef(
       hasChild,
       onClick,
       onSubmit,
+      onCancel,
       onActionClick,
       onDragOver,
       onCanDrop,
@@ -779,7 +821,9 @@ export const CardItem = forwardRef(
           </Box>
           {showCardNo && (
             <Box sx={{ pr: 1 }}>
-              <Link to={`/cards/` + card.cardNo}>{card.cardNo}</Link>
+              {card.cardNo !== -1 && (
+                <Link to={`/cards/` + card.cardNo}>{card.cardNo}</Link>
+              )}
             </Box>
           )}
         </Box>
@@ -791,6 +835,7 @@ export const CardItem = forwardRef(
                 value={card.objective}
                 endAdornment={endAdornment}
                 onSubmit={(e, value) => onSubmit && onSubmit(value)}
+                onCancel={(e) => onCancel && onCancel()}
               />
             </Box>
           </Box>
