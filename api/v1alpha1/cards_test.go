@@ -251,3 +251,34 @@ func TestRankDown(t *testing.T) {
 	})
 	require.NoError(t, err)
 }
+
+func TestGetParentChallenge(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	ctx, service := newTestClient(ctx, t)
+
+	type args struct {
+		cardNo uint
+	}
+	tests := [...]struct {
+		name     string
+		args     args
+		wantCard uint
+		wantErr  bool
+	}{
+		{`valid`, args{cardNo: 2141}, 2107, false},
+		{`valid`, args{cardNo: 2107}, 0, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := service.getParentChallenge(ctx, tt.args.cardNo)
+			require.Truef(t, (err != nil) == tt.wantErr, `getParentChallenge() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
+			if tt.wantErr {
+				return
+			}
+			require.Equal(t, tt.wantCard, got)
+		})
+	}
+
+}

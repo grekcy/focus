@@ -498,7 +498,18 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 
 		case proto.CardField_CARD_TYPE:
 			updates["card_type"] = req.Card.CardType
-			updates["parent_card_no"] = gorm.Expr("NULL")
+			if req.Card.CardType == models.CardTypeChallenge.String() {
+				parentChallengeNo, err := s.getParentChallenge(ctx, uint(req.Card.CardNo))
+				if err != nil {
+					return nil, err
+				}
+				if parentChallengeNo == 0 {
+					updates["parent_card_no"] = gorm.Expr("NULL")
+				} else {
+					updates["parent_card_no"] = parentChallengeNo
+				}
+				// get parent challenge
+			}
 
 		default:
 			log.Warnf("unknown field: %v", field)
@@ -526,6 +537,36 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 	}
 
 	return cardModelToProto(card), nil
+}
+
+func (s *v1alpha1ServiceImpl) getParentChallenge(ctx context.Context, cardNo uint) (uint, error) {
+	card, err := s.getCard(ctx, cardNo)
+	if err != nil {
+		return 0, err
+	}
+
+	if card.ParentCardNo == nil {
+		return 0, nil
+	}
+
+	cardNo = *card.ParentCardNo
+
+	for {
+		card, err := s.getCard(ctx, cardNo)
+		if err != nil {
+			return 0, err
+		}
+
+		if card.CardType == models.CardTypeChallenge.String() {
+			return card.CardNo, nil
+		}
+
+		if card.ParentCardNo == nil {
+			return 0, nil
+		}
+
+		cardNo = *card.ParentCardNo
+	}
 }
 
 func (s *v1alpha1ServiceImpl) getCardProgressSummary(ctx context.Context, cardNo uint) (uint64, uint64) {
