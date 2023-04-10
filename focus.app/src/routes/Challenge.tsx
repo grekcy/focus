@@ -165,7 +165,7 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
         </Box>
       </Box>
 
-      <CardListView cards={cards} />
+      <CardListView cards={cards} depth={challenge.card!.depth + 1} />
     </>
   );
 }

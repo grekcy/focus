@@ -150,11 +150,9 @@ export class FocusAPI {
     if (complete) card.setCompletedAt(Timestamp.fromDate(new Date()));
     else card.clearCreatedAt();
 
-    const req = new PatchCardReq();
-    req.addFields(CardField.COMPLETED_AT);
-    req.setCard(card);
-
-    return this.s.patchCard(req, null).then((r) => r.toObject());
+    return this.patchCard(card.toObject(), CardField.COMPLETED_AT).then((r) =>
+      r.toObject()
+    );
   };
 
   updateCardObjective = (cardNo: number, objective: string) => {
@@ -235,6 +233,13 @@ export class FocusAPI {
       switch (field) {
         case CardField.OBJECTIVE:
           c.setObjective(card.objective);
+          break;
+        case CardField.COMPLETED_AT:
+          if (card.completedAt)
+            c.setCompletedAt(
+              Timestamp.fromDate(new Date(card.completedAt!.seconds * 1000))
+            );
+          else c.clearCompletedAt();
           break;
         case CardField.CONTENT:
           c.setContent(card.content);

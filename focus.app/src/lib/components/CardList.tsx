@@ -45,6 +45,9 @@ export enum CardAction {
 
 interface CardListViewProp {
   cards: Card.AsObject[];
+  // NOTE getCard(), listCard()의 depth는 root에서부터 가져온다.
+  // 따라서 root에서 display하지 않을 경우는 기본 depth를 설정한다.
+  depth?: number;
   showCardNo?: boolean;
   onDoubleClick?: () => void;
   onSelect?: (cardNo: number) => void;
@@ -60,6 +63,7 @@ export const CardListView = forwardRef(
   (
     {
       cards: inCards,
+      depth = 0,
       showCardNo = true,
       onDoubleClick,
       onSelect,
@@ -99,15 +103,12 @@ export const CardListView = forwardRef(
 
           api
             .getCard(cardNo)
+            .then((r) => {
+              r.depth = r.depth - depth;
+              return r;
+            })
             .then((r) =>
-              setCards((p) =>
-                update(p, {
-                  $splice: [
-                    [index, 1],
-                    [index, 0, r],
-                  ],
-                })
-              )
+              setCards((p) => update(p.slice(), { [index]: { $set: r } }))
             )
             .catch((e) => app.toast(e.message, "error"));
         }
@@ -137,12 +138,13 @@ export const CardListView = forwardRef(
       return isParent(i, p);
     }
 
-    function handleSubmit(index: number, objective: string) {
+    function handleEditSubmit(index: number, objective: string) {
       const card = cards[index];
       if (card.cardNo === -1) {
         api
           .addCard(objective, cards[index - 1].cardNo)
-          .then((r) =>
+          .then((r) => {
+            r.depth = cards[index - 1].depth; // 같은 레벨로 추가됨.
             setCards((p) =>
               update(p, {
                 $splice: [
@@ -150,8 +152,8 @@ export const CardListView = forwardRef(
                   [index, 0, r],
                 ],
               })
-            )
-          )
+            );
+          })
           .catch((e) => app.toast(e.message, "error"));
 
         return;
@@ -159,14 +161,10 @@ export const CardListView = forwardRef(
 
       api
         .updateCardObjective(card.cardNo, objective)
-        .then(() => {
-          card.objective = objective;
-          setCards((p) => update(p, { index: { $set: card } }));
-        })
         .catch((e) => app.toast(e.message, "error"));
     }
 
-    function handleCancel(index: number) {
+    function handleEditCancel(index: number) {
       const card = cards[index];
       // Note canceled new card
       if (card.cardNo === -1) {
@@ -567,8 +565,7 @@ export const CardListView = forwardRef(
 
       api
         .completeCard(card.cardNo, complete)
-        .then((r) => setCards((p) => update(p, { [index]: { $set: r } })))
-        .then(() => {
+        .then((r) => {
           complete
             ? app.toast(`card completed: ${card.objective}`)
             : app.toast(`card set to in progress: ${card.objective}`);
@@ -633,8 +630,8 @@ export const CardListView = forwardRef(
                 endAdornment={endAdornment}
                 hasChild={hasChild}
                 onClick={(index) => handleCardClick(index)}
-                onSubmit={(v) => handleSubmit(i, v)}
-                onCancel={() => handleCancel(i)}
+                onSubmit={(v) => handleEditSubmit(i, v)}
+                onCancel={() => handleEditCancel(i)}
                 onActionClick={handleCardAction}
                 onDragOver={handleDragOver}
                 onCanDrop={handleCanDrop}
