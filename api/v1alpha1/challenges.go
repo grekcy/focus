@@ -26,7 +26,9 @@ func (s *v1alpha1ServiceImpl) ListChallenges(ctx context.Context, req *proto.Lis
 		&models.Card{
 			CardType: models.CardTypeChallenge.String(),
 		},
-		ListOpt{})
+		ListOpt{
+			excludeCompleted: true,
+		})
 	if err != nil {
 		return nil, err
 	}

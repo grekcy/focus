@@ -5,6 +5,9 @@ import {
   Divider,
   Drawer,
   IconButton,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
   Stack,
   Typography,
 } from "@mui/material";
@@ -25,7 +28,7 @@ import { Key } from "ts-key-enum";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { DrawerHeader } from "../../SideBar";
 import { arrayContentEquals } from "../lib";
-import { Card, Label } from "../proto/focus_pb";
+import { Card, Challenge, Label } from "../proto/focus_pb";
 import { useAction } from "./Action";
 import { DatePickButton } from "./DatePickButton";
 import { InlineEdit } from "./InlineEdit";
@@ -159,6 +162,19 @@ export const CardBar = forwardRef(
         .catch((e) => app.toast(e.message, "error"));
     }
 
+    const [challenges, setChallenges] = useState<Challenge.AsObject[]>([]);
+    useEffect(() => {
+      api
+        .listChallenges()
+        .then((r) => setChallenges(r))
+        .catch((e) => app.toast(e.message, "error"));
+    }, []);
+
+    function onChallengeChange(event: SelectChangeEvent) {
+      app.toast(`change challenge to: ${event.target.value}`, "info");
+      // setAge(event.target.value as string);
+    }
+
     const labelSelectorRef = useRef<HTMLDivElement>(null);
 
     function CardPanel() {
@@ -169,13 +185,34 @@ export const CardBar = forwardRef(
             onSubmit={(target, value) => handleObjectiveChanged(value)}
           />
 
-          <Typography variant="subtitle1">Labels:</Typography>
-          <LabelSelector
-            ref={labelSelectorRef}
-            labels={labels}
-            selected={editingLabel}
-            onSelectionChange={handleLabelChange}
-          />
+          <Stack direction="row">
+            <Typography variant="subtitle1">Labels:</Typography>
+            <LabelSelector
+              ref={labelSelectorRef}
+              labels={labels}
+              selected={editingLabel}
+              onSelectionChange={handleLabelChange}
+              sx={{ width: 1 }}
+            />
+          </Stack>
+
+          <Stack direction="row">
+            <Typography variant="subtitle1">Challenge:</Typography>
+            <Select
+              size="small"
+              value={card!.parentCardNo ? card!.parentCardNo.toString() : undefined}
+              onChange={onChallengeChange}
+              sx={{ width: 1 }}
+            >
+              {challenges.map((ch) => (
+                <MenuItem value={ch.card!.cardNo}>
+                  {ch.card!.objective}
+                </MenuItem>
+              ))}
+              <MenuItem value="">None</MenuItem>
+            </Select>
+          </Stack>
+
           <Typography variant="subtitle1">Description:</Typography>
           <InlineEdit
             multiline
