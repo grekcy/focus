@@ -102,14 +102,6 @@ export function InboxPage() {
     },
   });
 
-  const [actMoveToChallenge] = useAction({
-    label: "move card to challenge...",
-    onEnabled: () => cardNo !== -1,
-    onExecute: () => {
-      app.toast("move to challenge not implemented", "error");
-    },
-  });
-
   function updateDeferUntil(deferUntil: Date | null) {
     if (cardNo === -1) return;
 
@@ -253,7 +245,6 @@ export function InboxPage() {
         ref={contextMenuRef}
         actions={[
           actChallengeThis,
-          actMoveToChallenge,
           actDivider,
           actDeferUntilTomorrow,
           actDeferUntilNextWeek,

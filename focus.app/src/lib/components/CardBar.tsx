@@ -171,8 +171,14 @@ export const CardBar = forwardRef(
     }, []);
 
     function onChallengeChange(event: SelectChangeEvent) {
-      app.toast(`change challenge to: ${event.target.value}`, "info");
-      // setAge(event.target.value as string);
+      const value = parseInt(event.target.value);
+
+      if (!isNaN(value)) {
+        api
+          .setParentCard(cardNo!, value)
+          .then((r) => setCard(r))
+          .catch((e) => app.toast(e.message, "error"));
+      }
     }
 
     const labelSelectorRef = useRef<HTMLDivElement>(null);
@@ -200,7 +206,9 @@ export const CardBar = forwardRef(
             <Typography variant="subtitle1">Challenge:</Typography>
             <Select
               size="small"
-              value={card!.parentCardNo ? card!.parentCardNo.toString() : undefined}
+              value={
+                card!.parentCardNo ? card!.parentCardNo.toString() : undefined
+              }
               onChange={onChallengeChange}
               sx={{ width: 1 }}
             >

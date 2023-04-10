@@ -73,7 +73,11 @@ function ChallengeList() {
         </Typography>
         <Box flexGrow={1}></Box>
         <Box flexGrow={0}>
-          <Button onClick={() => app.toast("new challenge: not implemented", "error")}>New Challenge</Button>
+          <Button
+            onClick={() => app.toast("new challenge: not implemented", "error")}
+          >
+            New Challenge
+          </Button>
         </Box>
       </Box>
 
