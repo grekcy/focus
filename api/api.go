@@ -15,9 +15,11 @@ import (
 	"gorm.io/gorm"
 
 	"focus/api/v1alpha1"
+	"focus/api/v1alpha2"
 	"focus/config"
 	"focus/databases"
 	proto_v1alpha1 "focus/proto/v1alpha1"
+	proto_v1alpha2 "focus/proto/v1alpha2"
 )
 
 // Serve serve grpc service with block
@@ -66,6 +68,7 @@ func Serve(ctx context.Context, ln net.Listener) error {
 	)
 
 	proto_v1alpha1.RegisterFocusServer(g, v1alpha1.New(db))
+	proto_v1alpha2.RegisterFocusServer(g, v1alpha2.New(db))
 
 	return g.Serve(ln)
 }
