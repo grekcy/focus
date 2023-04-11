@@ -6,20 +6,13 @@ import {
   Typography,
 } from "@mui/material";
 import update from "immutability-helper";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { Event } from "../lib/api";
-import { actDivider, useAction } from "../lib/components/Action";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView, ICardListView } from "../lib/components/CardList";
-import {
-  ContextMenu,
-  IContextMenu,
-  popupContextMenu,
-} from "../lib/components/ContextMenu";
 import { LabelSelector } from "../lib/components/LabelSelector";
-import { datetime } from "../lib/datetime";
 import { Card, Label } from "../lib/proto/focus_v1alpha1_pb";
 
 export function InboxPage() {
@@ -90,116 +83,7 @@ export function InboxPage() {
       setSelectedLabels((p) => update(p, { $push: [id] }));
   }
 
-  const [actChallengeThis] = useAction({
-    label: "Challenge this card",
-    hotkey: "⌘+Ctrl+C",
-    onEnabled: () => cardNo !== -1,
-    onExecute: () => {
-      api
-        .updateCardType(cardNo, "challenge")
-        .then(() => app.toast("please review in challenge view", "success"))
-        .catch((e) => app.toast(e.message, "error"));
-    },
-  });
-
-  function updateDeferUntil(deferUntil: Date | null) {
-    if (cardNo === -1) return;
-
-    api
-      .updateCardDeferUntil(cardNo, deferUntil)
-      .then((r) =>
-        deferUntil
-          ? app.toast(
-              `card ${cardNo} defered until ${deferUntil.toLocaleString()}`
-            )
-          : app.toast(`card ${cardNo} clear defered`)
-      )
-      .catch((e) => app.toast(e.message, "error"));
-  }
-  const [actDeferUntilTomorrow] = useAction({
-    label: "defer until Tomorrow",
-    hotkey: "⌘+Ctrl+T",
-    onEnabled: () => !!selectedCard,
-    onExecute: () =>
-      updateDeferUntil(datetime.workTime().add(1, "day").toDate()),
-  });
-  const [actDeferUntilNextWeek] = useAction({
-    label: "defer until next Week",
-    hotkey: "⌘+Ctrl+W",
-    onEnabled: () => !!selectedCard,
-    onExecute: () =>
-      updateDeferUntil(datetime.workTime().add(7, "day").toDate()),
-  });
-  const [actDeferUntilNextMonth] = useAction({
-    label: "defer later...",
-    onEnabled: () => !!selectedCard,
-    onExecute: () =>
-      updateDeferUntil(
-        datetime
-          .workTime()
-          .add(Math.random() * 30 + 7, "day")
-          .toDate()
-      ),
-  });
-
-  const selectedCard = useMemo(() => {
-    if (cardNo === -1) return;
-    return cards.find((c) => c.cardNo === cardNo);
-  }, [cardNo, cards]);
-
-  const [actClearDefer] = useAction({
-    label: "clear defer",
-    onEnabled: () => !!selectedCard && !!selectedCard.deferUntil,
-    onExecute: () => updateDeferUntil(null),
-  });
-
-  function updateDueDate(dueDate: Date | null) {
-    if (cardNo === -1) return;
-
-    api
-      .updateCardDueDate(cardNo, dueDate)
-      .then((r) =>
-        dueDate
-          ? app.toast(
-              `set card ${cardNo} due date to ${dueDate.toLocaleString()}`
-            )
-          : app.toast(`card ${cardNo} due date cleared`)
-      )
-      .catch((e) => app.toast(e.message, "error"));
-  }
-
-  const [actDueToTomorrow] = useAction({
-    label: "due to Tomorrow",
-    onEnabled: () => !!selectedCard,
-    onExecute: () => updateDueDate(datetime.workTime().add(1, "day").toDate()),
-  });
-
-  const [actDueToNextWeek] = useAction({
-    label: "due to next Week",
-    onEnabled: () => !!selectedCard,
-    onExecute: () => updateDueDate(datetime.workTime().add(7, "day").toDate()),
-  });
-
-  const [actDueToLater] = useAction({
-    label: "due to later...",
-    onEnabled: () => !!selectedCard,
-    onExecute: () =>
-      updateDueDate(
-        datetime
-          .workTime()
-          .add(Math.random() * 30 + 7, "day")
-          .toDate()
-      ),
-  });
-
-  const [actClearDueDate] = useAction({
-    label: "clear due date",
-    onEnabled: () => !!selectedCard && !!selectedCard.dueDate,
-    onExecute: () => updateDueDate(null),
-  });
-
   const cardListRef = useRef<ICardListView>(null);
-  const contextMenuRef = useRef<IContextMenu>(null);
 
   return (
     <>
@@ -239,26 +123,9 @@ export function InboxPage() {
         showCardNo={false}
         onDoubleClick={() => cardBarRef.current && cardBarRef.current.toggle()}
         onSelect={handleSelectCard}
-        onContextMenu={(e) => popupContextMenu(e, contextMenuRef)}
         onLabelClick={handleLabelClick}
       />
 
-      <ContextMenu
-        ref={contextMenuRef}
-        actions={[
-          actChallengeThis,
-          actDivider,
-          actDeferUntilTomorrow,
-          actDeferUntilNextWeek,
-          actDeferUntilNextMonth,
-          actClearDefer,
-          actDivider,
-          actDueToTomorrow,
-          actDueToNextWeek,
-          actDueToLater,
-          actClearDueDate,
-        ]}
-      />
       <CardBar ref={cardBarRef} />
     </>
   );

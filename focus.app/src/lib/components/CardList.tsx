@@ -30,9 +30,11 @@ import { Link } from "react-router-dom";
 import { Key } from "ts-key-enum";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { Event } from "../api";
+import { datetime } from "../datetime";
 import { Card, Label } from "../proto/focus_v1alpha1_pb";
 import { newCard } from "../proto/helper";
-import { useAction } from "./Action";
+import { actDivider, useAction } from "./Action";
+import { ContextMenu, IContextMenu, popupContextMenu } from "./ContextMenu";
 import { EmptyIcon } from "./Icons";
 import { IInlineEdit, InlineEdit } from "./InlineEdit";
 import { LabelChip } from "./LabelChip";
@@ -53,7 +55,6 @@ interface CardListViewProp {
   onDoubleClick?: () => void;
   onSelect?: (cardNo: number) => void;
   onChange?: (cardNo: number) => void;
-  onContextMenu?: (e: MouseEvent) => void;
   onLabelClick?: (index: number) => void;
 }
 
@@ -70,7 +71,6 @@ export const CardListView = forwardRef(
       onDoubleClick,
       onSelect,
       onChange,
-      onContextMenu,
       onLabelClick,
     }: CardListViewProp,
     ref: Ref<ICardListView>
@@ -597,8 +597,141 @@ export const CardListView = forwardRef(
         .finally(() => setDeletingCard(false));
     }
 
+    const [actSample] = useAction({
+      label: "sample",
+      onExecute: () => alert("hello context menu"),
+    });
+
+    const [actChallengeThis] = useAction({
+      label: "Challenge this card",
+      hotkey: "⌘+Ctrl+C",
+      onEnabled: () => selected !== -1,
+      onExecute: () => {
+        const card = cards[selected];
+        api
+          .updateCardType(card.cardNo, "challenge")
+          .then(() => app.toast("please review in challenge view", "success"))
+          .catch((e) => app.toast(e.message, "error"));
+      },
+    });
+
+    function updateDeferUntil(deferUntil: Date | null) {
+      if (selected === -1) return;
+
+      api
+        .updateCardDeferUntil(cards[selected].cardNo, deferUntil)
+        .then((r) =>
+          deferUntil
+            ? app.toast(
+                `card ${
+                  cards[selected].cardNo
+                } defered until ${deferUntil.toLocaleString()}`
+              )
+            : app.toast(`card ${cards[selected].cardNo} clear defered`)
+        )
+        .catch((e) => app.toast(e.message, "error"));
+    }
+
+    const [actDeferUntilTomorrow] = useAction({
+      label: "Defer until Tomorrow",
+      hotkey: "⌘+Ctrl+T",
+      onEnabled: () => selected !== -1,
+      onExecute: () =>
+        updateDeferUntil(datetime.workTime().add(1, "day").toDate()),
+    });
+
+    const [actDeferUntilNextWeek] = useAction({
+      label: "Defer until next Week",
+      hotkey: "⌘+Ctrl+W",
+      onEnabled: () => selected !== -1,
+      onExecute: () =>
+        updateDeferUntil(datetime.workTime().add(7, "day").toDate()),
+    });
+
+    const [actDeferUntilNextMonth] = useAction({
+      label: "Defer later...",
+      onEnabled: () => selected !== -1,
+      onExecute: () =>
+        updateDeferUntil(
+          datetime
+            .workTime()
+            .add(Math.random() * 30 + 7, "day")
+            .toDate()
+        ),
+    });
+
+    function updateDueDate(dueDate: Date | null) {
+      if (selected === -1) return;
+
+      api
+        .updateCardDueDate(cards[selected].cardNo, dueDate)
+        .then((r) =>
+          dueDate
+            ? app.toast(
+                `set card ${
+                  cards[selected].cardNo
+                } due date to ${dueDate.toLocaleString()}`
+              )
+            : app.toast(`card ${cards[selected].cardNo} due date cleared`)
+        )
+        .catch((e) => app.toast(e.message, "error"));
+    }
+
+    const [actClearDefer] = useAction({
+      label: "Clear defer",
+      onEnabled: () => selected !== -1 && !!cards[selected].deferUntil,
+      onExecute: () => updateDeferUntil(null),
+    });
+
+    const [actDueToTomorrow] = useAction({
+      label: "Due to Tomorrow",
+      onEnabled: () => selected !== -1,
+      onExecute: () =>
+        updateDueDate(datetime.workTime().add(1, "day").toDate()),
+    });
+
+    const [actDueToNextWeek] = useAction({
+      label: "Due to next Week",
+      onEnabled: () => selected !== -1,
+      onExecute: () =>
+        updateDueDate(datetime.workTime().add(7, "day").toDate()),
+    });
+
+    const [actDueToLater] = useAction({
+      label: "Due to later...",
+      onEnabled: () => selected !== -1,
+      onExecute: () =>
+        updateDueDate(
+          datetime
+            .workTime()
+            .add(Math.random() * 30 + 7, "day")
+            .toDate()
+        ),
+    });
+
+    const [actClearDueDate] = useAction({
+      label: "Clear due date",
+      onEnabled: () => selected !== -1 && !!cards[selected].dueDate,
+      onExecute: () => updateDueDate(null),
+    });
+
+    const contextMenuActions = [
+      actChallengeThis,
+      actDivider,
+      actDeferUntilTomorrow,
+      actDeferUntilNextWeek,
+      actDeferUntilNextMonth,
+      actClearDefer,
+      actDivider,
+      actDueToTomorrow,
+      actDueToNextWeek,
+      actDueToLater,
+      actClearDueDate,
+    ];
+
+    const contextMenuRef = useRef<IContextMenu>(null);
     function handleContextMenu(e: MouseEvent) {
-      onContextMenu && onContextMenu(e);
+      popupContextMenu(e, contextMenuRef);
     }
 
     return (
@@ -648,6 +781,8 @@ export const CardListView = forwardRef(
             );
           })}
         </Box>
+
+        <ContextMenu ref={contextMenuRef} actions={contextMenuActions} />
       </DndProvider>
     );
   }

@@ -111,9 +111,13 @@ export function CardPage() {
   function RenderCard() {
     return (
       <>
-        <Breadcrumbs separator="›">
-          <Link to={`/cards/${card?.parentCardNo}`}>#{card?.parentCardNo}</Link>
-        </Breadcrumbs>
+        {card?.parentCardNo && (
+          <Breadcrumbs separator="›">
+            <Link to={`/cards/${card?.parentCardNo}`}>
+              #{card?.parentCardNo}
+            </Link>
+          </Breadcrumbs>
+        )}
         <Box display="flex">
           <Typography variant="h5" sx={{ pr: 1 }}>
             CARD-#{cardNo}
