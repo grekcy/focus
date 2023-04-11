@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/whitekid/goxp/fx"
 	"github.com/whitekid/goxp/log"
+	"github.com/whitekid/goxp/validate"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -17,6 +18,31 @@ import (
 	"focus/models"
 	proto "focus/proto/v1alpha1"
 )
+
+func (s *v1alpha1ServiceImpl) CreateLabel(ctx context.Context, req *proto.Label) (*proto.Label, error) {
+	if err := validate.Struct(&struct {
+		Label string `validate:"required"`
+	}{
+		Label: req.Label,
+	}); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	newLabel := &models.Label{
+		WorkspaceID: s.currentWorkspace(ctx).ID,
+		Label:       req.Label,
+		Description: req.Description,
+		Color:       req.Color,
+	}
+	s.db.Transaction(func(tx *gorm.DB) error {
+		if tx := tx.Save(newLabel); tx.Error != nil {
+			return status.Errorf(codes.Internal, "fail to create label")
+		}
+		return nil
+	})
+
+	return labelModelToProto(newLabel), nil
+}
 
 func (s *v1alpha1ServiceImpl) listLabels(ctx context.Context, where *models.Label) ([]*models.Label, error) {
 	labels := []*models.Label{}

@@ -96,7 +96,7 @@ func (s *v1alpha1ServiceImpl) addCard(ctx context.Context, objective string, add
 		}
 
 		if tx := txn.Save(newCard.Card); tx.Error != nil {
-			return status.Errorf(codes.Internal, "fail to save card")
+			return status.Errorf(codes.Internal, "fail to add card")
 		}
 
 		return nil

@@ -471,6 +471,49 @@ export class FocusClient {
     this.methodDescriptordeleteCard);
   }
 
+  methodDescriptorcreateLabel = new grpcWeb.MethodDescriptor(
+    '/api.v1alpha1.Focus/createLabel',
+    grpcWeb.MethodType.UNARY,
+    focus_v1alpha1_pb.Label,
+    focus_v1alpha1_pb.Label,
+    (request: focus_v1alpha1_pb.Label) => {
+      return request.serializeBinary();
+    },
+    focus_v1alpha1_pb.Label.deserializeBinary
+  );
+
+  createLabel(
+    request: focus_v1alpha1_pb.Label,
+    metadata: grpcWeb.Metadata | null): Promise<focus_v1alpha1_pb.Label>;
+
+  createLabel(
+    request: focus_v1alpha1_pb.Label,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: focus_v1alpha1_pb.Label) => void): grpcWeb.ClientReadableStream<focus_v1alpha1_pb.Label>;
+
+  createLabel(
+    request: focus_v1alpha1_pb.Label,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: focus_v1alpha1_pb.Label) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/api.v1alpha1.Focus/createLabel',
+        request,
+        metadata || {},
+        this.methodDescriptorcreateLabel,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/api.v1alpha1.Focus/createLabel',
+    request,
+    metadata || {},
+    this.methodDescriptorcreateLabel);
+  }
+
   methodDescriptorlistLabels = new grpcWeb.MethodDescriptor(
     '/api.v1alpha1.Focus/listLabels',
     grpcWeb.MethodType.UNARY,

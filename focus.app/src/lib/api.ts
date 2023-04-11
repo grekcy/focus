@@ -265,6 +265,14 @@ export class FocusAPI {
     return this.s.deleteCard(no, null);
   };
 
+  createLabel = (label: string, description: string, color: string) => {
+    const req = new Label();
+    req.setLabel(label);
+    req.setDescription(description);
+    req.setColor(color);
+    return this.s.createLabel(req, null).then((r) => r.toObject());
+  };
+
   listLabels = (labels?: string[]) => {
     const req = new ListLabelsReq();
     if (labels && labels.length > 0) req.setLabelsList(labels);

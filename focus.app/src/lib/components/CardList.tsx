@@ -312,7 +312,7 @@ export const CardListView = forwardRef(
 
       api
         .setParentCard(cards[selected].cardNo, cards[upward].cardNo)
-        .then(() => {
+        .then((r) => {
           cards[selected].depth = cards[selected].depth + 1;
           cards[selected].parentCardNo = cards[upward].cardNo;
 
@@ -326,6 +326,7 @@ export const CardListView = forwardRef(
 
             return x;
           });
+          onChange && onChange(r.cardNo);
         })
         .catch((e) => app.toast(e.message, "error"));
     }
@@ -347,7 +348,6 @@ export const CardListView = forwardRef(
 
       // parent의 next sibling으로 rank 조정
       const nextSibling = findFirstSiblingDownward(parent);
-      console.log(nextSibling);
       if (nextSibling === -1) {
         // parent의 nextSilbing이 없으면 parent의 마지막 아이템으로 변경
         api
@@ -372,6 +372,7 @@ export const CardListView = forwardRef(
               setSelected((p) => parent + siblings.length - child.length);
               return x;
             });
+            onChange && onChange(r.cardNo);
           })
           .catch((e) => app.toast(e.message, "error"));
         return;
@@ -379,7 +380,7 @@ export const CardListView = forwardRef(
 
       api
         .rerankCard(cards[selected].cardNo, cards[nextSibling].cardNo)
-        .then((r) => {
+        .then(() => {
           const siblings = findSiblings(selected);
 
           cards[selected].parentCardNo = cards[nextSibling].parentCardNo;
@@ -400,6 +401,7 @@ export const CardListView = forwardRef(
             return x;
           });
           setSelected((p) => p + siblings.length);
+          onChange && onChange(cards[selected].cardNo);
         })
         .catch((e) => app.toast(e.message, "error"));
     }
@@ -597,11 +599,6 @@ export const CardListView = forwardRef(
         .finally(() => setDeletingCard(false));
     }
 
-    const [actSample] = useAction({
-      label: "sample",
-      onExecute: () => alert("hello context menu"),
-    });
-
     const [actChallengeThis] = useAction({
       label: "Challenge this card",
       hotkey: "⌘+Ctrl+C",
@@ -715,6 +712,10 @@ export const CardListView = forwardRef(
       onExecute: () => updateDueDate(null),
     });
 
+    const [actMoveCardToInbox] = useAction({
+      label: "move card to INBOX",
+    });
+
     const contextMenuActions = [
       actChallengeThis,
       actDivider,
@@ -727,6 +728,8 @@ export const CardListView = forwardRef(
       actDueToNextWeek,
       actDueToLater,
       actClearDueDate,
+      actDivider,
+      actMoveCardToInbox,
     ];
 
     const contextMenuRef = useRef<IContextMenu>(null);

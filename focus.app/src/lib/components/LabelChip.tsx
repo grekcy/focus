@@ -50,6 +50,7 @@ const LabelTextColors: { [key: string]: string } = {
   "#FFFFFF": "#000000",
   "#000000": "#FFFFFF",
   "#BFD4F2": "#000000",
+  "#FEF2C0": "#000000",
 };
 
 export function LabelTextColorFor(color: string) {

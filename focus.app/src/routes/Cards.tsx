@@ -178,10 +178,6 @@ export function CardPage() {
                       {creator.name}
                     </Button>
                   </TableCell>
-                  <TableCell variant="head">Status</TableCell>
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {card!.status ? card!.status : "None"}
-                  </TableCell>
                   <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
                     Created at
                   </TableCell>
@@ -208,17 +204,9 @@ export function CardPage() {
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
-                    Belongs to
-                  </TableCell>
-                  <TableCell>
-                    {card!.parentCardNo! > 0 ? (
-                      <Link to={`/cards/${card!.parentCardNo}`}>
-                        {card!.parentCardNo}
-                      </Link>
-                    ) : (
-                      "None"
-                    )}
+                  <TableCell variant="head">Status</TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap" }}>
+                    {card!.status ? card!.status : "None"}
                   </TableCell>
                   <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
                     Due to
@@ -234,7 +222,7 @@ export function CardPage() {
                     />
                   </TableCell>
                   <TableCell variant="head">Labels</TableCell>
-                  <TableCell colSpan={5}>
+                  <TableCell colSpan={3}>
                     <LabelSelector labels={[]} />
                   </TableCell>
                 </TableRow>

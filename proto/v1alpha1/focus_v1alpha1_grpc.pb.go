@@ -31,6 +31,7 @@ const (
 	Focus_PatchCard_FullMethodName              = "/api.v1alpha1.Focus/patchCard"
 	Focus_RerankCard_FullMethodName             = "/api.v1alpha1.Focus/rerankCard"
 	Focus_DeleteCard_FullMethodName             = "/api.v1alpha1.Focus/deleteCard"
+	Focus_CreateLabel_FullMethodName            = "/api.v1alpha1.Focus/createLabel"
 	Focus_ListLabels_FullMethodName             = "/api.v1alpha1.Focus/listLabels"
 	Focus_UpdateLabel_FullMethodName            = "/api.v1alpha1.Focus/updateLabel"
 	Focus_DeleteLabel_FullMethodName            = "/api.v1alpha1.Focus/deleteLabel"
@@ -52,6 +53,7 @@ type FocusClient interface {
 	PatchCard(ctx context.Context, in *PatchCardReq, opts ...grpc.CallOption) (*Card, error)
 	RerankCard(ctx context.Context, in *RankCardReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCard(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	CreateLabel(ctx context.Context, in *Label, opts ...grpc.CallOption) (*Label, error)
 	ListLabels(ctx context.Context, in *ListLabelsReq, opts ...grpc.CallOption) (*ListLabelsResp, error)
 	UpdateLabel(ctx context.Context, in *Label, opts ...grpc.CallOption) (*Label, error)
 	DeleteLabel(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -157,6 +159,15 @@ func (c *focusClient) DeleteCard(ctx context.Context, in *wrapperspb.UInt64Value
 	return out, nil
 }
 
+func (c *focusClient) CreateLabel(ctx context.Context, in *Label, opts ...grpc.CallOption) (*Label, error) {
+	out := new(Label)
+	err := c.cc.Invoke(ctx, Focus_CreateLabel_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *focusClient) ListLabels(ctx context.Context, in *ListLabelsReq, opts ...grpc.CallOption) (*ListLabelsResp, error) {
 	out := new(ListLabelsResp)
 	err := c.cc.Invoke(ctx, Focus_ListLabels_FullMethodName, in, out, opts...)
@@ -216,6 +227,7 @@ type FocusServer interface {
 	PatchCard(context.Context, *PatchCardReq) (*Card, error)
 	RerankCard(context.Context, *RankCardReq) (*emptypb.Empty, error)
 	DeleteCard(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error)
+	CreateLabel(context.Context, *Label) (*Label, error)
 	ListLabels(context.Context, *ListLabelsReq) (*ListLabelsResp, error)
 	UpdateLabel(context.Context, *Label) (*Label, error)
 	DeleteLabel(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error)
@@ -257,6 +269,9 @@ func (UnimplementedFocusServer) RerankCard(context.Context, *RankCardReq) (*empt
 }
 func (UnimplementedFocusServer) DeleteCard(context.Context, *wrapperspb.UInt64Value) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteCard not implemented")
+}
+func (UnimplementedFocusServer) CreateLabel(context.Context, *Label) (*Label, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateLabel not implemented")
 }
 func (UnimplementedFocusServer) ListLabels(context.Context, *ListLabelsReq) (*ListLabelsResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListLabels not implemented")
@@ -466,6 +481,24 @@ func _Focus_DeleteCard_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Focus_CreateLabel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Label)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FocusServer).CreateLabel(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Focus_CreateLabel_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FocusServer).CreateLabel(ctx, req.(*Label))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Focus_ListLabels_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListLabelsReq)
 	if err := dec(in); err != nil {
@@ -602,6 +635,10 @@ var Focus_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "deleteCard",
 			Handler:    _Focus_DeleteCard_Handler,
+		},
+		{
+			MethodName: "createLabel",
+			Handler:    _Focus_CreateLabel_Handler,
 		},
 		{
 			MethodName: "listLabels",

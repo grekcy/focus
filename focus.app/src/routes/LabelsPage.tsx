@@ -64,31 +64,51 @@ export function LabelsPage() {
     setLabels((p) => p.slice());
   }
 
-  function handleOkClick(index: number) {
+  async function handleOkClick(index: number) {
     const label = labels[index];
-    api
-      .updateLabel(label)
-      .then((r) => {
-        setLabels((p) =>
-          update(p, {
-            $splice: [
-              [index, 1],
-              [index, 0, r],
-            ],
-          })
+
+    try {
+      let updated: Label.AsObject | null = null;
+
+      if (label.id !== 0) {
+        updated = await api.updateLabel(label);
+      } else {
+        updated = await api.createLabel(
+          label.label,
+          label.description,
+          label.color
         );
-        setEditing((p) => update(p, { [index]: { $set: false } }));
-      })
-      .catch((e) => app.toast(e.message, "error"));
+
+        if (updated) {
+          setLabels((p) =>
+            update(p, {
+              $splice: [
+                [index, 1],
+                [index, 0, updated!],
+              ],
+            })
+          );
+          setEditing((p) => update(p, { [index]: { $set: false } }));
+        }
+      }
+    } catch (e: any) {
+      app.toast(e.message, "error");
+    }
   }
 
   function handleEditCancelClick(i: number) {
-    const x = labels[i];
-    x.label = prevValue[i].label;
-    x.description = prevValue[i].desc;
-    x.color = prevValue[i].color;
+    if (labels[i].id !== 0) {
+      const x = labels[i];
+      x.label = prevValue[i].label;
+      x.description = prevValue[i].desc;
+      x.color = prevValue[i].color;
 
-    setLabels((p) => p.slice());
+      setLabels((p) => p.slice());
+    } else {
+      // cancel new item
+      setLabels((p) => update(p, { $splice: [[i, 1]] }));
+    }
+
     setEditing((p) => update(p, { [i]: { $set: false } }));
   }
 
@@ -118,11 +138,25 @@ export function LabelsPage() {
     setChoosingColorItem(-1);
   }
 
+  function addLabel() {
+    const newLabel = new Label().toObject();
+    newLabel.label = "new label";
+    setLabels((p) => update(p, { $push: [newLabel] }));
+    setEditing((p) => update(p, { [labels.length]: { $set: true } }));
+  }
+
   return (
     <>
-      <Typography variant="h5" flexGrow={1}>
-        Labels
-      </Typography>
+      <Box display="flex">
+        <Typography variant="h5" flexGrow={1}>
+          Labels
+        </Typography>
+        <Box flexGrow={1}></Box>
+        <Box flexGrow={0}>
+          <Button onClick={() => addLabel()}>New Label</Button>
+        </Box>
+      </Box>
+
       <TableContainer>
         <Table>
           <TableHead>
@@ -164,7 +198,10 @@ export function LabelsPage() {
                     >
                       <EditIcon />
                     </IconButton>
-                    <IconButton onClick={() => handleDeleteClick(i)}>
+                    <IconButton
+                      onClick={() => handleDeleteClick(i)}
+                      sx={{ display: !!editing[i] ? "none" : "" }}
+                    >
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>

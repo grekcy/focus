@@ -24,6 +24,7 @@ service Focus {
   rpc rerankCard(RankCardReq) returns (google.protobuf.Empty) {}
   rpc deleteCard(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {}
 
+  rpc createLabel(Label) returns (Label) {}
   rpc listLabels(ListLabelsReq) returns (ListLabelsResp) {}
   rpc updateLabel(Label) returns (Label) {}
   rpc deleteLabel(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {

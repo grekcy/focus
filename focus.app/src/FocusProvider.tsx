@@ -79,7 +79,7 @@ const cookies = new Cookies();
 export const FocusClientProvider = forwardRef(
   ({ children }: FocusClientProviderProps, ref: Ref<IFocusClientProvider>) => {
     const api = new FocusAPI(
-      "http://localhost:8080",
+      "https://focus-dev.woosum.net",
       () => "whitekid@gmail.com" // FIXME
     );
 
