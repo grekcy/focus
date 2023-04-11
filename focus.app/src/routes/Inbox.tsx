@@ -224,8 +224,8 @@ export function InboxPage() {
             <LabelSelector
               labels={labels}
               selected={selectedLabels}
-              sx={{ minWidth: { md: "300px" } }}
               onSelectionChange={(labels) => setSelectedLabels(labels)}
+              sx={{ minWidth: { md: "300px" } }}
             />
           </Stack>
         </Box>

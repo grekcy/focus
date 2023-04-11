@@ -84,6 +84,18 @@ export function CardPage() {
       })
       .catch((e) => app.toast(e.message, "error"));
   }, [card]);
+
+  function handleChildCardChange() {
+    api
+      .getCardProgressSummary(card!.cardNo)
+      .then((r) => {
+        // TODO 이거 넣으면 상태가 제대로 업데이트 되지 않는데...
+        // setTotalCards(r.total);
+        // setCompletedCards(r.done);
+      })
+      .catch((e) => app.toast(e.message, "error"));
+  }
+
   const [expandCards, setExpandCards] = useState(true);
 
   function onDueDateChange(value: Date | null) {
@@ -276,13 +288,18 @@ export function CardPage() {
             {totalCards > 0 && (
               <LinearProgressWithLabel
                 value={(completedCards * 100) / totalCards}
+                valueBuffer={0}
                 color="success"
                 sx={{ width: "30rem", ml: "1rem" }}
               />
             )}
           </AccordionSummary>
           <AccordionDetails>
-            <CardListView cards={cards} depth={card!.depth + 1} />
+            <CardListView
+              cards={cards}
+              depth={card!.depth + 1}
+              onChange={() => handleChildCardChange()}
+            />
           </AccordionDetails>
           <AccordionActions>
             <FormControlLabel

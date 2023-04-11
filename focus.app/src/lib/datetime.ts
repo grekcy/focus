@@ -1,7 +1,9 @@
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc"; // import plugin
+import localizedFormat from "dayjs/plugin/localizedFormat";
+import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
+dayjs.extend(localizedFormat);
 
 // function midnight(): Dayjs {}
 

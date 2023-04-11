@@ -5,6 +5,7 @@ import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
 import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import TripOriginIcon from "@mui/icons-material/TripOrigin";
 import { Box, IconButton, Stack, Tooltip } from "@mui/material";
+import dayjs from "dayjs";
 import type { Identifier, XYCoord } from "dnd-core";
 import update from "immutability-helper";
 import React, {
@@ -787,6 +788,13 @@ export const CardItem = forwardRef(
       onActionClick && onActionClick(index, action);
     }
 
+    let deferColor = card.deferUntil ? "info.light" : "lightgray";
+    let dueColor = card.dueDate ? "info.light" : "lightgray";
+    if (card.dueDate) {
+      if (dayjs(card.dueDate.seconds * 1000).diff(dayjs(), "day") < 2)
+        dueColor = "error.light";
+    }
+
     const app = useFocusApp();
 
     return (
@@ -846,30 +854,24 @@ export const CardItem = forwardRef(
           {(card.deferUntil || card.dueDate) && (
             <Box sx={{ display: "flex" }}>
               <Box sx={{ flexGrow: 1 }}></Box>
-              <Box
-                sx={{
-                  flexGrow: 0,
-                  color: card.deferUntil ? "gray" : "lightgray",
-                }}
-              >
-                {card.deferUntil
-                  ? `defer until ${new Date(
-                      card.deferUntil.seconds * 1000
-                    ).toLocaleDateString()}`
-                  : "not deferred"}
+              <Box sx={{ flexGrow: 0, color: deferColor }}>
+                {card.deferUntil &&
+                  dayjs(card.deferUntil.seconds * 1000).isAfter(dayjs()) && (
+                    <>
+                      defer until{" "}
+                      {new Date(
+                        card.deferUntil.seconds * 1000
+                      ).toLocaleDateString()}
+                    </>
+                  )}
               </Box>
-              <Box
-                sx={{
-                  flexGrow: 0,
-                  pl: "1rem",
-                  color: card.dueDate ? "gray" : "lightgray",
-                }}
-              >
-                {card.dueDate
-                  ? `due to ${new Date(
-                      card.dueDate.seconds * 1000
-                    ).toLocaleDateString()}`
-                  : "no due date"}
+              <Box sx={{ flexGrow: 0, pl: "1rem", color: dueColor }}>
+                {card.dueDate && (
+                  <>
+                    due to{" "}
+                    {new Date(card.dueDate.seconds * 1000).toLocaleDateString()}
+                  </>
+                )}
               </Box>
             </Box>
           )}
