@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"focus/models"
-	"focus/proto"
+	proto "focus/proto/v1alpha1"
 
 	"github.com/whitekid/goxp/fx"
 	"google.golang.org/protobuf/types/known/wrapperspb"

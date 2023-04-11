@@ -1,7 +1,7 @@
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
 import { UInt64Value } from "google-protobuf/google/protobuf/wrappers_pb";
-import { v1alpha1Client } from "./proto/FocusServiceClientPb";
+import { FocusClient } from "./proto/Focus_v1alpha1ServiceClientPb";
 import {
   AddCardReq,
   Card,
@@ -13,7 +13,7 @@ import {
   ListLabelsReq,
   PatchCardReq,
   RankCardReq,
-} from "./proto/focus_pb";
+} from "./proto/focus_v1alpha1_pb";
 
 export enum Event {
   CARD_CREATED,
@@ -21,7 +21,7 @@ export enum Event {
 }
 
 export class FocusAPI {
-  s: v1alpha1Client;
+  s: FocusClient;
   listeners: { [event: string]: EventListener[] };
 
   constructor(endpoint: string, getToken: () => string) {
@@ -30,7 +30,7 @@ export class FocusAPI {
       unaryInterceptors: [authInterceptor],
       streamInterceptors: [authInterceptor],
     };
-    this.s = new v1alpha1Client(endpoint, null, options);
+    this.s = new FocusClient(endpoint, null, options);
     this.listeners = {};
   }
 

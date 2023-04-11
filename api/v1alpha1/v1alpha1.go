@@ -8,16 +8,16 @@ import (
 	"gorm.io/gorm"
 
 	"focus/models"
-	"focus/proto"
+	proto "focus/proto/v1alpha1"
 )
 
 type v1alpha1ServiceImpl struct {
-	proto.UnimplementedV1Alpha1Server
+	proto.UnimplementedFocusServer
 
 	db *gorm.DB
 }
 
-func New(db *gorm.DB) proto.V1Alpha1Server {
+func New(db *gorm.DB) proto.FocusServer {
 	return &v1alpha1ServiceImpl{
 		db: db,
 	}

@@ -1,15 +1,16 @@
 syntax = "proto3";
 
-package api;
+package api.v1alpha1;
 
-import "google/protobuf/wrappers.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
-// import "google/protobuf/duration.proto";
+import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
-option go_package = "github.com/grekcy/focus/proto";
+option go_package = "github.com/grekcy/focus/proto/v1alpha1";
 
-service v1alpha1 {
+service Focus {
   rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
 
   rpc getUser(google.protobuf.UInt64Value) returns (User);

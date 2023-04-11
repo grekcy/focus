@@ -11,7 +11,7 @@ import {
 } from "../lib/components/ContextMenu";
 import { LabelChip } from "../lib/components/LabelChip";
 import { datetime } from "../lib/datetime";
-import { Card, Label } from "../lib/proto/focus_pb";
+import { Card, Label } from "../lib/proto/focus_v1alpha1_pb";
 
 export function TodayPage() {
   const app = useFocusApp();

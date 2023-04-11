@@ -12,10 +12,10 @@ import (
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"focus/proto"
+	proto "focus/proto/v1alpha1"
 )
 
-func newTestServer(ctx context.Context, t *testing.T) proto.V1Alpha1Client {
+func newTestServer(ctx context.Context, t *testing.T) proto.FocusClient {
 	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	require.NoError(t, err)
 
@@ -39,7 +39,7 @@ func newTestServer(ctx context.Context, t *testing.T) proto.V1Alpha1Client {
 	)
 	require.NoError(t, err)
 
-	return proto.NewV1Alpha1Client(conn)
+	return proto.NewFocusClient(conn)
 }
 
 type TokenAuth struct {

@@ -27,7 +27,7 @@ import { Key } from "ts-key-enum";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { DrawerHeader } from "../../SideBar";
 import { arrayContentEquals } from "../lib";
-import { Card, Challenge, Label } from "../proto/focus_pb";
+import { Card, Challenge, Label } from "../proto/focus_v1alpha1_pb";
 import { useAction } from "./Action";
 import { DatePickButton } from "./DatePickButton";
 import { InlineEdit } from "./InlineEdit";

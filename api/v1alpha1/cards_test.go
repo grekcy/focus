@@ -14,7 +14,7 @@ import (
 
 	"focus/helper"
 	"focus/models"
-	"focus/proto"
+	proto "focus/proto/v1alpha1"
 )
 
 func TestAddCard(t *testing.T) {

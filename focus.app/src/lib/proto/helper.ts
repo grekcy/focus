@@ -1,4 +1,4 @@
-import { Card, Challenge, User } from "./focus_pb";
+import { Card, Challenge, User } from "./focus_v1alpha1_pb";
 
 // returns new card object
 export function newCard(cardNo: number, objective: string): Card.AsObject {

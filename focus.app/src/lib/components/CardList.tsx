@@ -29,7 +29,7 @@ import { Link } from "react-router-dom";
 import { Key } from "ts-key-enum";
 import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { Event } from "../api";
-import { Card, Label } from "../proto/focus_pb";
+import { Card, Label } from "../proto/focus_v1alpha1_pb";
 import { newCard } from "../proto/helper";
 import { useAction } from "./Action";
 import { EmptyIcon } from "./Icons";

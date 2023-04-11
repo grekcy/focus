@@ -1,5 +1,5 @@
 import { FocusAPI } from "./api";
-import { Card } from "./proto/focus_pb";
+import { Card } from "./proto/focus_v1alpha1_pb";
 
 const endpoint = "http://127.0.0.1:8080";
 

@@ -15,7 +15,7 @@ import (
 
 	"focus/helper"
 	"focus/models"
-	"focus/proto"
+	proto "focus/proto/v1alpha1"
 )
 
 func (s *v1alpha1ServiceImpl) listLabels(ctx context.Context, where *models.Label) ([]*models.Label, error) {

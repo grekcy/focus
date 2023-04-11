@@ -30,7 +30,7 @@ import { DatePickButton } from "../lib/components/DatePickButton";
 import { InlineEdit } from "../lib/components/InlineEdit";
 import { LabelSelector } from "../lib/components/LabelSelector";
 import { loerm } from "../lib/lib";
-import { Card, User } from "../lib/proto/focus_pb";
+import { Card, User } from "../lib/proto/focus_v1alpha1_pb";
 import { newEmptyUser } from "../lib/proto/helper";
 
 export function CardPage() {

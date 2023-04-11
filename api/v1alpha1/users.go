@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 
 	"focus/models"
-	"focus/proto"
+	proto "focus/proto/v1alpha1"
 )
 
 func (s *v1alpha1ServiceImpl) listUsers(ctx context.Context, where *models.User) ([]*models.User, error) {

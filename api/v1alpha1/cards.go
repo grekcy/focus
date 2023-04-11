@@ -20,7 +20,7 @@ import (
 
 	"focus/helper"
 	"focus/models"
-	"focus/proto"
+	proto "focus/proto/v1alpha1"
 )
 
 func (s *v1alpha1ServiceImpl) AddCard(ctx context.Context, req *proto.AddCardReq) (*proto.Card, error) {

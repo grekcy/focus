@@ -20,7 +20,7 @@ import update from "immutability-helper";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { LabelChip, LabelColors } from "../lib/components/LabelChip";
-import { Label } from "../lib/proto/focus_pb";
+import { Label } from "../lib/proto/focus_v1alpha1_pb";
 
 export function LabelsPage() {
   const app = useFocusApp();

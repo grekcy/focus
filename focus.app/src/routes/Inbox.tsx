@@ -20,7 +20,7 @@ import {
 } from "../lib/components/ContextMenu";
 import { LabelSelector } from "../lib/components/LabelSelector";
 import { datetime } from "../lib/datetime";
-import { Card, Label } from "../lib/proto/focus_pb";
+import { Card, Label } from "../lib/proto/focus_v1alpha1_pb";
 
 export function InboxPage() {
   const app = useFocusApp();

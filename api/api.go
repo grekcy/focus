@@ -17,7 +17,7 @@ import (
 	"focus/api/v1alpha1"
 	"focus/config"
 	"focus/databases"
-	"focus/proto"
+	proto_v1alpha1 "focus/proto/v1alpha1"
 )
 
 // Serve serve grpc service with block
@@ -65,7 +65,7 @@ func Serve(ctx context.Context, ln net.Listener) error {
 		grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(authInterceptor(db))),
 	)
 
-	proto.RegisterV1Alpha1Server(g, v1alpha1.New(db))
+	proto_v1alpha1.RegisterFocusServer(g, v1alpha1.New(db))
 
 	return g.Serve(ln)
 }

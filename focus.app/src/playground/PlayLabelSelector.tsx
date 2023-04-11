@@ -3,7 +3,7 @@ import update from "immutability-helper";
 import { useEffect, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { LabelSelector } from "../lib/components/LabelSelector";
-import { Label } from "../lib/proto/focus_pb";
+import { Label } from "../lib/proto/focus_v1alpha1_pb";
 
 export function PlayLabelSelector() {
   const app = useFocusApp();
