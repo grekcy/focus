@@ -713,12 +713,10 @@ export const CardListView = forwardRef(
     });
 
     const [actMoveCardToInbox] = useAction({
-      label: "move card to INBOX",
+      label: "Move card to INBOX",
     });
 
     const contextMenuActions = [
-      actChallengeThis,
-      actDivider,
       actDeferUntilTomorrow,
       actDeferUntilNextWeek,
       actDeferUntilNextMonth,
@@ -729,6 +727,7 @@ export const CardListView = forwardRef(
       actDueToLater,
       actClearDueDate,
       actDivider,
+      actChallengeThis,
       actMoveCardToInbox,
     ];
 
@@ -971,9 +970,12 @@ export const CardItem = forwardRef(
           </Box>
           {showCardNo && (
             <Box sx={{ pr: 1 }}>
-              {card.cardNo !== -1 && (
-                <Link to={`/cards/` + card.cardNo}>{card.cardNo}</Link>
-              )}
+              {card.cardNo !== -1 &&
+                (card.cardType === "challenge" ? (
+                  <Link to={`/challenges/` + card.cardNo}>{card.cardNo}</Link>
+                ) : (
+                  <Link to={`/cards/` + card.cardNo}>{card.cardNo}</Link>
+                ))}
             </Box>
           )}
         </Box>

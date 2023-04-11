@@ -84,6 +84,7 @@ export const ContextMenu = forwardRef(
               <Divider />
             ) : (
               <MenuItem
+                key={item.label}
                 disabled={item.onEnabled ? !item.onEnabled() : false}
                 onClick={(e) => handleMenuItemClick(e, item.onExecute)}
               >
