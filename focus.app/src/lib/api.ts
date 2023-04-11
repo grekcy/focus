@@ -1,7 +1,7 @@
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
 import { UInt64Value } from "google-protobuf/google/protobuf/wrappers_pb";
-import { V1Alpha1Client } from "./proto/FocusServiceClientPb";
+import { v1alpha1Client } from "./proto/FocusServiceClientPb";
 import {
   AddCardReq,
   Card,
@@ -21,7 +21,7 @@ export enum Event {
 }
 
 export class FocusAPI {
-  s: V1Alpha1Client;
+  s: v1alpha1Client;
   listeners: { [event: string]: EventListener[] };
 
   constructor(endpoint: string, getToken: () => string) {
@@ -30,7 +30,7 @@ export class FocusAPI {
       unaryInterceptors: [authInterceptor],
       streamInterceptors: [authInterceptor],
     };
-    this.s = new V1Alpha1Client(endpoint, null, options);
+    this.s = new v1alpha1Client(endpoint, null, options);
     this.listeners = {};
   }
 
@@ -134,9 +134,7 @@ export class FocusAPI {
     if (complete) card.setCompletedAt(Timestamp.fromDate(new Date()));
     else card.clearCreatedAt();
 
-    return this.patchCard(card.toObject(), CardField.COMPLETED_AT).then((r) =>
-      r.toObject()
-    );
+    return this.patchCard(card.toObject(), CardField.COMPLETED_AT);
   };
 
   updateCardObjective = (cardNo: number, objective: string) => {
@@ -144,9 +142,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setObjective(objective);
 
-    return this.patchCard(card.toObject(), CardField.OBJECTIVE).then((r) =>
-      r.toObject()
-    );
+    return this.patchCard(card.toObject(), CardField.OBJECTIVE);
   };
 
   updateCardContent = (cardNo: number, content: string) => {
@@ -154,9 +150,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setContent(content);
 
-    return this.patchCard(card.toObject(), CardField.CONTENT).then((r) =>
-      r.toObject()
-    );
+    return this.patchCard(card.toObject(), CardField.CONTENT);
   };
 
   setParentCard = (cardNo: number, parent: number) => {
@@ -164,9 +158,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setParentCardNo(parent);
 
-    return this.patchCard(card.toObject(), CardField.PARENT_CARD).then((r) =>
-      r.toObject()
-    );
+    return this.patchCard(card.toObject(), CardField.PARENT_CARD);
   };
 
   updateCardLabel = (cardNo: number, labels: number[]) => {
@@ -174,9 +166,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setLabelsList(labels);
 
-    return this.patchCard(card.toObject(), CardField.LABEL).then((r) =>
-      r.toObject()
-    );
+    return this.patchCard(card.toObject(), CardField.LABEL);
   };
 
   updateCardDeferUntil = (cardNo: number, deferUntil: Date | null) => {
@@ -184,9 +174,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     if (deferUntil) card.setDeferUntil(Timestamp.fromDate(deferUntil));
 
-    return this.patchCard(card.toObject(), CardField.DEFER_UNTIL).then((r) =>
-      r.toObject()
-    );
+    return this.patchCard(card.toObject(), CardField.DEFER_UNTIL);
   };
 
   updateCardDueDate = (cardNo: number, dueDate: Date | null) => {
@@ -194,9 +182,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     if (dueDate) card.setDueDate(Timestamp.fromDate(dueDate));
 
-    return this.patchCard(card.toObject(), CardField.DUE_DATE).then((r) =>
-      r.toObject()
-    );
+    return this.patchCard(card.toObject(), CardField.DUE_DATE);
   };
 
   updateCardType = (cardNo: number, cardType: string) => {
@@ -204,9 +190,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setCardType(cardType);
 
-    return this.patchCard(card.toObject(), CardField.CARD_TYPE).then((r) =>
-      r.toObject()
-    );
+    return this.patchCard(card.toObject(), CardField.CARD_TYPE);
   };
 
   patchCard = (card: Card.AsObject, ...fields: CardField[]) => {
@@ -264,7 +248,7 @@ export class FocusAPI {
 
     return this.s.patchCard(req, null).then((r) => {
       this.notify(r, Event.CARD_UPDATED, card.cardNo);
-      return r;
+      return r.toObject();
     });
   };
 

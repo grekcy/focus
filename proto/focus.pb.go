@@ -1214,7 +1214,7 @@ var file_focus_proto_rawDesc = []byte{
 	0x4c, 0x41, 0x42, 0x45, 0x4c, 0x10, 0x04, 0x12, 0x0f, 0x0a, 0x0b, 0x44, 0x45, 0x46, 0x45, 0x52,
 	0x5f, 0x55, 0x4e, 0x54, 0x49, 0x4c, 0x10, 0x05, 0x12, 0x0c, 0x0a, 0x08, 0x44, 0x55, 0x45, 0x5f,
 	0x44, 0x41, 0x54, 0x45, 0x10, 0x06, 0x12, 0x0d, 0x0a, 0x09, 0x43, 0x41, 0x52, 0x44, 0x5f, 0x54,
-	0x59, 0x50, 0x45, 0x10, 0x07, 0x32, 0xf6, 0x06, 0x0a, 0x08, 0x56, 0x31, 0x41, 0x6c, 0x70, 0x68,
+	0x59, 0x50, 0x45, 0x10, 0x07, 0x32, 0xf6, 0x06, 0x0a, 0x08, 0x76, 0x31, 0x61, 0x6c, 0x70, 0x68,
 	0x61, 0x31, 0x12, 0x41, 0x0a, 0x07, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x16, 0x2e,
 	0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e,
 	0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a, 0x1c, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
@@ -1330,36 +1330,36 @@ var file_focus_proto_depIdxs = []int32{
 	2,  // 13: api.Challenge.card:type_name -> api.Card
 	15, // 14: api.ListChallengesResp.items:type_name -> api.Challenge
 	2,  // 15: api.GetCardResp.ItemsEntry.value:type_name -> api.Card
-	19, // 16: api.V1Alpha1.version:input_type -> google.protobuf.Empty
-	20, // 17: api.V1Alpha1.getUser:input_type -> google.protobuf.UInt64Value
-	3,  // 18: api.V1Alpha1.addCard:input_type -> api.AddCardReq
-	4,  // 19: api.V1Alpha1.listCards:input_type -> api.ListCardReq
-	20, // 20: api.V1Alpha1.getCard:input_type -> google.protobuf.UInt64Value
-	6,  // 21: api.V1Alpha1.getCards:input_type -> api.GetCardReq
-	20, // 22: api.V1Alpha1.getCardProgressSummary:input_type -> google.protobuf.UInt64Value
-	9,  // 23: api.V1Alpha1.patchCard:input_type -> api.PatchCardReq
-	8,  // 24: api.V1Alpha1.rerankCard:input_type -> api.RankCardReq
-	20, // 25: api.V1Alpha1.deleteCard:input_type -> google.protobuf.UInt64Value
-	12, // 26: api.V1Alpha1.listLabels:input_type -> api.ListLabelsReq
-	10, // 27: api.V1Alpha1.updateLabel:input_type -> api.Label
-	20, // 28: api.V1Alpha1.deleteLabel:input_type -> google.protobuf.UInt64Value
-	14, // 29: api.V1Alpha1.listChallenges:input_type -> api.ListChallengesReq
-	20, // 30: api.V1Alpha1.getChallenge:input_type -> google.protobuf.UInt64Value
-	21, // 31: api.V1Alpha1.version:output_type -> google.protobuf.StringValue
-	1,  // 32: api.V1Alpha1.getUser:output_type -> api.User
-	2,  // 33: api.V1Alpha1.addCard:output_type -> api.Card
-	5,  // 34: api.V1Alpha1.listCards:output_type -> api.ListCardResp
-	2,  // 35: api.V1Alpha1.getCard:output_type -> api.Card
-	7,  // 36: api.V1Alpha1.getCards:output_type -> api.GetCardResp
-	11, // 37: api.V1Alpha1.getCardProgressSummary:output_type -> api.CardProgressSummaryResp
-	2,  // 38: api.V1Alpha1.patchCard:output_type -> api.Card
-	19, // 39: api.V1Alpha1.rerankCard:output_type -> google.protobuf.Empty
-	19, // 40: api.V1Alpha1.deleteCard:output_type -> google.protobuf.Empty
-	13, // 41: api.V1Alpha1.listLabels:output_type -> api.ListLabelsResp
-	10, // 42: api.V1Alpha1.updateLabel:output_type -> api.Label
-	19, // 43: api.V1Alpha1.deleteLabel:output_type -> google.protobuf.Empty
-	16, // 44: api.V1Alpha1.listChallenges:output_type -> api.ListChallengesResp
-	15, // 45: api.V1Alpha1.getChallenge:output_type -> api.Challenge
+	19, // 16: api.v1alpha1.version:input_type -> google.protobuf.Empty
+	20, // 17: api.v1alpha1.getUser:input_type -> google.protobuf.UInt64Value
+	3,  // 18: api.v1alpha1.addCard:input_type -> api.AddCardReq
+	4,  // 19: api.v1alpha1.listCards:input_type -> api.ListCardReq
+	20, // 20: api.v1alpha1.getCard:input_type -> google.protobuf.UInt64Value
+	6,  // 21: api.v1alpha1.getCards:input_type -> api.GetCardReq
+	20, // 22: api.v1alpha1.getCardProgressSummary:input_type -> google.protobuf.UInt64Value
+	9,  // 23: api.v1alpha1.patchCard:input_type -> api.PatchCardReq
+	8,  // 24: api.v1alpha1.rerankCard:input_type -> api.RankCardReq
+	20, // 25: api.v1alpha1.deleteCard:input_type -> google.protobuf.UInt64Value
+	12, // 26: api.v1alpha1.listLabels:input_type -> api.ListLabelsReq
+	10, // 27: api.v1alpha1.updateLabel:input_type -> api.Label
+	20, // 28: api.v1alpha1.deleteLabel:input_type -> google.protobuf.UInt64Value
+	14, // 29: api.v1alpha1.listChallenges:input_type -> api.ListChallengesReq
+	20, // 30: api.v1alpha1.getChallenge:input_type -> google.protobuf.UInt64Value
+	21, // 31: api.v1alpha1.version:output_type -> google.protobuf.StringValue
+	1,  // 32: api.v1alpha1.getUser:output_type -> api.User
+	2,  // 33: api.v1alpha1.addCard:output_type -> api.Card
+	5,  // 34: api.v1alpha1.listCards:output_type -> api.ListCardResp
+	2,  // 35: api.v1alpha1.getCard:output_type -> api.Card
+	7,  // 36: api.v1alpha1.getCards:output_type -> api.GetCardResp
+	11, // 37: api.v1alpha1.getCardProgressSummary:output_type -> api.CardProgressSummaryResp
+	2,  // 38: api.v1alpha1.patchCard:output_type -> api.Card
+	19, // 39: api.v1alpha1.rerankCard:output_type -> google.protobuf.Empty
+	19, // 40: api.v1alpha1.deleteCard:output_type -> google.protobuf.Empty
+	13, // 41: api.v1alpha1.listLabels:output_type -> api.ListLabelsResp
+	10, // 42: api.v1alpha1.updateLabel:output_type -> api.Label
+	19, // 43: api.v1alpha1.deleteLabel:output_type -> google.protobuf.Empty
+	16, // 44: api.v1alpha1.listChallenges:output_type -> api.ListChallengesResp
+	15, // 45: api.v1alpha1.getChallenge:output_type -> api.Challenge
 	31, // [31:46] is the sub-list for method output_type
 	16, // [16:31] is the sub-list for method input_type
 	16, // [16:16] is the sub-list for extension type_name

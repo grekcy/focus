@@ -22,7 +22,7 @@ import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty
 import * as google_protobuf_wrappers_pb from 'google-protobuf/google/protobuf/wrappers_pb';
 
 
-export class V1Alpha1Client {
+export class v1alpha1Client {
   client_: grpcWeb.AbstractClientBase;
   hostname_: string;
   credentials_: null | { [index: string]: string; };
@@ -42,7 +42,7 @@ export class V1Alpha1Client {
   }
 
   methodDescriptorversion = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/version',
+    '/api.v1alpha1/version',
     grpcWeb.MethodType.UNARY,
     google_protobuf_empty_pb.Empty,
     google_protobuf_wrappers_pb.StringValue,
@@ -70,7 +70,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/version',
+          '/api.v1alpha1/version',
         request,
         metadata || {},
         this.methodDescriptorversion,
@@ -78,14 +78,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/version',
+      '/api.v1alpha1/version',
     request,
     metadata || {},
     this.methodDescriptorversion);
   }
 
   methodDescriptorgetUser = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/getUser',
+    '/api.v1alpha1/getUser',
     grpcWeb.MethodType.UNARY,
     google_protobuf_wrappers_pb.UInt64Value,
     focus_pb.User,
@@ -113,7 +113,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/getUser',
+          '/api.v1alpha1/getUser',
         request,
         metadata || {},
         this.methodDescriptorgetUser,
@@ -121,14 +121,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/getUser',
+      '/api.v1alpha1/getUser',
     request,
     metadata || {},
     this.methodDescriptorgetUser);
   }
 
   methodDescriptoraddCard = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/addCard',
+    '/api.v1alpha1/addCard',
     grpcWeb.MethodType.UNARY,
     focus_pb.AddCardReq,
     focus_pb.Card,
@@ -156,7 +156,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/addCard',
+          '/api.v1alpha1/addCard',
         request,
         metadata || {},
         this.methodDescriptoraddCard,
@@ -164,14 +164,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/addCard',
+      '/api.v1alpha1/addCard',
     request,
     metadata || {},
     this.methodDescriptoraddCard);
   }
 
   methodDescriptorlistCards = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/listCards',
+    '/api.v1alpha1/listCards',
     grpcWeb.MethodType.UNARY,
     focus_pb.ListCardReq,
     focus_pb.ListCardResp,
@@ -199,7 +199,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/listCards',
+          '/api.v1alpha1/listCards',
         request,
         metadata || {},
         this.methodDescriptorlistCards,
@@ -207,14 +207,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/listCards',
+      '/api.v1alpha1/listCards',
     request,
     metadata || {},
     this.methodDescriptorlistCards);
   }
 
   methodDescriptorgetCard = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/getCard',
+    '/api.v1alpha1/getCard',
     grpcWeb.MethodType.UNARY,
     google_protobuf_wrappers_pb.UInt64Value,
     focus_pb.Card,
@@ -242,7 +242,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/getCard',
+          '/api.v1alpha1/getCard',
         request,
         metadata || {},
         this.methodDescriptorgetCard,
@@ -250,14 +250,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/getCard',
+      '/api.v1alpha1/getCard',
     request,
     metadata || {},
     this.methodDescriptorgetCard);
   }
 
   methodDescriptorgetCards = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/getCards',
+    '/api.v1alpha1/getCards',
     grpcWeb.MethodType.UNARY,
     focus_pb.GetCardReq,
     focus_pb.GetCardResp,
@@ -285,7 +285,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/getCards',
+          '/api.v1alpha1/getCards',
         request,
         metadata || {},
         this.methodDescriptorgetCards,
@@ -293,14 +293,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/getCards',
+      '/api.v1alpha1/getCards',
     request,
     metadata || {},
     this.methodDescriptorgetCards);
   }
 
   methodDescriptorgetCardProgressSummary = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/getCardProgressSummary',
+    '/api.v1alpha1/getCardProgressSummary',
     grpcWeb.MethodType.UNARY,
     google_protobuf_wrappers_pb.UInt64Value,
     focus_pb.CardProgressSummaryResp,
@@ -328,7 +328,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/getCardProgressSummary',
+          '/api.v1alpha1/getCardProgressSummary',
         request,
         metadata || {},
         this.methodDescriptorgetCardProgressSummary,
@@ -336,14 +336,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/getCardProgressSummary',
+      '/api.v1alpha1/getCardProgressSummary',
     request,
     metadata || {},
     this.methodDescriptorgetCardProgressSummary);
   }
 
   methodDescriptorpatchCard = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/patchCard',
+    '/api.v1alpha1/patchCard',
     grpcWeb.MethodType.UNARY,
     focus_pb.PatchCardReq,
     focus_pb.Card,
@@ -371,7 +371,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/patchCard',
+          '/api.v1alpha1/patchCard',
         request,
         metadata || {},
         this.methodDescriptorpatchCard,
@@ -379,14 +379,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/patchCard',
+      '/api.v1alpha1/patchCard',
     request,
     metadata || {},
     this.methodDescriptorpatchCard);
   }
 
   methodDescriptorrerankCard = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/rerankCard',
+    '/api.v1alpha1/rerankCard',
     grpcWeb.MethodType.UNARY,
     focus_pb.RankCardReq,
     google_protobuf_empty_pb.Empty,
@@ -414,7 +414,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/rerankCard',
+          '/api.v1alpha1/rerankCard',
         request,
         metadata || {},
         this.methodDescriptorrerankCard,
@@ -422,14 +422,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/rerankCard',
+      '/api.v1alpha1/rerankCard',
     request,
     metadata || {},
     this.methodDescriptorrerankCard);
   }
 
   methodDescriptordeleteCard = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/deleteCard',
+    '/api.v1alpha1/deleteCard',
     grpcWeb.MethodType.UNARY,
     google_protobuf_wrappers_pb.UInt64Value,
     google_protobuf_empty_pb.Empty,
@@ -457,7 +457,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/deleteCard',
+          '/api.v1alpha1/deleteCard',
         request,
         metadata || {},
         this.methodDescriptordeleteCard,
@@ -465,14 +465,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/deleteCard',
+      '/api.v1alpha1/deleteCard',
     request,
     metadata || {},
     this.methodDescriptordeleteCard);
   }
 
   methodDescriptorlistLabels = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/listLabels',
+    '/api.v1alpha1/listLabels',
     grpcWeb.MethodType.UNARY,
     focus_pb.ListLabelsReq,
     focus_pb.ListLabelsResp,
@@ -500,7 +500,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/listLabels',
+          '/api.v1alpha1/listLabels',
         request,
         metadata || {},
         this.methodDescriptorlistLabels,
@@ -508,14 +508,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/listLabels',
+      '/api.v1alpha1/listLabels',
     request,
     metadata || {},
     this.methodDescriptorlistLabels);
   }
 
   methodDescriptorupdateLabel = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/updateLabel',
+    '/api.v1alpha1/updateLabel',
     grpcWeb.MethodType.UNARY,
     focus_pb.Label,
     focus_pb.Label,
@@ -543,7 +543,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/updateLabel',
+          '/api.v1alpha1/updateLabel',
         request,
         metadata || {},
         this.methodDescriptorupdateLabel,
@@ -551,14 +551,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/updateLabel',
+      '/api.v1alpha1/updateLabel',
     request,
     metadata || {},
     this.methodDescriptorupdateLabel);
   }
 
   methodDescriptordeleteLabel = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/deleteLabel',
+    '/api.v1alpha1/deleteLabel',
     grpcWeb.MethodType.UNARY,
     google_protobuf_wrappers_pb.UInt64Value,
     google_protobuf_empty_pb.Empty,
@@ -586,7 +586,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/deleteLabel',
+          '/api.v1alpha1/deleteLabel',
         request,
         metadata || {},
         this.methodDescriptordeleteLabel,
@@ -594,14 +594,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/deleteLabel',
+      '/api.v1alpha1/deleteLabel',
     request,
     metadata || {},
     this.methodDescriptordeleteLabel);
   }
 
   methodDescriptorlistChallenges = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/listChallenges',
+    '/api.v1alpha1/listChallenges',
     grpcWeb.MethodType.UNARY,
     focus_pb.ListChallengesReq,
     focus_pb.ListChallengesResp,
@@ -629,7 +629,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/listChallenges',
+          '/api.v1alpha1/listChallenges',
         request,
         metadata || {},
         this.methodDescriptorlistChallenges,
@@ -637,14 +637,14 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/listChallenges',
+      '/api.v1alpha1/listChallenges',
     request,
     metadata || {},
     this.methodDescriptorlistChallenges);
   }
 
   methodDescriptorgetChallenge = new grpcWeb.MethodDescriptor(
-    '/api.V1Alpha1/getChallenge',
+    '/api.v1alpha1/getChallenge',
     grpcWeb.MethodType.UNARY,
     google_protobuf_wrappers_pb.UInt64Value,
     focus_pb.Challenge,
@@ -672,7 +672,7 @@ export class V1Alpha1Client {
     if (callback !== undefined) {
       return this.client_.rpcCall(
         this.hostname_ +
-          '/api.V1Alpha1/getChallenge',
+          '/api.v1alpha1/getChallenge',
         request,
         metadata || {},
         this.methodDescriptorgetChallenge,
@@ -680,7 +680,7 @@ export class V1Alpha1Client {
     }
     return this.client_.unaryCall(
     this.hostname_ +
-      '/api.V1Alpha1/getChallenge',
+      '/api.v1alpha1/getChallenge',
     request,
     metadata || {},
     this.methodDescriptorgetChallenge);

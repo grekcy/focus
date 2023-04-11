@@ -6,7 +6,10 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
+  Breadcrumbs,
   Button,
+  Checkbox,
+  FormControlLabel,
   IconButton,
   LinearProgress,
   LinearProgressProps,
@@ -91,9 +94,14 @@ export function CardPage() {
       .catch((e) => app.toast(e.message, "error"));
   }
 
+  const [withDeferred, setWithDeferred] = useState(false);
+
   function RenderCard() {
     return (
       <>
+        <Breadcrumbs separator="›">
+          <Link to={`/cards/${card?.parentCardNo}`}>#{card?.parentCardNo}</Link>
+        </Breadcrumbs>
         <Box display="flex">
           <Typography variant="h5" sx={{ pr: 1 }}>
             CARD-#{cardNo}
@@ -277,6 +285,15 @@ export function CardPage() {
             <CardListView cards={cards} depth={card!.depth + 1} />
           </AccordionDetails>
           <AccordionActions>
+            <FormControlLabel
+              label="show deferred"
+              control={
+                <Checkbox
+                  value={withDeferred}
+                  onChange={() => setWithDeferred((p) => !p)}
+                />
+              }
+            />
             <TextField
               variant="standard"
               placeholder="add card...."

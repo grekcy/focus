@@ -66,7 +66,7 @@ export function AppBar({ open }: AppBarProps) {
         .addCard(objective)
         .then((r) => {
           setQucikAddObjective("");
-          app.toast(`added: ${objective}`, "success");
+          app.toast(`added: ${objective} as ${r.cardNo}`, "success");
         })
         .catch((e) => app.toast(e.message, "error"))
         .finally(() => setAdding(false));

@@ -7,6 +7,7 @@ import (
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
+	"github.com/whitekid/goxp"
 	"github.com/whitekid/goxp/fx"
 	"github.com/whitekid/goxp/log"
 	"github.com/whitekid/goxp/validate"
@@ -33,10 +34,19 @@ func (s *v1alpha1ServiceImpl) AddCard(ctx context.Context, req *proto.AddCardReq
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	r, err := s.addCard(ctx, req.Objective,
+		goxp.TernaryCF(req.AddAfter == nil, func() uint { return 0 }, func() uint { return uint(*req.AddAfter) }))
+	if err != nil {
+		return nil, err
+	}
+	return cardModelToProto(r), nil
+}
+
+func (s *v1alpha1ServiceImpl) addCard(ctx context.Context, objective string, addAfter uint) (*CardWithDepth, error) {
 	var parentCardNo *uint
 	var rank uint
-	if req.AddAfter != nil {
-		card, err := s.getCard(ctx, uint(*req.AddAfter))
+	if addAfter != 0 {
+		card, err := s.getCard(ctx, addAfter)
 		if err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
@@ -46,7 +56,7 @@ func (s *v1alpha1ServiceImpl) AddCard(ctx context.Context, req *proto.AddCardReq
 
 	newCard := &CardWithDepth{
 		Card: &models.Card{
-			Objective:    req.Objective,
+			Objective:    objective,
 			ParentCardNo: parentCardNo,
 			CardType:     models.CardTypeCard.String(),
 			CreatorID:    s.currentUser(ctx).ID,
@@ -55,7 +65,7 @@ func (s *v1alpha1ServiceImpl) AddCard(ctx context.Context, req *proto.AddCardReq
 		},
 	}
 
-	if err := s.db.Transaction(func(txn *gorm.DB) error {
+	if err := s.db.WithContext(ctx).Transaction(func(txn *gorm.DB) error {
 		if err := txn.Unscoped().Model(&models.Card{}).
 			Where(&models.Card{WorkspaceID: s.currentWorkspace(ctx).ID}).
 			Select("COALESCE(max(card_no), 0, max(card_no)) + 1").Row().Scan(&newCard.CardNo); err != nil {
@@ -94,7 +104,7 @@ func (s *v1alpha1ServiceImpl) AddCard(ctx context.Context, req *proto.AddCardReq
 		return nil, err
 	}
 
-	return cardModelToProto(newCard), nil
+	return newCard, nil
 }
 
 func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCardReq) (*emptypb.Empty, error) {
@@ -122,7 +132,7 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 		//  4
 		//  5   card.rank
 		//  6
-		if err := s.db.Transaction(func(txn *gorm.DB) error {
+		if err := s.db.WithContext(ctx).Transaction(func(txn *gorm.DB) error {
 			tx := txn.Model(&models.Card{}).
 				Where("workspace_id = ?", s.currentWorkspace(ctx).ID).
 				Where("rank BETWEEN ? AND ?", targetCard.Rank, card.Rank)
@@ -157,7 +167,7 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 		//  5   target.rank <new rank here>
 		//  6
 		//
-		if err := s.db.Transaction(func(tx *gorm.DB) error {
+		if err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 			tx = s.db.Model(&models.Card{}).
 				Where("workspace_id = ?", s.currentWorkspace(ctx).ID).
 				Where("rank BETWEEN ? AND ?", card.Rank, targetCard.Rank-1)
@@ -198,7 +208,7 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
+	if err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		tx = s.db.Delete(&models.Card{}, &models.Card{
 			WorkspaceID: s.currentWorkspace(ctx).ID,
 			CardNo:      uint(req.Value)})
@@ -323,6 +333,14 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, startWhere *models.
 			tx = tx.Where("parent_card_no IS NULL")
 		}
 
+		if opt.excludeCompleted {
+			tx = tx.Where("completed_at IS NULL")
+		}
+
+		if opt.excludeDeferred {
+			tx = tx.Where("defer_until IS NULL OR defer_until < now()")
+		}
+
 		if startWhere != nil {
 			if startWhere.CardType != "" {
 				tx = tx.Where("card_type = ?", startWhere.CardType)
@@ -334,16 +352,28 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, startWhere *models.
 		return tx
 	})
 
-	query := s.db.ToSQL(func(tx *gorm.DB) *gorm.DB {
-		tx = tx.Select("*")
+	recursiveQuery := s.db.ToSQL(func(tx *gorm.DB) *gorm.DB {
+		tx = tx.Select("cards.*, depth + 1 AS depth").
+			Model(&models.Card{}).
+			Joins("JOIN cte ON cte.card_no = cards.parent_card_no")
+
 		if opt.excludeCompleted {
-			tx = tx.Where("completed_at IS NULL")
+			tx = tx.Where("cards.completed_at IS NULL")
 		}
 
 		if opt.excludeDeferred {
-			tx = tx.Where("defer_until IS NULL OR defer_until < now()")
+			tx = tx.Where("cards.defer_until IS NULL OR cards.defer_until < now()")
 		}
 
+		if where != nil && where.CardType != "" {
+			tx = tx.Where("cards.card_type = ?", where.CardType)
+		}
+
+		return tx.Find(&[]models.Card{})
+	})
+
+	query := s.db.ToSQL(func(tx *gorm.DB) *gorm.DB {
+		tx = tx.Select("*")
 		if where != nil {
 			if where.CardNo != 0 {
 				tx = tx.Where("card_no = ?", where.CardNo)
@@ -351,10 +381,6 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, startWhere *models.
 
 			if len(where.Labels) > 0 {
 				tx = tx.Where("? <@ labels", where.Labels)
-			}
-
-			if where.CardType != "" {
-				tx = tx.Where("card_type = ?", where.CardType)
 			}
 		}
 
@@ -373,15 +399,13 @@ func (s *v1alpha1ServiceImpl) listCards(ctx context.Context, startWhere *models.
 	})
 
 	r := make([]*CardWithDepth, 0)
-	if tx := s.db.Raw(fmt.Sprintf(`WITH RECURSIVE cte AS (
+	if tx := s.db.WithContext(ctx).Raw(fmt.Sprintf(`WITH RECURSIVE cte AS (
         %s
     UNION ALL
-        SELECT cards.*, depth + 1 AS depth
-        FROM cards
-        JOIN cte ON cte.card_no = cards.parent_card_no
+        %s
 )
 SEARCH DEPTH FIRST BY rank SET ordercol
-%s`, nonRecursiveQuery, query)).Scan(&r); tx.Error != nil {
+%s`, nonRecursiveQuery, recursiveQuery, query)).Scan(&r); tx.Error != nil {
 		return nil, status.Errorf(codes.Internal, "fail to list cards: %+v", errors.Wrap(tx.Error, "list card failed"))
 	}
 
@@ -489,7 +513,7 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 			}
 
 		case proto.CardField_PARENT_CARD:
-			tx := s.db
+			tx := s.db.WithContext(ctx)
 			if req.Card.ParentCardNo == nil {
 				updates["parent_card_no"] = gorm.Expr("NULL")
 				tx = tx.Where("parent_card_no IS NULL")
@@ -549,7 +573,7 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 		return nil, status.Error(codes.InvalidArgument, "no columns to update")
 	}
 
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
+	if err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		updates["updated_at"] = time.Now()
 		if tx := s.db.Model(card.Card).UpdateColumns(updates); tx.Error != nil {
 			return tx.Error
@@ -600,10 +624,10 @@ func (s *v1alpha1ServiceImpl) getParentChallenge(ctx context.Context, cardNo uin
 
 func (s *v1alpha1ServiceImpl) getCardProgressSummary(ctx context.Context, cardNo uint) (uint64, uint64) {
 	var totalCards int64
-	s.db.Model(&models.Card{}).Where("parent_card_no = ?", cardNo).Count(&totalCards)
+	s.db.WithContext(ctx).Model(&models.Card{}).Where("parent_card_no = ?", cardNo).Count(&totalCards)
 
 	var completedCards int64
-	s.db.Model(&models.Card{}).Where("parent_card_no = ? AND completed_at IS NOT NULL", cardNo).Count(&completedCards)
+	s.db.WithContext(ctx).Model(&models.Card{}).Where("parent_card_no = ? AND completed_at IS NOT NULL", cardNo).Count(&completedCards)
 
 	return uint64(totalCards), uint64(completedCards)
 }

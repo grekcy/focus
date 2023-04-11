@@ -9,7 +9,7 @@ import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/grekcy/focus/proto";
 
-service V1Alpha1 {
+service v1alpha1 {
   rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
 
   rpc getUser(google.protobuf.UInt64Value) returns (User);

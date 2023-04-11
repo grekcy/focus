@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
-import { actDivider, useAction } from "../lib/components/Action";
+import { useAction } from "../lib/components/Action";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView } from "../lib/components/CardList";
 import {
@@ -22,7 +22,11 @@ export function TodayPage() {
   const [cards, setCards] = useState<Card.AsObject[]>([]);
   useEffect(() => {
     api
-      .listCards()
+      .listCards({
+        startCardType: "",
+        excludeCompleted: true,
+        includeDeferred: false,
+      })
       .then((r) => setCards(r))
       .catch((e) => app.toast(e.message, "error"));
   }, []);
@@ -128,13 +132,14 @@ export function TodayPage() {
       <ContextMenu
         ref={contextMenuRef}
         actions={[
+          // TODO context menu를 상황에 맞게 처리해야할 듯.
           // actChallengeThis,
-          actDivider,
+          // actDivider,
           actDeferUntilTomorrow,
           actDeferUntilNextWeek,
           actDeferUntilNextMonth,
           actClearDefer,
-          actDivider,
+          // actDivider,
           // actDueToTomorrow,
           // actDueToNextWeek,
           // actDueToLater,

@@ -231,6 +231,8 @@ export function InboxPage() {
         </Box>
       </Box>
 
+      {cards.length === 0 && <>There is no card in INBOX!</>}
+
       <CardListView
         ref={cardListRef}
         cards={cards}

@@ -14,7 +14,7 @@ import (
 
 func (s *v1alpha1ServiceImpl) listUsers(ctx context.Context, where *models.User) ([]*models.User, error) {
 	users := []*models.User{}
-	if tx := s.db.Where(where).Find(&users); tx.Error != nil {
+	if tx := s.db.WithContext(ctx).Where(where).Find(&users); tx.Error != nil {
 		return nil, status.Errorf(codes.Internal, "fail to list tags: %+v", tx.Error)
 	}
 

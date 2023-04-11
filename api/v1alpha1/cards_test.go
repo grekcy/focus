@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	"context"
+	"math"
 	"testing"
 	"time"
 
@@ -89,7 +90,10 @@ func TestListCards(t *testing.T) {
 			where: &models.Card{Labels: helper.ToArray(fx.Of(1))},
 			opts:  ListOpt{excludeCompleted: true}}, false},
 		{`inbox`, args{&models.Card{CardType: models.CardTypeCard.String()}, &models.Card{}, ListOpt{excludeCompleted: true}}, false},
-		{`challenge list`, args{&models.Card{CardType: models.CardTypeChallenge.String()}, &models.Card{CardType: models.CardTypeChallenge.String()}, ListOpt{excludeCompleted: true}}, false},
+		{`challenge list`, args{
+			&models.Card{CardType: models.CardTypeChallenge.String()},
+			&models.Card{CardType: models.CardTypeChallenge.String()}, ListOpt{excludeCompleted: true}}, false},
+		{`today`, args{&models.Card{}, &models.Card{}, ListOpt{excludeCompleted: true, excludeDeferred: true}}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -148,20 +152,46 @@ func TestGetCard(t *testing.T) {
 
 	ctx, service := newTestClient(ctx, t)
 
-	_, err := service.GetCards(ctx, &proto.GetCardReq{})
-	require.Error(t, err, "empty request")
+	inProgressCard := &models.Card{}
+	require.NoError(t, service.db.WithContext(ctx).Where("defer_until IS NULL AND completed_at IS NULL").Take(inProgressCard).Error)
+	require.NotEqual(t, uint(0), inProgressCard.ID)
 
-	_, err = service.GetCards(ctx, &proto.GetCardReq{CardNos: []uint64{1, 9999999999999999999}})
-	require.Error(t, err, "not exists")
+	deletedCard := &models.Card{}
+	require.NoError(t, service.db.WithContext(ctx).Unscoped().Where("deleted_at IS NOT NULL").Take(deletedCard).Error)
+	require.NotEqual(t, uint(0), deletedCard.ID)
 
-	items, err := service.listCards(ctx, nil, nil, ListOpt{excludeCompleted: true})
-	require.NoError(t, err)
-	require.NotEmpty(t, items)
-	cardNo := fx.Map(items, func(x *CardWithDepth) uint64 { return uint64(x.CardNo) })
+	completedCard := &models.Card{}
+	require.NoError(t, service.db.WithContext(ctx).Where("completed_at IS NOT NULL").Take(completedCard).Error)
+	require.NotEqual(t, uint(0), completedCard.ID)
 
-	got, err := service.GetCards(ctx, &proto.GetCardReq{CardNos: cardNo})
-	require.NoError(t, err)
-	require.Equal(t, len(items), len(got.Items))
+	deferredCard := &models.Card{}
+	require.NoError(t, service.db.WithContext(ctx).Where("defer_until IS NULL OR defer_until < now() AND completed_at IS NOT NULL").Take(deferredCard).Error)
+	require.NotEqual(t, uint(0), deferredCard.ID)
+
+	type args struct {
+		cardNo uint
+	}
+	tests := [...]struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{`not exists`, args{math.MaxUint}, true},
+		{`default`, args{inProgressCard.CardNo}, false},
+		{`completed`, args{completedCard.CardNo}, false},
+		{`deferred`, args{deferredCard.CardNo}, false},
+		{`deleted`, args{deletedCard.CardNo}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := service.getCard(ctx, tt.args.cardNo)
+			require.Truef(t, (err != nil) == tt.wantErr, `getCard() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
+			if tt.wantErr {
+				return
+			}
+			_ = got
+		})
+	}
 }
 
 func TestCompleteCard(t *testing.T) {
@@ -221,7 +251,7 @@ func TestCompleteCard(t *testing.T) {
 }
 
 func newCardForTest(ctx context.Context, t *testing.T, service *v1alpha1ServiceImpl, objective string) (*proto.Card, fixtures.Teardown) {
-	card, err := service.AddCard(ctx, &proto.AddCardReq{Objective:objective})
+	card, err := service.AddCard(ctx, &proto.AddCardReq{Objective: objective})
 	require.NoError(t, err, "fail to create card")
 
 	return card, func() {
