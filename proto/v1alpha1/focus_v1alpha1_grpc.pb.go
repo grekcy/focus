@@ -22,6 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Focus_Version_FullMethodName                = "/api.v1alpha1.Focus/version"
+	Focus_VersionEx_FullMethodName              = "/api.v1alpha1.Focus/versionEx"
 	Focus_LoginWithGoogleOauth_FullMethodName   = "/api.v1alpha1.Focus/loginWithGoogleOauth"
 	Focus_GetUser_FullMethodName                = "/api.v1alpha1.Focus/getUser"
 	Focus_AddCard_FullMethodName                = "/api.v1alpha1.Focus/addCard"
@@ -45,6 +46,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FocusClient interface {
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
+	VersionEx(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
 	// returns api key
 	LoginWithGoogleOauth(ctx context.Context, in *GoogleLoginReq, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
 	GetUser(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*User, error)
@@ -75,6 +77,15 @@ func NewFocusClient(cc grpc.ClientConnInterface) FocusClient {
 func (c *focusClient) Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
 	out := new(wrapperspb.StringValue)
 	err := c.cc.Invoke(ctx, Focus_Version_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *focusClient) VersionEx(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error) {
+	out := new(wrapperspb.StringValue)
+	err := c.cc.Invoke(ctx, Focus_VersionEx_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -230,6 +241,7 @@ func (c *focusClient) GetChallenge(ctx context.Context, in *wrapperspb.UInt64Val
 // for forward compatibility
 type FocusServer interface {
 	Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
+	VersionEx(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
 	// returns api key
 	LoginWithGoogleOauth(context.Context, *GoogleLoginReq) (*wrapperspb.StringValue, error)
 	GetUser(context.Context, *wrapperspb.UInt64Value) (*User, error)
@@ -256,6 +268,9 @@ type UnimplementedFocusServer struct {
 
 func (UnimplementedFocusServer) Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Version not implemented")
+}
+func (UnimplementedFocusServer) VersionEx(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VersionEx not implemented")
 }
 func (UnimplementedFocusServer) LoginWithGoogleOauth(context.Context, *GoogleLoginReq) (*wrapperspb.StringValue, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginWithGoogleOauth not implemented")
@@ -332,6 +347,24 @@ func _Focus_Version_Handler(srv interface{}, ctx context.Context, dec func(inter
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(FocusServer).Version(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Focus_VersionEx_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FocusServer).VersionEx(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Focus_VersionEx_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FocusServer).VersionEx(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -634,6 +667,10 @@ var Focus_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "version",
 			Handler:    _Focus_Version_Handler,
+		},
+		{
+			MethodName: "versionEx",
+			Handler:    _Focus_VersionEx_Handler,
 		},
 		{
 			MethodName: "loginWithGoogleOauth",

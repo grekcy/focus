@@ -33,22 +33,22 @@ func TestAddCard(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			ctx, service := newTestClient(ctx, t)
+			client := newTestClient(ctx, t)
 
-			got, err := service.AddCard(ctx, &proto.AddCardReq{Objective: tt.args.objective})
+			got, err := client.AddCard(ctx, &proto.AddCardReq{Objective: tt.args.objective})
 			require.Truef(t, (err != nil) == tt.wantErr, `AddCardReq() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
 			if tt.wantErr {
 				return
 			}
 			defer func() {
-				_, err = service.DeleteCard(ctx, helper.UInt64(got.CardNo))
+				_, err = client.DeleteCard(ctx, helper.UInt64(got.CardNo))
 				require.NoError(t, err)
 			}()
 
 			require.NotEqual(t, uint64(0), got.CardNo)
 			require.Equal(t, tt.args.objective, got.Objective)
 
-			got1, err := service.GetCard(ctx, helper.UInt64(got.CardNo))
+			got1, err := client.GetCard(ctx, helper.UInt64(got.CardNo))
 			require.NoError(t, err)
 			require.Equal(t, got, got1)
 		})
@@ -59,18 +59,18 @@ func TestListCards(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	ctx, service := newTestClient(ctx, t)
+	client := newTestClient(ctx, t)
 
 	// set deferred cards
-	deferredCard, err := service.AddCard(ctx, &proto.AddCardReq{Objective: "test defer card"})
+	deferredCard, err := client.AddCard(ctx, &proto.AddCardReq{Objective: "test defer card"})
 	require.NoError(t, err)
-	service.PatchCard(ctx, &proto.PatchCardReq{Card: &proto.Card{
+	client.PatchCard(ctx, &proto.PatchCardReq{Card: &proto.Card{
 		CardNo:     deferredCard.CardNo,
 		DeferUntil: timestamppb.New(time.Now().AddDate(0, 0, 1)),
 	}, Fields: []proto.CardField{proto.CardField_DEFER_UNTIL}})
 
 	defer func() {
-		service.DeleteCard(ctx, wrapperspb.UInt64(deferredCard.CardNo))
+		client.DeleteCard(ctx, wrapperspb.UInt64(deferredCard.CardNo))
 	}()
 
 	type args struct {
@@ -97,7 +97,7 @@ func TestListCards(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := service.listCards(ctx, tt.args.startWhere, tt.args.where, tt.args.opts)
+			got, err := client.service.listCards(ctx, tt.args.startWhere, tt.args.where, tt.args.opts)
 			require.Truef(t, (err != nil) == tt.wantErr, `listCards() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
 			if tt.wantErr {
 				return
@@ -150,22 +150,22 @@ func TestGetCard(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	ctx, service := newTestClient(ctx, t)
+	client := newTestClient(ctx, t)
 
 	inProgressCard := &models.Card{}
-	require.NoError(t, service.db.WithContext(ctx).Where("defer_until IS NULL AND completed_at IS NULL").Take(inProgressCard).Error)
+	require.NoError(t, client.service.db.WithContext(ctx).Where("defer_until IS NULL AND completed_at IS NULL").Take(inProgressCard).Error)
 	require.NotEqual(t, uint(0), inProgressCard.ID)
 
 	deletedCard := &models.Card{}
-	require.NoError(t, service.db.WithContext(ctx).Unscoped().Where("deleted_at IS NOT NULL").Take(deletedCard).Error)
+	require.NoError(t, client.service.db.WithContext(ctx).Unscoped().Where("deleted_at IS NOT NULL").Take(deletedCard).Error)
 	require.NotEqual(t, uint(0), deletedCard.ID)
 
 	completedCard := &models.Card{}
-	require.NoError(t, service.db.WithContext(ctx).Where("completed_at IS NOT NULL").Take(completedCard).Error)
+	require.NoError(t, client.service.db.WithContext(ctx).Where("completed_at IS NOT NULL").Take(completedCard).Error)
 	require.NotEqual(t, uint(0), completedCard.ID)
 
 	deferredCard := &models.Card{}
-	require.NoError(t, service.db.WithContext(ctx).Where("defer_until IS NULL OR defer_until < now() AND completed_at IS NOT NULL").Take(deferredCard).Error)
+	require.NoError(t, client.service.db.WithContext(ctx).Where("defer_until IS NULL OR defer_until < now() AND completed_at IS NOT NULL").Take(deferredCard).Error)
 	require.NotEqual(t, uint(0), deferredCard.ID)
 
 	type args struct {
@@ -184,7 +184,7 @@ func TestGetCard(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := service.getCard(ctx, tt.args.cardNo)
+			got, err := client.service.getCard(ctx, tt.args.cardNo)
 			require.Truef(t, (err != nil) == tt.wantErr, `getCard() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
 			if tt.wantErr {
 				return
@@ -198,15 +198,15 @@ func TestCompleteCard(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	ctx, service := newTestClient(ctx, t)
-	card, teardown := newCardForTest(ctx, t, service, "test card for complete card")
+	client := newTestClient(ctx, t)
+	card, teardown := newCardForTest(ctx, t, client.service, "test card for complete card")
 	defer teardown()
 
 	require.Nil(t, card.CompletedAt)
 
 	// set completed
 	{
-		_, err := service.PatchCard(ctx, &proto.PatchCardReq{
+		_, err := client.PatchCard(ctx, &proto.PatchCardReq{
 			Fields: []proto.CardField{proto.CardField_COMPLETED_AT},
 			Card: &proto.Card{
 				CardNo:      card.CardNo,
@@ -215,7 +215,7 @@ func TestCompleteCard(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		updated, err := service.GetCard(ctx, helper.UInt64(card.CardNo))
+		updated, err := client.GetCard(ctx, helper.UInt64(card.CardNo))
 		require.NoError(t, err)
 		require.NotNil(t, updated.CompletedAt)
 		require.Less(t, time.Since(updated.CompletedAt.AsTime()), time.Second)
@@ -223,7 +223,7 @@ func TestCompleteCard(t *testing.T) {
 
 	// set again will be failed
 	{
-		_, err := service.PatchCard(ctx, &proto.PatchCardReq{
+		_, err := client.PatchCard(ctx, &proto.PatchCardReq{
 			Fields: []proto.CardField{proto.CardField_COMPLETED_AT},
 			Card: &proto.Card{
 				CardNo:      card.CardNo,
@@ -235,7 +235,7 @@ func TestCompleteCard(t *testing.T) {
 
 	// turn to in-progress
 	{
-		_, err := service.PatchCard(ctx, &proto.PatchCardReq{
+		_, err := client.PatchCard(ctx, &proto.PatchCardReq{
 			Fields: []proto.CardField{proto.CardField_COMPLETED_AT},
 			Card: &proto.Card{
 				CardNo:      card.CardNo,
@@ -244,7 +244,7 @@ func TestCompleteCard(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		updated, err := service.GetCard(ctx, helper.UInt64(card.CardNo))
+		updated, err := client.GetCard(ctx, helper.UInt64(card.CardNo))
 		require.NoError(t, err)
 		require.Nil(t, updated.CompletedAt)
 	}
@@ -264,18 +264,18 @@ func TestRankDown(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	ctx, service := newTestClient(ctx, t)
-	card1, teardown := newCardForTest(ctx, t, service, "test objective for rank #1")
+	client := newTestClient(ctx, t)
+	card1, teardown := newCardForTest(ctx, t, client.service, "test objective for rank #1")
 	defer teardown()
 
-	card2, teardown := newCardForTest(ctx, t, service, "test objective for rank #2")
+	card2, teardown := newCardForTest(ctx, t, client.service, "test objective for rank #2")
 	defer teardown()
 
-	card3, teardown := newCardForTest(ctx, t, service, "test objective for rank #3")
+	card3, teardown := newCardForTest(ctx, t, client.service, "test objective for rank #3")
 	defer teardown()
 
 	_ = card2
-	_, err := service.RerankCard(ctx, &proto.RankCardReq{
+	_, err := client.RerankCard(ctx, &proto.RankCardReq{
 		CardNo:       card1.CardNo,
 		TargetCardNo: card3.CardNo,
 	})
@@ -286,7 +286,7 @@ func TestGetParentChallenge(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	ctx, service := newTestClient(ctx, t)
+	client := newTestClient(ctx, t)
 
 	type args struct {
 		cardNo uint
@@ -302,7 +302,7 @@ func TestGetParentChallenge(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := service.getParentChallenge(ctx, tt.args.cardNo)
+			got, err := client.service.getParentChallenge(ctx, tt.args.cardNo)
 			require.Truef(t, (err != nil) == tt.wantErr, `getParentChallenge() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
 			if tt.wantErr {
 				return

@@ -23,12 +23,11 @@ export function LoginPage() {
       <Container>
         {error && <Alert severity="error">{error}</Alert>}
 
-        <p>cookie token: {cookies.get("focus-token")}</p>
         <GoogleOAuthProvider clientId={process.env.REACT_APP_OAUTH_CLIENT_ID!}>
           <GoogleLogin
             onSuccess={(resp) => {
               api
-                .loginWithGoogle(resp)
+                .loginWithGoogle(resp.credential!, resp.clientId!)
                 .then((r) => {
                   cookies.set("focus-token", r.value, {
                     path: "/",

@@ -64,14 +64,19 @@ export class FocusAPI {
     return this.s.version(new Empty(), null).then((r) => r.toObject());
   };
 
+  versionEx = () => {
+    return this.s.versionEx(new Empty(), null).then((r) => r.toObject());
+  };
+
   //
   // FocusAPI
   //
 
-  loginWithGoogle = (resp: any) => {
+  loginWithGoogle = (credential: string, clientId: string, extra?: string) => {
     const req = new GoogleLoginReq();
-    req.setCredential(resp.credential);
-    req.setClientId(resp.clientId);
+    req.setCredential(credential);
+    req.setClientId(clientId);
+    extra && req.setExtra(extra);
     return this.s.loginWithGoogleOauth(req, null).then((r) => r.toObject());
   };
 

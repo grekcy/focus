@@ -6,9 +6,10 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/lithammer/shortuuid/v4"
-	"github.com/whitekid/goxp/log"
+	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	"github.com/pkg/errors"
 	"github.com/whitekid/goxp/validate"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -19,17 +20,20 @@ import (
 	proto "focus/proto/v1alpha1"
 )
 
-// extractUserInfo extract user info and set to context
+// extractUserInfo extract user info from token in context and set user to context
 // context.WithValue(keyUser): *models.User; current user
 // context.WithValue(keyUserWorkspace): *models.Workspace; default workspace for current user
 func ExtractUserInfo(ctx context.Context) (context.Context, error) {
 	db := ctx.Value(KeyDB).(*gorm.DB)
-	token := ctx.Value(KeyToken).(string) // TODO use jwt token
+	apikey := ctx.Value(KeyToken).(string)
 
-	log.Debugf("@@@ ExtractUserInfo(): %v", token)
+	email, err := parseAPIKey(apikey)
+	if err != nil {
+		return nil, err
+	}
 
-	user := &models.User{}
-	if tx := db.First(user, &models.User{Email: token}); tx.Error != nil {
+	user := &models.User{Email: email}
+	if tx := db.First(user); tx.Error != nil {
 		return nil, status.Error(codes.Unauthenticated, "user not found")
 	}
 	ctx = context.WithValue(ctx, KeyUser, user)
@@ -45,6 +49,43 @@ func ExtractUserInfo(ctx context.Context) (context.Context, error) {
 	ctx = context.WithValue(ctx, KeyUserWorkspace, userWorkspace.Workspace)
 
 	return ctx, nil
+}
+
+var authMap = map[string]string{
+	"version":              "",
+	"loginWithGoogleOauth": "",
+}
+
+func (s *v1alpha1ServiceImpl) authInterceptor() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		p := strings.Split(info.FullMethod, "/")
+		method := p[len(p)-1]
+
+		auth, ok := authMap[method]
+		if !ok {
+			auth = "required"
+		}
+
+		switch auth {
+		case "": // no authentication
+		case "required": // user required
+			token, err := grpc_auth.AuthFromMD(ctx, "bearer")
+			if err != nil {
+				return nil, err
+			}
+
+			ctx = context.WithValue(ctx, KeyToken, token)
+			ctx = context.WithValue(ctx, KeyDB, s.db) // TODO 맘에 안드네, struct의 멤버이면 ctx 없이 가도 되는데
+			ctx, err = ExtractUserInfo(ctx)
+			if err != nil {
+				return nil, err
+			}
+		default:
+			return nil, status.Errorf(codes.Internal, "invalid auth method: %v", auth)
+		}
+
+		return handler(ctx, req)
+	}
 }
 
 func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *proto.GoogleLoginReq) (*wrapperspb.StringValue, error) {
@@ -66,48 +107,83 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	claims := token.Claims.(jwt.MapClaims)
+	exp, err := token.Claims.GetExpirationTime()
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
 
 	if req.Extra != "__charlie__" {
-		exp, ok := claims["exp"].(float64)
-		if !ok || exp == 0 {
-			return nil, status.Errorf(codes.InvalidArgument, "expired")
-		}
-		expiredAt := time.Unix(int64(exp), 0)
-		if expiredAt.Before(time.Now()) {
+		if exp.Before(time.Now()) {
 			return nil, status.Errorf(codes.InvalidArgument, "expired")
 		}
 	}
 
-	email, ok := claims["email"].(string)
+	email, ok := token.Claims.(jwt.MapClaims)["email"].(string)
 	if !ok || email == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "empty email")
 	}
 
-	name, ok := claims["name"].(string)
+	name, ok := token.Claims.(jwt.MapClaims)["name"].(string)
 	if !ok || name == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "empty name")
 	}
 
-	tk := &models.Token{
-		UserID:    s.currentUser(ctx).ID,
-		Token:     shortuuid.New() + shortuuid.New(),
-		ExpiredAt: time.Now().AddDate(1, 0, 0),
-	}
-	if err := s.db.Transaction(func(tx *gorm.DB) error {
-		return tx.Save(tk).Error
-	}); err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
 	// return jwt token
-	tok, err := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.RegisteredClaims{
-		Issuer:    email,
-		ExpiresAt: jwt.NewNumericDate(tk.ExpiredAt),
-	}).SignedString(config.AuthSigningKey())
+	tok, err := signAPIKey(email, time.Now().AddDate(1, 0, 0))
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, err
 	}
 
 	return wrapperspb.String(tok), nil
+}
+
+// signAPIKey return signed jwt token
+func signAPIKey(email string, expireAt time.Time) (string, error) {
+	token, err := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.RegisteredClaims{
+		Issuer:    email,
+		ExpiresAt: jwt.NewNumericDate(expireAt),
+	}).SignedString(config.AuthSigningKey())
+	if err != nil {
+		return "", status.Error(codes.Internal, err.Error())
+	}
+
+	return token, nil
+}
+
+// parseAPIKey parse jwt signed api key and returns email
+// errors when jwt token expired
+func parseAPIKey(jwtToken string) (string, error) {
+	token, err := jwt.ParseWithClaims(jwtToken, &jwt.RegisteredClaims{},
+		func(token *jwt.Token) (any, error) {
+			if token.Method.Alg() != jwt.SigningMethodHS512.Name {
+				return nil, errors.Errorf("Unexpected signing method: %v", token.Method.Alg())
+			}
+			return config.AuthSigningKey(), nil
+		})
+	if err != nil {
+		return "", status.Errorf(codes.Unauthenticated, err.Error())
+	}
+
+	if !token.Valid {
+		return "", status.Errorf(codes.Unauthenticated, "invalid token")
+	}
+
+	claims, ok := token.Claims.(*jwt.RegisteredClaims)
+	if !ok {
+		return "", status.Errorf(codes.Unauthenticated, "invalid calims")
+	}
+
+	if claims.ExpiresAt == nil {
+		return "", status.Errorf(codes.Unauthenticated, "expired missed")
+	}
+
+	if claims.ExpiresAt.Before(time.Now()) {
+		return "", status.Errorf(codes.Internal, "api key expired")
+	}
+
+	if claims.Issuer == "" {
+		return "", status.Errorf(codes.Internal, "email missed")
+	}
+
+	return claims.Issuer, nil
 }

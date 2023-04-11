@@ -55,13 +55,3 @@ func (t *TokenAuth) GetRequestMetadata(ctx context.Context, in ...string) (map[s
 func (t *TokenAuth) RequireTransportSecurity() bool {
 	return false
 }
-
-func TestVersion(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	client := newTestServer(ctx, t)
-	v, err := client.Version(ctx, &emptypb.Empty{})
-	require.NoError(t, err)
-	require.Equal(t, "v1alpha1", v.Value)
-}

@@ -1,6 +1,7 @@
 package databases
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -13,7 +14,15 @@ import (
 	"focus/models"
 )
 
-func Open(dburl string) (*gorm.DB, error) {
+func Open() (*gorm.DB, error) {
+	return openURL(fmt.Sprintf("pgsql://%s:%s@%s/%s",
+		config.DBUser(),
+		config.DBPassword(),
+		config.DBHostname(),
+		config.DBName()))
+}
+
+func openURL(dburl string) (*gorm.DB, error) {
 	var sqlLogger logger.Interface
 	if config.DBLogSQL() {
 		sqlLogger = logger.New(&gormLogger{},

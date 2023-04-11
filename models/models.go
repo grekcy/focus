@@ -118,13 +118,3 @@ func (l *Label) BeforeCreate(tx *gorm.DB) error {
 	l.UID = gormx.GenerateID()
 	return nil
 }
-
-type Token struct {
-	*gorm.Model
-
-	UserID    uint      `gorm:"not null;index"`
-	Token     string    `gorm:"type:varchar(50);not null;uniqueIndex;check:token<>''"`
-	ExpiredAt time.Time `gorm:"not null;index"`
-
-	User *User `gorm:"foreignKey:UserID"`
-}

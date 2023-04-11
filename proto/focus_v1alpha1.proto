@@ -11,6 +11,7 @@ import "google/protobuf/wrappers.proto";
 
 service Focus {
   rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
+  rpc versionEx(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
 
   // returns api key
   rpc loginWithGoogleOauth(GoogleLoginReq)

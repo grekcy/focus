@@ -2,18 +2,16 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"time"
 
-	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/whitekid/goxp/log"
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/encoding/gzip"
 	"google.golang.org/grpc/keepalive"
-	"gorm.io/gorm"
 
+	"focus/api/types"
 	"focus/api/v1alpha1"
 	"focus/api/v1alpha2"
 	"focus/config"
@@ -55,51 +53,41 @@ func Serve(ctx context.Context, ln net.Listener) error {
 
 	logger := log.Zap(log.New())
 
-	db, err := databases.Open(fmt.Sprintf("pgsql://%s:%s@%s/%s", config.DBUser(), config.DBPassword(), config.DBHostname(), config.DBName()))
+	db, err := databases.Open()
 	if err != nil {
 		return err
 	}
 
-	g := grpc.NewServer(
+	opts := []grpc.ServerOption{
 		grpc.KeepaliveEnforcementPolicy(kaep),
 		grpc.KeepaliveParams(kasp),
-		grpc.StreamInterceptor(grpc_zap.StreamServerInterceptor(logger)),
-		grpc.UnaryInterceptor(grpc_auth.UnaryServerInterceptor(authInterceptor(db))),
-	)
+	}
 
-	proto_v1alpha1.RegisterFocusServer(g, v1alpha1.New(db))
-	proto_v1alpha2.RegisterFocusServer(g, v1alpha2.New(db))
+	// NOTE interceptor는 한번만 설정 가능
+	unaryInterceptors := []grpc.UnaryServerInterceptor{
+		grpc_zap.UnaryServerInterceptor(logger),
+	}
+
+	streamInterceptors := []grpc.StreamServerInterceptor{
+		grpc_zap.StreamServerInterceptor(logger),
+	}
+
+	v1alpha1Svc := v1alpha1.New(db)
+	v1alpha2Svc := v1alpha2.New(db)
+
+	for _, intf := range []any{v1alpha1Svc, v1alpha2Svc} {
+		if v, ok := intf.(types.Interceptor); ok {
+			unaryInterceptors = append(unaryInterceptors, v.GetUnrayInterceptor()...)
+			streamInterceptors = append(streamInterceptors, v.GetStreamInterceptor()...)
+		}
+	}
+
+	opts = append(opts, grpc.ChainUnaryInterceptor(unaryInterceptors...))
+	opts = append(opts, grpc.ChainStreamInterceptor(streamInterceptors...))
+
+	g := grpc.NewServer(opts...)
+	proto_v1alpha1.RegisterFocusServer(g, v1alpha1Svc)
+	proto_v1alpha2.RegisterFocusServer(g, v1alpha2Svc)
 
 	return g.Serve(ln)
-}
-
-// FIXME loginWithGoogle은 authentication header가 필요없음...
-func authInterceptor(db *gorm.DB) func(ctx context.Context) (context.Context, error) {
-	return func(ctx context.Context) (context.Context, error) {
-		token, err := grpc_auth.AuthFromMD(ctx, "bearer")
-		if err != nil {
-			log.Debugf("@@@@ authIntercepter(): %v", err)
-			return nil, err
-		}
-		ctx = context.WithValue(ctx, v1alpha1.KeyToken, token)
-
-		// tokenInfo, err := parseToken(token)
-		// if err != nil {
-		// 	return nil, status.Errorf(codes.Unauthenticated, "invalid auth token: %v", err)
-		// }
-
-		// grpc_ctxtags.Extract(ctx).Set("auth.sub", userClaimFromToken(tokenInfo))
-		// ctx = context.WithValue(ctx, "tokenInfo", tokenInfo)
-
-		ctx = context.WithValue(ctx, v1alpha1.KeyDB, db)
-		return v1alpha1.ExtractUserInfo(ctx)
-	}
-}
-
-func parseToken(token string) (struct{}, error) {
-	return struct{}{}, nil
-}
-
-func userClaimFromToken(struct{}) string {
-	return "foobar"
 }

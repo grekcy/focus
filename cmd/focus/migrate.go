@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 	"github.com/whitekid/cobrax"
 
-	"focus/config"
 	"focus/databases"
 	"focus/models"
 )
@@ -16,7 +13,7 @@ func init() {
 		Use:   "migrate",
 		Short: "migrate database",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			db, err := databases.Open(fmt.Sprintf("pgsql://%s:%s@%s/%s", config.DBUser(), config.DBPassword(), config.DBHostname(), config.DBName()))
+			db, err := databases.Open()
 			if err != nil {
 				return nil
 			}
