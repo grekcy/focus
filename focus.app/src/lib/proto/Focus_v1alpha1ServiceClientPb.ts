@@ -84,6 +84,49 @@ export class FocusClient {
     this.methodDescriptorversion);
   }
 
+  methodDescriptorloginWithGoogleOauth = new grpcWeb.MethodDescriptor(
+    '/api.v1alpha1.Focus/loginWithGoogleOauth',
+    grpcWeb.MethodType.UNARY,
+    focus_v1alpha1_pb.GoogleLoginReq,
+    google_protobuf_wrappers_pb.StringValue,
+    (request: focus_v1alpha1_pb.GoogleLoginReq) => {
+      return request.serializeBinary();
+    },
+    google_protobuf_wrappers_pb.StringValue.deserializeBinary
+  );
+
+  loginWithGoogleOauth(
+    request: focus_v1alpha1_pb.GoogleLoginReq,
+    metadata: grpcWeb.Metadata | null): Promise<google_protobuf_wrappers_pb.StringValue>;
+
+  loginWithGoogleOauth(
+    request: focus_v1alpha1_pb.GoogleLoginReq,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: google_protobuf_wrappers_pb.StringValue) => void): grpcWeb.ClientReadableStream<google_protobuf_wrappers_pb.StringValue>;
+
+  loginWithGoogleOauth(
+    request: focus_v1alpha1_pb.GoogleLoginReq,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: google_protobuf_wrappers_pb.StringValue) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/api.v1alpha1.Focus/loginWithGoogleOauth',
+        request,
+        metadata || {},
+        this.methodDescriptorloginWithGoogleOauth,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/api.v1alpha1.Focus/loginWithGoogleOauth',
+    request,
+    metadata || {},
+    this.methodDescriptorloginWithGoogleOauth);
+  }
+
   methodDescriptorgetUser = new grpcWeb.MethodDescriptor(
     '/api.v1alpha1.Focus/getUser',
     grpcWeb.MethodType.UNARY,

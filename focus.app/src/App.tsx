@@ -13,6 +13,7 @@ import { ErrorPage } from "./routes/ErrorPage";
 import { ForecastPage } from "./routes/Forecast";
 import { InboxPage } from "./routes/Inbox";
 import { LabelsPage } from "./routes/LabelsPage";
+import { LoginPage } from "./routes/LoginPage";
 import { PerformancePage } from "./routes/Performance";
 import { PlanningPage } from "./routes/Planning";
 import { RootPage } from "./routes/Root";
@@ -49,6 +50,7 @@ function App() {
                   <Route path="/planning" element={<PlanningPage />} />
                   <Route path="/performance" element={<PerformancePage />} />
                   <Route path="/labels" element={<LabelsPage />} />
+                  <Route path="/auth/login" element={<LoginPage />} />
                   <Route path="/playground/:playId?" element={<PlayIndex />} />
                   <Route path="*" element={<ErrorPage />} />
                 </Routes>

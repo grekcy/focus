@@ -7,6 +7,7 @@ import {
   Card,
   CardField,
   GetCardReq,
+  GoogleLoginReq,
   Label,
   ListCardReq,
   ListChallengesReq,
@@ -66,6 +67,14 @@ export class FocusAPI {
   //
   // FocusAPI
   //
+
+  loginWithGoogle = (resp: any) => {
+    const req = new GoogleLoginReq();
+    req.setCredential(resp.credential);
+    req.setClientId(resp.clientId);
+    return this.s.loginWithGoogleOauth(req, null).then((r) => r.toObject());
+  };
+
   getUser = (id: number) => {
     const userId = new UInt64Value();
     userId.setValue(id);

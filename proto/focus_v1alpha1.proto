@@ -12,6 +12,10 @@ import "google/protobuf/wrappers.proto";
 service Focus {
   rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
 
+  // returns api key
+  rpc loginWithGoogleOauth(GoogleLoginReq)
+      returns (google.protobuf.StringValue) {};
+
   rpc getUser(google.protobuf.UInt64Value) returns (User);
 
   rpc addCard(AddCardReq) returns (Card);
@@ -32,6 +36,12 @@ service Focus {
 
   rpc listChallenges(ListChallengesReq) returns (ListChallengesResp) {}
   rpc getChallenge(google.protobuf.UInt64Value) returns (Challenge) {}
+}
+
+message GoogleLoginReq {
+  string credential = 1;
+  string client_id = 2;
+  string extra = 3;
 }
 
 message User {

@@ -27,6 +27,7 @@ var defaults = map[string]any{
 	"database.max_open_conns":     100,
 	"database.conn_max_life_time": time.Hour,
 	"database.log_sql":            true,
+	"auth.signing_key":            "auth-signing-key",
 }
 
 func ApiServerBindAddr() string        { return v.GetString("apiserver.bind_addr") }
@@ -38,6 +39,7 @@ func DBMaxIdleConns() int              { return v.GetInt("database.max_idle_conn
 func DBMaxOpenConns() int              { return v.GetInt("database.max_open_conns") }
 func DBConnMaxLifeTime() time.Duration { return v.GetDuration("database.conn_max_life_time") }
 func DBLogSQL() bool                   { return v.GetBool("database.log_sql") }
+func AuthSigningKey() []byte           { return []byte(v.GetString("auth.signing_key")) }
 
 const envPrefix = "FC"
 

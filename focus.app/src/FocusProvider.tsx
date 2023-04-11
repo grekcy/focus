@@ -78,9 +78,8 @@ const cookies = new Cookies();
 
 export const FocusClientProvider = forwardRef(
   ({ children }: FocusClientProviderProps, ref: Ref<IFocusClientProvider>) => {
-    const api = new FocusAPI(
-      process.env.REACT_APP_API_ENDPOINT!,
-      () => "whitekid@gmail.com" // FIXME
+    const api = new FocusAPI(process.env.REACT_APP_API_ENDPOINT!, () =>
+      cookies.get("focus-token")
     );
 
     useImperativeHandle(ref, () => ({

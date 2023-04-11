@@ -7,6 +7,32 @@ import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/t
 import * as google_protobuf_wrappers_pb from 'google-protobuf/google/protobuf/wrappers_pb';
 
 
+export class GoogleLoginReq extends jspb.Message {
+  getCredential(): string;
+  setCredential(value: string): GoogleLoginReq;
+
+  getClientId(): string;
+  setClientId(value: string): GoogleLoginReq;
+
+  getExtra(): string;
+  setExtra(value: string): GoogleLoginReq;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GoogleLoginReq.AsObject;
+  static toObject(includeInstance: boolean, msg: GoogleLoginReq): GoogleLoginReq.AsObject;
+  static serializeBinaryToWriter(message: GoogleLoginReq, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GoogleLoginReq;
+  static deserializeBinaryFromReader(message: GoogleLoginReq, reader: jspb.BinaryReader): GoogleLoginReq;
+}
+
+export namespace GoogleLoginReq {
+  export type AsObject = {
+    credential: string,
+    clientId: string,
+    extra: string,
+  }
+}
+
 export class User extends jspb.Message {
   getId(): number;
   setId(value: number): User;

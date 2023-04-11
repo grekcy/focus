@@ -73,10 +73,12 @@ func Serve(ctx context.Context, ln net.Listener) error {
 	return g.Serve(ln)
 }
 
+// FIXME loginWithGoogle은 authentication header가 필요없음...
 func authInterceptor(db *gorm.DB) func(ctx context.Context) (context.Context, error) {
 	return func(ctx context.Context) (context.Context, error) {
 		token, err := grpc_auth.AuthFromMD(ctx, "bearer")
 		if err != nil {
+			log.Debugf("@@@@ authIntercepter(): %v", err)
 			return nil, err
 		}
 		ctx = context.WithValue(ctx, v1alpha1.KeyToken, token)
