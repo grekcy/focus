@@ -35,7 +35,8 @@ func newTestClientWithEmail(ctx context.Context, t *testing.T, email string) *Te
 	service := New(db).(*v1alpha1ServiceImpl)
 
 	g := grpc.NewServer(
-		grpc.UnaryInterceptor(service.GetUnrayInterceptor()),
+		grpc.ChainStreamInterceptor(service.StreamInterceptor()...),
+		grpc.ChainUnaryInterceptor(service.UnrayInterceptor()...),
 	)
 
 	proto.RegisterFocusServer(g, service)

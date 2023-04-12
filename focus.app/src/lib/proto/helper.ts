@@ -14,6 +14,11 @@ export function newEmptyUser() {
   return user.toObject();
 }
 
+export function newGuestUser() {
+  const user = new User();
+  return user.toObject();
+}
+
 export function newChallenge() {
   const challenge = new Challenge();
   return challenge.toObject();

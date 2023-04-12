@@ -16,9 +16,7 @@ export function LoginPage() {
 
   return (
     <>
-      <Typography variant="h5" flexGrow={1}>
-        Login
-      </Typography>
+      <Typography variant="h5">Login</Typography>
 
       <Container>
         {error && <Alert severity="error">{error}</Alert>}
@@ -33,6 +31,7 @@ export function LoginPage() {
                     path: "/",
                     maxAge: 86300 * 100,
                   });
+                  api.setLogin(r.value);
                 })
                 .then(() => navigate("/inbox"))
                 .catch((e) => app.toast(e.message, "error"));

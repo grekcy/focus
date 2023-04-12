@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardListView } from "../lib/components/CardList";
+import { DatePickButton } from "../lib/components/DatePickButton";
 import { Card, Challenge } from "../lib/proto/focus_v1alpha1_pb";
 import { newChallenge } from "../lib/proto/helper";
 
@@ -162,12 +163,14 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
 
       <Box sx={{ display: "flex", p: "1rem" }}>
         <Typography sx={{ flexGrow: "0", pr: "1rem" }}>
-          Due to:{" "}
-          {challenge.card!.dueDate
-            ? new Date(
-                challenge.card!.dueDate.seconds * 1000
-              ).toLocaleDateString()
-            : "None"}
+          Due to:
+          <DatePickButton
+            value={
+              challenge.card!.dueDate
+                ? new Date(challenge.card!.dueDate.seconds * 1000)
+                : null
+            }
+          />
         </Typography>
         <Box sx={{ flexGrow: "1" }}>
           <ChallengeProgress done={completedCards} total={totalCards} />

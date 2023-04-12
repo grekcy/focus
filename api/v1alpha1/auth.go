@@ -8,6 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/pkg/errors"
+	"github.com/whitekid/goxp/log"
 	"github.com/whitekid/goxp/validate"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -27,12 +28,12 @@ func ExtractUserInfo(ctx context.Context) (context.Context, error) {
 	db := ctx.Value(KeyDB).(*gorm.DB)
 	apikey := ctx.Value(KeyToken).(string)
 
-	email, err := parseAPIKey(apikey)
+	uid, err := parseAPIKey(apikey)
 	if err != nil {
 		return nil, err
 	}
 
-	user := &models.User{Email: email}
+	user := &models.User{UID: uid}
 	if tx := db.First(user); tx.Error != nil {
 		return nil, status.Error(codes.Unauthenticated, "user not found")
 	}
@@ -43,7 +44,7 @@ func ExtractUserInfo(ctx context.Context) (context.Context, error) {
 		UserID: user.ID,
 		Role:   models.RoleDefault,
 	}).First(userWorkspace); tx.Error != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "user workspace not found: %v", tx.Error)
+		return nil, status.Errorf(codes.Internal, "user workspace not found: %v", tx.Error)
 	}
 
 	ctx = context.WithValue(ctx, KeyUserWorkspace, userWorkspace.Workspace)
@@ -116,6 +117,11 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 		if exp.Before(time.Now()) {
 			return nil, status.Errorf(codes.InvalidArgument, "expired")
 		}
+
+		// NOTE google oauth token은 valid하지 않음. 키를 모르니까
+		// if !token.Valid {
+		// 	return nil, status.Errorf(codes.InvalidArgument, "invalid apikey")
+		// }
 	}
 
 	email, ok := token.Claims.(jwt.MapClaims)["email"].(string)
@@ -128,8 +134,80 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 		return nil, status.Errorf(codes.InvalidArgument, "empty name")
 	}
 
+	// create user if not exists
+	user := &models.User{}
+	if tx := s.db.Where("email = ?", email).Take(&user); tx.Error != nil {
+		if tx.Error.Error() == "record not found" { // FIXME
+			log.Infof("create new user: email=%s, name=%s", email, name)
+
+			if err := s.db.Transaction(func(txn *gorm.DB) error {
+				uw := &models.UserWorkspace{
+					Role: models.RoleDefault,
+					User: &models.User{
+						Email: email,
+						Name:  name,
+					},
+					Workspace: &models.Workspace{
+						Name: email,
+					},
+				}
+
+				if tx := txn.Create(uw); tx.Error != nil {
+					log.Errorf("%+v", tx.Error)
+					return status.Errorf(codes.Internal, tx.Error.Error())
+				}
+
+				user = uw.User
+
+				defaultLabels := []*models.Label{
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "enhancement",
+						Color:       "success.light",
+					},
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "design",
+						Color:       "info.light",
+					},
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "important",
+						Color:       "secondary.light",
+					},
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "urgent",
+						Color:       "error.main",
+					},
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "bug",
+						Color:       "error.light",
+					},
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "starred",
+						Color:       "warning.light",
+					},
+				}
+				if tx := txn.Create(defaultLabels); tx.Error != nil {
+					log.Errorf("%+v", tx.Error)
+					return status.Errorf(codes.Internal, tx.Error.Error())
+				}
+
+				return nil
+			}); err != nil {
+				return nil, err
+			}
+		} else {
+			log.Errorf("%+v %T", tx.Error.Error(), tx.Error)
+			return nil, status.Errorf(codes.Internal, "%+v", tx.Error.Error())
+		}
+	}
+
 	// return jwt token
-	tok, err := signAPIKey(email, time.Now().AddDate(1, 0, 0))
+	tok, err := signAPIKey(user.UID, time.Now().AddDate(1, 0, 0))
 	if err != nil {
 		return nil, err
 	}
@@ -138,9 +216,13 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 }
 
 // signAPIKey return signed jwt token
-func signAPIKey(email string, expireAt time.Time) (string, error) {
+func signAPIKey(uid string, expireAt time.Time) (string, error) {
+	if uid == "" {
+		return "", status.Error(codes.Internal, "uid required")
+	}
+
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.RegisteredClaims{
-		Issuer:    email,
+		Subject:   uid,
 		ExpiresAt: jwt.NewNumericDate(expireAt),
 	}).SignedString(config.AuthSigningKey())
 	if err != nil {
@@ -150,7 +232,7 @@ func signAPIKey(email string, expireAt time.Time) (string, error) {
 	return token, nil
 }
 
-// parseAPIKey parse jwt signed api key and returns email
+// parseAPIKey parse jwt signed api key and returns subject(user uid)
 // errors when jwt token expired
 func parseAPIKey(jwtToken string) (string, error) {
 	token, err := jwt.ParseWithClaims(jwtToken, &jwt.RegisteredClaims{},
@@ -181,9 +263,9 @@ func parseAPIKey(jwtToken string) (string, error) {
 		return "", status.Errorf(codes.Internal, "api key expired")
 	}
 
-	if claims.Issuer == "" {
-		return "", status.Errorf(codes.Internal, "email missed")
+	if claims.Subject == "" {
+		return "", status.Errorf(codes.Internal, "subject missed")
 	}
 
-	return claims.Issuer, nil
+	return claims.Subject, nil
 }

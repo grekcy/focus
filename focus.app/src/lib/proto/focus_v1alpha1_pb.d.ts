@@ -1,6 +1,5 @@
 import * as jspb from 'google-protobuf'
 
-import * as google_protobuf_duration_pb from 'google-protobuf/google/protobuf/duration_pb';
 import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb';
 import * as google_protobuf_field_mask_pb from 'google-protobuf/google/protobuf/field_mask_pb';
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb';
@@ -37,6 +36,9 @@ export class User extends jspb.Message {
   getId(): number;
   setId(value: number): User;
 
+  getUid(): string;
+  setUid(value: string): User;
+
   getEmail(): string;
   setEmail(value: string): User;
 
@@ -54,12 +56,16 @@ export class User extends jspb.Message {
 export namespace User {
   export type AsObject = {
     id: number,
+    uid: string,
     email: string,
     name: string,
   }
 }
 
 export class Card extends jspb.Message {
+  getUid(): string;
+  setUid(value: string): Card;
+
   getCardNo(): number;
   setCardNo(value: number): Card;
 
@@ -131,6 +137,7 @@ export class Card extends jspb.Message {
 
 export namespace Card {
   export type AsObject = {
+    uid: string,
     cardNo: number,
     parentCardNo?: number,
     depth: number,
@@ -150,27 +157,27 @@ export namespace Card {
 
   export enum ParentCardNoCase { 
     _PARENT_CARD_NO_NOT_SET = 0,
-    PARENT_CARD_NO = 2,
+    PARENT_CARD_NO = 3,
   }
 
   export enum DeferUntilCase { 
     _DEFER_UNTIL_NOT_SET = 0,
-    DEFER_UNTIL = 6,
+    DEFER_UNTIL = 7,
   }
 
   export enum DueDateCase { 
     _DUE_DATE_NOT_SET = 0,
-    DUE_DATE = 7,
+    DUE_DATE = 8,
   }
 
   export enum CompletedAtCase { 
     _COMPLETED_AT_NOT_SET = 0,
-    COMPLETED_AT = 8,
+    COMPLETED_AT = 9,
   }
 
   export enum ResponsibilityIdCase { 
     _RESPONSIBILITY_ID_NOT_SET = 0,
-    RESPONSIBILITY_ID = 10,
+    RESPONSIBILITY_ID = 11,
   }
 }
 
@@ -347,6 +354,9 @@ export class Label extends jspb.Message {
   getId(): number;
   setId(value: number): Label;
 
+  getUid(): string;
+  setUid(value: string): Label;
+
   getWorkspaceId(): number;
   setWorkspaceId(value: number): Label;
 
@@ -375,6 +385,7 @@ export class Label extends jspb.Message {
 export namespace Label {
   export type AsObject = {
     id: number,
+    uid: string,
     workspaceId: number,
     label: string,
     description: string,

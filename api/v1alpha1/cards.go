@@ -167,8 +167,8 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 		//  5   target.rank <new rank here>
 		//  6
 		//
-		if err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-			tx = s.db.Model(&models.Card{}).
+		if err := s.db.WithContext(ctx).Transaction(func(txn *gorm.DB) error {
+			tx := txn.Model(&models.Card{}).
 				Where("workspace_id = ?", s.currentWorkspace(ctx).ID).
 				Where("rank BETWEEN ? AND ?", card.Rank, targetCard.Rank-1)
 
@@ -182,7 +182,7 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 				return tx.Error
 			}
 
-			if tx := s.db.Model(card.Card).UpdateColumns(map[string]any{
+			if tx := txn.Model(card.Card).UpdateColumns(map[string]any{
 				"rank":           targetCard.Rank - 1,
 				"parent_card_no": targetCard.ParentCardNo,
 			}); tx.Error != nil {
@@ -208,8 +208,8 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	if err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		tx = s.db.Delete(&models.Card{}, &models.Card{
+	if err := s.db.WithContext(ctx).Transaction(func(txn *gorm.DB) error {
+		tx := txn.Delete(&models.Card{}, &models.Card{
 			WorkspaceID: s.currentWorkspace(ctx).ID,
 			CardNo:      uint(req.Value)})
 		if tx.Error != nil {
@@ -230,6 +230,7 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 
 func cardModelToProto(in *CardWithDepth) *proto.Card {
 	return &proto.Card{
+		Uid:              in.UID,
 		CardNo:           uint64(in.CardNo),
 		ParentCardNo:     helper.PP[uint, uint64](in.ParentCardNo),
 		Depth:            uint32(in.Depth),

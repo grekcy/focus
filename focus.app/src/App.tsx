@@ -7,6 +7,7 @@ import { AppBar } from "./AppBar";
 import { FocusClientProvider, FocusProvider } from "./FocusProvider";
 import { DrawerHeader, SideBar } from "./SideBar";
 import { PlayIndex } from "./playground/PlayIndex";
+import { AccountPage } from "./routes/AccountPage";
 import { CardPage } from "./routes/Cards";
 import { ChallengeIndex } from "./routes/Challenge";
 import { ErrorPage } from "./routes/ErrorPage";
@@ -50,6 +51,7 @@ function App() {
                   <Route path="/planning" element={<PlanningPage />} />
                   <Route path="/performance" element={<PerformancePage />} />
                   <Route path="/labels" element={<LabelsPage />} />
+                  <Route path="/account" element={<AccountPage />} />
                   <Route path="/auth/login" element={<LoginPage />} />
                   <Route path="/playground/:playId?" element={<PlayIndex />} />
                   <Route path="*" element={<ErrorPage />} />

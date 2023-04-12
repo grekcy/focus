@@ -19,7 +19,7 @@ type User struct {
 	*gorm.Model
 
 	UID   string `gorm:"type:varchar(22);not null;uniqueIndex;check:uid<>''"`
-	Email string `gorm:"type:varchar(100);not null;index;check:email<>''"`
+	Email string `gorm:"type:varchar(100);not null;uniqueIndex:,where:deleted_at IS NULL;check:email<>''"`
 	Name  string `gorm:"type:varchar(50);not null;name<>''"`
 }
 
@@ -32,7 +32,7 @@ type Workspace struct {
 	*gorm.Model
 
 	UID  string `gorm:"type:varchar(22);not null;uniqueIndex;check:uid<>''"`
-	Name string `gorm:"type:varchar(100);not null;uniqueIndex;check:name<>''"`
+	Name string `gorm:"type:varchar(100);not null;uniqueIndex:,where:deleted_at IS NULL;check:name<>''"`
 }
 
 func (w *Workspace) BeforeCreate(tx *gorm.DB) error {
