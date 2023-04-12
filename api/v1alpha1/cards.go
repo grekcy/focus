@@ -230,6 +230,7 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 
 func cardModelToProto(in *CardWithDepth) *proto.Card {
 	return &proto.Card{
+		Uid:              in.UID,
 		CardNo:           uint64(in.CardNo),
 		ParentCardNo:     helper.PP[uint, uint64](in.ParentCardNo),
 		Depth:            uint32(in.Depth),

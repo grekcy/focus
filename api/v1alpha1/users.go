@@ -40,6 +40,7 @@ func (s *v1alpha1ServiceImpl) getUser(ctx context.Context, userID uint) (*models
 func userModelToProto(in *models.User) *proto.User {
 	return &proto.User{
 		Id:    uint64(in.ID),
+		Uid:   in.UID,
 		Email: in.Email,
 		Name:  in.Name,
 	}

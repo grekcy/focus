@@ -13,7 +13,7 @@ service Focus {
   rpc version(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
   rpc versionEx(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
 
-  // returns api key
+  // returns jwt api key
   rpc loginWithGoogleOauth(GoogleLoginReq)
       returns (google.protobuf.StringValue) {};
 
@@ -47,26 +47,28 @@ message GoogleLoginReq {
 
 message User {
   uint64 id = 1;
-  string email = 2;
-  string name = 3;
+  string uid = 2; // uuid
+  string email = 3;
+  string name = 4;
 }
 
 message Card {
-  uint64 card_no = 1;
-  optional uint64 parent_card_no = 2;
-  uint32 depth = 3;
-  google.protobuf.Timestamp created_at = 4;
-  google.protobuf.Timestamp updated_at = 5;
-  optional google.protobuf.Timestamp defer_until = 6;
-  optional google.protobuf.Timestamp due_date = 7;
-  optional google.protobuf.Timestamp completed_at = 8;
-  uint64 creator_id = 9;
-  optional uint64 responsibility_id = 10;
-  string card_type = 11;
-  string status = 12;
-  string objective = 13;
-  string content = 14;
-  repeated uint64 labels = 15;
+  string uid = 1; // uuid
+  uint64 card_no = 2;
+  optional uint64 parent_card_no = 3;
+  uint32 depth = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+  optional google.protobuf.Timestamp defer_until = 7;
+  optional google.protobuf.Timestamp due_date = 8;
+  optional google.protobuf.Timestamp completed_at = 9;
+  uint64 creator_id = 10;
+  optional uint64 responsibility_id = 11;
+  string card_type = 12;
+  string status = 13;
+  string objective = 14;
+  string content = 15;
+  repeated uint64 labels = 16;
 }
 
 message AddCardReq {
@@ -110,11 +112,12 @@ message PatchCardReq {
 
 message Label {
   uint64 id = 1;
-  uint64 workspace_id = 2;
-  string label = 3;
-  string description = 4;
-  string color = 5;
-  google.protobuf.Timestamp created_at = 6;
+  string uid = 2; // uuid
+  uint64 workspace_id = 3;
+  string label = 4;
+  string description = 5;
+  string color = 6;
+  google.protobuf.Timestamp created_at = 7;
 }
 
 message CardProgressSummaryResp {
@@ -130,6 +133,7 @@ message ListChallengesReq {}
 
 message Challenge {
   Card card = 1; // card information
+  // TODO 굳이 이렇게 할 필요 있을까? cardProgressSummary()로 하면 될텐데..
   // progress
   uint64 total_cards = 2;
   uint64 completed_cards = 3;

@@ -47,7 +47,7 @@ const (
 type FocusClient interface {
 	Version(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
 	VersionEx(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
-	// returns api key
+	// returns jwt api key
 	LoginWithGoogleOauth(ctx context.Context, in *GoogleLoginReq, opts ...grpc.CallOption) (*wrapperspb.StringValue, error)
 	GetUser(ctx context.Context, in *wrapperspb.UInt64Value, opts ...grpc.CallOption) (*User, error)
 	AddCard(ctx context.Context, in *AddCardReq, opts ...grpc.CallOption) (*Card, error)
@@ -242,7 +242,7 @@ func (c *focusClient) GetChallenge(ctx context.Context, in *wrapperspb.UInt64Val
 type FocusServer interface {
 	Version(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
 	VersionEx(context.Context, *emptypb.Empty) (*wrapperspb.StringValue, error)
-	// returns api key
+	// returns jwt api key
 	LoginWithGoogleOauth(context.Context, *GoogleLoginReq) (*wrapperspb.StringValue, error)
 	GetUser(context.Context, *wrapperspb.UInt64Value) (*User, error)
 	AddCard(context.Context, *AddCardReq) (*Card, error)

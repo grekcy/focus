@@ -56,6 +56,7 @@ func (s *v1alpha1ServiceImpl) listLabels(ctx context.Context, where *models.Labe
 func labelModelToProto(in *models.Label) *proto.Label {
 	return &proto.Label{
 		Id:          uint64(in.ID),
+		Uid:         in.UID,
 		WorkspaceId: uint64(in.WorkspaceID),
 		Label:       in.Label,
 		Description: in.Description,
