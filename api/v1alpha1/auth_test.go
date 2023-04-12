@@ -58,6 +58,7 @@ func TestLoginUserNotExists(t *testing.T) {
 			for _, uw := range userWorkspaces {
 				client.service.db.Transaction(func(txn *gorm.DB) error {
 					require.NoError(t, txn.Unscoped().Delete(&models.UserWorkspace{}, uw.ID).Error)
+					require.NoError(t, txn.Unscoped().Where("workspace_id = ?", uw.WorkspaceID).Delete(&models.Label{}).Error)
 					require.NoError(t, txn.Unscoped().Delete(&models.Workspace{}, uw.WorkspaceID).Error)
 					require.NoError(t, txn.Unscoped().Delete(&models.User{}, uw.UserID).Error)
 					return nil
@@ -88,4 +89,8 @@ func TestLoginUserNotExists(t *testing.T) {
 	userWorkspace, err := client.service.userDefaultWorkspace(user.ID)
 	require.NoError(t, err, "default workspace not found")
 	require.Equal(t, user.Email, userWorkspace.Name)
+
+	labels, err := client.service.listLabels(ctx, &models.Label{WorkspaceID: userWorkspace.ID})
+	require.NoError(t, err)
+	require.NotEmpty(t, labels)
 }

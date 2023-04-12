@@ -68,7 +68,9 @@ func labelModelToProto(in *models.Label) *proto.Label {
 func (s *v1alpha1ServiceImpl) ListLabels(ctx context.Context, req *proto.ListLabelsReq) (*proto.ListLabelsResp, error) {
 	log.Debugf("ListLabel(): req=%+v", req)
 
-	r, err := s.listLabels(ctx, nil)
+	r, err := s.listLabels(ctx, &models.Label{
+		WorkspaceID: s.currentWorkspace(ctx).ID},
+	)
 	if err != nil {
 		return nil, err
 	}

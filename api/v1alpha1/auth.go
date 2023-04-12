@@ -140,23 +140,66 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 		if tx.Error.Error() == "record not found" { // FIXME
 			log.Infof("create new user: email=%s, name=%s", email, name)
 
-			uw := &models.UserWorkspace{
-				Role: models.RoleDefault,
-				User: &models.User{
-					Email: email,
-					Name:  name,
-				},
-				Workspace: &models.Workspace{
-					Name: email,
-				},
-			}
+			if err := s.db.Transaction(func(txn *gorm.DB) error {
+				uw := &models.UserWorkspace{
+					Role: models.RoleDefault,
+					User: &models.User{
+						Email: email,
+						Name:  name,
+					},
+					Workspace: &models.Workspace{
+						Name: email,
+					},
+				}
 
-			if tx := s.db.Create(uw); tx.Error != nil {
-				log.Errorf("%+v", tx.Error)
-				return nil, status.Errorf(codes.Internal, tx.Error.Error())
-			}
+				if tx := txn.Create(uw); tx.Error != nil {
+					log.Errorf("%+v", tx.Error)
+					return status.Errorf(codes.Internal, tx.Error.Error())
+				}
 
-			user = uw.User
+				user = uw.User
+
+				defaultLabels := []*models.Label{
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "enhancement",
+						Color:       "success.light",
+					},
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "design",
+						Color:       "info.light",
+					},
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "important",
+						Color:       "secondary.light",
+					},
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "urgent",
+						Color:       "error.main",
+					},
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "bug",
+						Color:       "error.light",
+					},
+					{
+						WorkspaceID: uw.WorkspaceID,
+						Label:       "starred",
+						Color:       "warning.light",
+					},
+				}
+				if tx := txn.Create(defaultLabels); tx.Error != nil {
+					log.Errorf("%+v", tx.Error)
+					return status.Errorf(codes.Internal, tx.Error.Error())
+				}
+
+				return nil
+			}); err != nil {
+				return nil, err
+			}
 		} else {
 			log.Errorf("%+v %T", tx.Error.Error(), tx.Error)
 			return nil, status.Errorf(codes.Internal, "%+v", tx.Error.Error())
