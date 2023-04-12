@@ -37,11 +37,11 @@ const (
 	KeyUserWorkspace Key = "focus.user.workspace"
 )
 
-func (s *v1alpha1ServiceImpl) GetUnrayInterceptor() []grpc.UnaryServerInterceptor {
+func (s *v1alpha1ServiceImpl) UnrayInterceptor() []grpc.UnaryServerInterceptor {
 	return []grpc.UnaryServerInterceptor{s.authInterceptor()}
 }
 
-func (s *v1alpha1ServiceImpl) GetStreamInterceptor() []grpc.StreamServerInterceptor { return nil }
+func (s *v1alpha1ServiceImpl) StreamInterceptor() []grpc.StreamServerInterceptor { return nil }
 
 func (s *v1alpha1ServiceImpl) Version(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.StringValue, error) {
 	return &wrapperspb.StringValue{Value: "v1alpha1"}, nil

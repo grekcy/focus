@@ -24,8 +24,8 @@ func New(db *gorm.DB) proto.FocusServer {
 	return &v1alpha2ServiceImpl{db: db}
 }
 
-func (s *v1alpha2ServiceImpl) GetUnrayInterceptor() []grpc.UnaryServerInterceptor   { return nil }
-func (s *v1alpha2ServiceImpl) GetStreamInterceptor() []grpc.StreamServerInterceptor { return nil }
+func (s *v1alpha2ServiceImpl) UnrayInterceptor() []grpc.UnaryServerInterceptor   { return nil }
+func (s *v1alpha2ServiceImpl) StreamInterceptor() []grpc.StreamServerInterceptor { return nil }
 
 func (s *v1alpha2ServiceImpl) Version(ctx context.Context, _ *emptypb.Empty) (*wrapperspb.StringValue, error) {
 	return &wrapperspb.StringValue{Value: "v1alpha2"}, nil

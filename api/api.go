@@ -77,8 +77,8 @@ func Serve(ctx context.Context, ln net.Listener) error {
 
 	for _, intf := range []any{v1alpha1Svc, v1alpha2Svc} {
 		if v, ok := intf.(types.Interceptor); ok {
-			unaryInterceptors = append(unaryInterceptors, v.GetUnrayInterceptor()...)
-			streamInterceptors = append(streamInterceptors, v.GetStreamInterceptor()...)
+			unaryInterceptors = append(unaryInterceptors, v.UnrayInterceptor()...)
+			streamInterceptors = append(streamInterceptors, v.StreamInterceptor()...)
 		}
 	}
 
