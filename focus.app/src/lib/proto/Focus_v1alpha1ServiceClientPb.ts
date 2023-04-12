@@ -170,6 +170,49 @@ export class FocusClient {
     this.methodDescriptorloginWithGoogleOauth);
   }
 
+  methodDescriptorgetProfile = new grpcWeb.MethodDescriptor(
+    '/api.v1alpha1.Focus/getProfile',
+    grpcWeb.MethodType.UNARY,
+    google_protobuf_empty_pb.Empty,
+    focus_v1alpha1_pb.User,
+    (request: google_protobuf_empty_pb.Empty) => {
+      return request.serializeBinary();
+    },
+    focus_v1alpha1_pb.User.deserializeBinary
+  );
+
+  getProfile(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null): Promise<focus_v1alpha1_pb.User>;
+
+  getProfile(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.RpcError,
+               response: focus_v1alpha1_pb.User) => void): grpcWeb.ClientReadableStream<focus_v1alpha1_pb.User>;
+
+  getProfile(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.RpcError,
+               response: focus_v1alpha1_pb.User) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/api.v1alpha1.Focus/getProfile',
+        request,
+        metadata || {},
+        this.methodDescriptorgetProfile,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/api.v1alpha1.Focus/getProfile',
+    request,
+    metadata || {},
+    this.methodDescriptorgetProfile);
+  }
+
   methodDescriptorgetUser = new grpcWeb.MethodDescriptor(
     '/api.v1alpha1.Focus/getUser',
     grpcWeb.MethodType.UNARY,

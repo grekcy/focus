@@ -3,9 +3,9 @@ syntax = "proto3";
 package api.v1alpha1;
 option go_package = "github.com/grekcy/focus/proto/v1alpha1";
 
-import "google/protobuf/duration.proto";
+// import "google/protobuf/duration.proto";
 import "google/protobuf/empty.proto";
-import "google/protobuf/field_mask.proto";
+// import "google/protobuf/field_mask.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
@@ -16,6 +16,9 @@ service Focus {
   // returns jwt api key
   rpc loginWithGoogleOauth(GoogleLoginReq)
       returns (google.protobuf.StringValue) {};
+
+  // return current user profile
+  rpc getProfile(google.protobuf.Empty) returns (User);
 
   rpc getUser(google.protobuf.UInt64Value) returns (User);
 

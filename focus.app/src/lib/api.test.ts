@@ -9,7 +9,7 @@ enum Status {
 }
 
 describe("focus API: not require authenticate", () => {
-  const service = new FocusAPI(endpoint, () => "");
+  const service = new FocusAPI(endpoint, "");
 
   test("get version", async () => {
     const got = await service.version();
@@ -18,8 +18,7 @@ describe("focus API: not require authenticate", () => {
 });
 
 describe("focus API", () => {
-  let token = "";
-  const service = new FocusAPI(endpoint, () => token);
+  const service = new FocusAPI(endpoint, "");
 
   beforeAll(async () => {
     const got = await service.loginWithGoogle(
@@ -28,7 +27,7 @@ describe("focus API", () => {
       "__charlie__"
     );
     expect(got.value).not.toEqual("");
-    token = got.value;
+    service.setLogin(got.value);
   });
 
   test("versionEx", async () => {

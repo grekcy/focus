@@ -5,12 +5,17 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gorm.io/gorm"
 
 	"focus/models"
 	proto "focus/proto/v1alpha1"
 )
+
+func (s *v1alpha1ServiceImpl) GetProfile(ctx context.Context, _ *emptypb.Empty) (*proto.User, error) {
+	return userModelToProto(s.currentUser(ctx)), nil
+}
 
 func (s *v1alpha1ServiceImpl) listUsers(ctx context.Context, where *models.User) ([]*models.User, error) {
 	users := []*models.User{}

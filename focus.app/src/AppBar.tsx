@@ -1,11 +1,19 @@
+import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import AddIcon from "@mui/icons-material/Add";
+import LoginIcon from "@mui/icons-material/Login";
+import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import {
   Avatar,
   Box,
+  Divider,
   IconButton,
   InputAdornment,
   ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
   AppBar as MuiAppBar,
   AppBarProps as MuiAppBarProps,
   SvgIcon,
@@ -14,10 +22,13 @@ import {
   Toolbar,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { SyntheticEvent, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { MouseEvent, SyntheticEvent, useEffect, useRef, useState } from "react";
+import { Cookies } from "react-cookie";
+import { Link, useNavigate } from "react-router-dom";
 import { useFocusApp, useFocusClient } from "./FocusProvider";
 import { useAction } from "./lib/components/Action";
+import { User } from "./lib/proto/focus_v1alpha1_pb";
+import { newGuestUser } from "./lib/proto/helper";
 
 const drawerWidth = 170;
 
@@ -79,6 +90,35 @@ export function AppBar({ open }: AppBarProps) {
     onExecute: () => ref.current && ref.current.focus(),
   });
 
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  function handleOpenUserMenu(event: MouseEvent<HTMLElement>): void {
+    setAnchorElUser(event.currentTarget);
+  }
+
+  const [currentUser, setCurrentUser] = useState<User.AsObject>(newGuestUser());
+  useEffect(() => {
+    if (api.isLogined()) {
+      api
+        .getProfile()
+        .then((r) => setCurrentUser(r))
+        .catch((e) => app.toast(e.message, "error"));
+    } else {
+      setCurrentUser(newGuestUser());
+    }
+  }, [api]);
+
+  const cookies = new Cookies();
+
+  const navigate = useNavigate();
+  function handleLogout() {
+    setAnchorElUser(null);
+
+    cookies.remove("focus-token");
+    api.setLogin("");
+
+    navigate("/");
+  }
+
   const ref = useRef<HTMLDivElement>(null);
 
   return (
@@ -118,9 +158,50 @@ export function AppBar({ open }: AppBarProps) {
           />
         </Box>
         <Box sx={{ flexGrow: 0 }}>
-          <IconButton>
+          <IconButton onClick={handleOpenUserMenu}>
             <Avatar />
           </IconButton>
+          <Menu
+            anchorEl={anchorElUser}
+            open={!!anchorElUser}
+            onClose={() => setAnchorElUser(null)}
+          >
+            {api.isLogined() && (
+              <>
+                <MenuItem
+                  component={Link}
+                  to="/account"
+                  onClick={() => setAnchorElUser(null)}
+                >
+                  <ListItemIcon>
+                    <AccountBoxIcon />
+                  </ListItemIcon>
+                  <ListItemText>{currentUser.name} - Profile</ListItemText>
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={() => handleLogout()}>
+                  <ListItemIcon>
+                    <LogoutIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Logout" />
+                </MenuItem>
+              </>
+            )}
+            {!api.isLogined() && (
+              <>
+                <MenuItem
+                  component={Link}
+                  to="/auth/login"
+                  onClick={() => setAnchorElUser(null)}
+                >
+                  <ListItemIcon>
+                    <LoginIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Login" />
+                </MenuItem>
+              </>
+            )}
+          </Menu>
         </Box>
       </Toolbar>
     </MAppBar>

@@ -23,10 +23,12 @@ export enum Event {
 
 export class FocusAPI {
   s: FocusClient;
+  token: string = ""; // apikey
   listeners: { [event: string]: EventListener[] };
 
-  constructor(endpoint: string, getToken: () => string) {
-    const authInterceptor = new AuthInterceptor(getToken);
+  constructor(endpoint: string, token: string) {
+    this.token = token!;
+    const authInterceptor = new AuthInterceptor(() => this.token);
     const options = {
       unaryInterceptors: [authInterceptor],
       streamInterceptors: [authInterceptor],
@@ -69,6 +71,21 @@ export class FocusAPI {
   };
 
   //
+  // authentication
+  //
+  isLogined = () => {
+    return this.token !== "";
+  };
+
+  logout = () => {
+    this.token = "";
+  };
+
+  setLogin = (token: string) => {
+    this.token = token;
+  };
+
+  //
   // FocusAPI
   //
 
@@ -78,6 +95,10 @@ export class FocusAPI {
     req.setClientId(clientId);
     extra && req.setExtra(extra);
     return this.s.loginWithGoogleOauth(req, null).then((r) => r.toObject());
+  };
+
+  getProfile = () => {
+    return this.s.getProfile(new Empty(), null).then((r) => r.toObject());
   };
 
   getUser = (id: number) => {
