@@ -647,6 +647,7 @@ export const CardListView = forwardRef(
 
     const [actDeferUntilNextMonth] = useAction({
       label: "Defer later...",
+      hotkey: "⌘+Ctrl+R",
       onEnabled: () => selected !== -1,
       onExecute: () =>
         updateDeferUntil(
@@ -667,7 +668,7 @@ export const CardListView = forwardRef(
             ? app.toast(
                 `set card ${
                   cards[selected].cardNo
-                } due date to ${dueDate.toLocaleString()}`
+                } due date to ${dueDate.toLocaleDateString()}`
               )
             : app.toast(`card ${cards[selected].cardNo} due date cleared`)
         )
@@ -680,18 +681,16 @@ export const CardListView = forwardRef(
       onExecute: () => updateDeferUntil(null),
     });
 
-    const [actDueToTomorrow] = useAction({
-      label: "Due to Tomorrow",
+    const [actDueToToday] = useAction({
+      label: "Due to Today",
       onEnabled: () => selected !== -1,
-      onExecute: () =>
-        updateDueDate(datetime.workTime().add(1, "day").toDate()),
+      onExecute: () => updateDueDate(datetime.dueTime().toDate()),
     });
 
     const [actDueToNextWeek] = useAction({
       label: "Due to next Week",
       onEnabled: () => selected !== -1,
-      onExecute: () =>
-        updateDueDate(datetime.workTime().add(7, "day").toDate()),
+      onExecute: () => updateDueDate(datetime.dueTime().add(7, "day").toDate()),
     });
 
     const [actDueToLater] = useAction({
@@ -700,7 +699,7 @@ export const CardListView = forwardRef(
       onExecute: () =>
         updateDueDate(
           datetime
-            .workTime()
+            .dueTime()
             .add(Math.random() * 30 + 7, "day")
             .toDate()
         ),
@@ -722,7 +721,7 @@ export const CardListView = forwardRef(
       actDeferUntilNextMonth,
       actClearDefer,
       actDivider,
-      actDueToTomorrow,
+      actDueToToday,
       actDueToNextWeek,
       actDueToLater,
       actClearDueDate,
