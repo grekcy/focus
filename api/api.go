@@ -7,6 +7,7 @@ import (
 
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/whitekid/goxp/log"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/encoding/gzip"
 	"google.golang.org/grpc/keepalive"
@@ -51,7 +52,7 @@ func Serve(ctx context.Context, ln net.Listener) error {
 		Timeout: time.Second,     // Wait 1 second for the ping ack before assuming the connection is dead
 	}
 
-	logger := log.Zap(log.New())
+	logger := log.Zap(log.New(zap.AddCallerSkip(2)))
 
 	db, err := databases.Open()
 	if err != nil {

@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 import update from "immutability-helper";
 import { ChangeEvent, useEffect, useState } from "react";
-import { useFocusApp, useFocusClient } from "../FocusProvider";
+import { useFocusApp, useFocusClient } from "../lib/components/FocusProvider";
 import { LabelChip, LabelColors } from "../lib/components/LabelChip";
 import { Label } from "../lib/proto/focus_v1alpha1_pb";
 

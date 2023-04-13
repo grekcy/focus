@@ -13,6 +13,7 @@ require (
 	github.com/whitekid/cobrax v0.0.0-20230316054516-c4338cdfe72c
 	github.com/whitekid/gormx v0.0.0-20230222021154-a2fac842229c
 	github.com/whitekid/goxp v0.0.0-20230317034230-382ba50fc378
+	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
@@ -54,7 +55,6 @@ require (
 	github.com/whitekid/iter v0.0.0-20230222021346-f1627b52f797 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
-	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect

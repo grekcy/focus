@@ -23,12 +23,12 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { MouseEvent, SyntheticEvent, useEffect, useRef, useState } from "react";
-import { Cookies } from "react-cookie";
 import { Link, useNavigate } from "react-router-dom";
-import { useFocusApp, useFocusClient } from "./FocusProvider";
-import { useAction } from "./lib/components/Action";
-import { User } from "./lib/proto/focus_v1alpha1_pb";
-import { newGuestUser } from "./lib/proto/helper";
+import { useAction } from "../lib/components/Action";
+import { useAuth } from "../lib/components/AuthProvider";
+import { useFocus } from "../lib/components/FocusProvider";
+import { User } from "../lib/proto/focus_v1alpha1_pb";
+import { newGuestUser } from "../lib/proto/helper";
 
 const drawerWidth = 170;
 
@@ -62,8 +62,8 @@ export function AppBar({ open }: AppBarProps) {
   const [qucikAddObjective, setQucikAddObjective] = useState("");
   const [adding, setAdding] = useState(false);
 
-  const app = useFocusApp();
-  const api = useFocusClient();
+  const [app, api] = useFocus();
+  const auth = useAuth();
 
   function onQuickAddKeyUp(e: SyntheticEvent) {
     if ((e.nativeEvent as KeyboardEvent).key === "Enter") {
@@ -97,7 +97,7 @@ export function AppBar({ open }: AppBarProps) {
 
   const [currentUser, setCurrentUser] = useState<User.AsObject>(newGuestUser());
   useEffect(() => {
-    if (api.isLogined()) {
+    if (auth.isAuthenticated()) {
       api
         .getProfile()
         .then((r) => setCurrentUser(r))
@@ -107,14 +107,11 @@ export function AppBar({ open }: AppBarProps) {
     }
   }, [api]);
 
-  const cookies = new Cookies();
-
   const navigate = useNavigate();
   function handleLogout() {
     setAnchorElUser(null);
 
-    cookies.remove("focus-token");
-    api.setLogin("");
+    auth.setToken("");
 
     navigate("/");
   }
@@ -166,7 +163,7 @@ export function AppBar({ open }: AppBarProps) {
             open={!!anchorElUser}
             onClose={() => setAnchorElUser(null)}
           >
-            {api.isLogined() && (
+            {auth.isAuthenticated() && (
               <>
                 <MenuItem
                   component={Link}
@@ -187,7 +184,7 @@ export function AppBar({ open }: AppBarProps) {
                 </MenuItem>
               </>
             )}
-            {!api.isLogined() && (
+            {!auth.isAuthenticated() && (
               <>
                 <MenuItem
                   component={Link}

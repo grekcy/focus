@@ -8,16 +8,15 @@ import {
 import update from "immutability-helper";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView } from "../lib/components/CardList";
+import { useFocus } from "../lib/components/FocusProvider";
 import { LabelChip } from "../lib/components/LabelChip";
 import { LabelSelector } from "../lib/components/LabelSelector";
 import { Card, Label } from "../lib/proto/focus_v1alpha1_pb";
 
 export function TodayPage() {
-  const app = useFocusApp();
-  const api = useFocusClient();
+  const [app, api] = useFocus();
 
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -56,10 +55,8 @@ export function TodayPage() {
 
   const cardBarRef = useRef<ICardBar>(null);
 
-  const [cardNo, setCardNo] = useState(-1);
   function handleSelectCard(cardNo: number) {
     if (cardBarRef.current) cardBarRef.current.setCardNo(cardNo);
-    setCardNo(cardNo);
   }
 
   const [labels, setLabels] = useState<Label.AsObject[]>([]);

@@ -24,12 +24,12 @@ import {
 } from "react";
 import { Link } from "react-router-dom";
 import { Key } from "ts-key-enum";
-import { useFocusApp, useFocusClient } from "../../FocusProvider";
-import { DrawerHeader } from "../../SideBar";
+import { DrawerHeader } from "../../routes/SideBar";
 import { arrayContentEquals } from "../lib";
 import { Card, Challenge, Label } from "../proto/focus_v1alpha1_pb";
 import { useAction } from "./Action";
 import { DatePickButton } from "./DatePickButton";
+import { useFocusApp, useFocusClient } from "./FocusProvider";
 import { InlineEdit } from "./InlineEdit";
 import { LabelSelector } from "./LabelSelector";
 

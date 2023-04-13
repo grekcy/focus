@@ -1,15 +1,12 @@
+import { StatusCode } from "grpc-web";
 import { FocusAPI } from "./api";
+import { useAuth } from "./components/AuthProvider";
 import { Card } from "./proto/focus_v1alpha1_pb";
 
 const endpoint = "http://127.0.0.1:8080";
 
-enum Status {
-  Internal = 13,
-  InvalidArgument = 3,
-}
-
 describe("focus API: not require authenticate", () => {
-  const service = new FocusAPI(endpoint, "");
+  const service = new FocusAPI(endpoint, useAuth());
 
   test("get version", async () => {
     const got = await service.version();
@@ -18,7 +15,8 @@ describe("focus API: not require authenticate", () => {
 });
 
 describe("focus API", () => {
-  const service = new FocusAPI(endpoint, "");
+  const auth = useAuth();
+  const service = new FocusAPI(endpoint, auth);
 
   beforeAll(async () => {
     const got = await service.loginWithGoogle(
@@ -27,7 +25,7 @@ describe("focus API", () => {
       "__charlie__"
     );
     expect(got.value).not.toEqual("");
-    service.setLogin(got.value);
+    auth.setToken(got.value);
   });
 
   test("versionEx", async () => {
@@ -45,7 +43,7 @@ describe("focus API", () => {
 
   test("quick add: empty objective", async () => {
     const got = await service.addCard("").catch((e) => e);
-    expect(got.code).toEqual(Status.InvalidArgument);
+    expect(got.code).toEqual(StatusCode.INVALID_ARGUMENT);
   });
 
   test("quick add", async () => {
