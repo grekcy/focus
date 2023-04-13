@@ -101,7 +101,7 @@ enum CardField {
   OBJECTIVE = 0;
   COMPLETED_AT = 1;
   CONTENT = 2;
-  PARENT_CARD = 3;
+  PARENT_CARD_NO = 3;
   LABEL = 4;
   DEFER_UNTIL = 5;
   DUE_DATE = 6;

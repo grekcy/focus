@@ -677,7 +677,8 @@ export const CardListView = forwardRef(
 
     const [actClearDefer] = useAction({
       label: "Clear defer",
-      onEnabled: () => selected !== -1 && !!cards[selected].deferUntil,
+      onEnabled: () =>
+        selected !== -1 && cards[selected] && !!cards[selected].deferUntil,
       onExecute: () => updateDeferUntil(null),
     });
 
@@ -708,12 +709,29 @@ export const CardListView = forwardRef(
 
     const [actClearDueDate] = useAction({
       label: "Clear due date",
-      onEnabled: () => selected !== -1 && !!cards[selected].dueDate,
+      onEnabled: () =>
+        selected !== -1 && cards[selected] && !!cards[selected].dueDate,
       onExecute: () => updateDueDate(null),
     });
 
+    function moveCardToInbox() {
+      if (selected === -1) return;
+
+      api
+        .moveCardToInbox(cards[selected].cardNo)
+        .then((r) =>
+          app.toast(
+            `card ${cards[selected].cardNo} was moved to INBOX`,
+            "success"
+          )
+        )
+        .catch((e) => app.toast(e.message, "error"));
+    }
+
     const [actMoveCardToInbox] = useAction({
       label: "Move card to INBOX",
+      onEnabled: () => selected !== -1,
+      onExecute: () => moveCardToInbox(),
     });
 
     const contextMenuActions = [

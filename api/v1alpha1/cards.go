@@ -513,7 +513,7 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 				updates["completed_at"] = req.Card.CompletedAt.AsTime()
 			}
 
-		case proto.CardField_PARENT_CARD:
+		case proto.CardField_PARENT_CARD_NO:
 			tx := s.db.WithContext(ctx)
 			if req.Card.ParentCardNo == nil {
 				updates["parent_card_no"] = gorm.Expr("NULL")
