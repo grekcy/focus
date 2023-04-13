@@ -13,7 +13,7 @@ interface AuthProviderProp {
   children: ReactNode;
 }
 
-class localStorageAuthProvider {
+export class localStorageAuthProvider {
   isAuthenticated = () => !!this.getToken();
   setToken = (token: string | null) => {
     if (token) localStorage.setItem("token", token);
