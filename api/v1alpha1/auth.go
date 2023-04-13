@@ -25,8 +25,8 @@ import (
 // context.WithValue(keyUser): *models.User; current user
 // context.WithValue(keyUserWorkspace): *models.Workspace; default workspace for current user
 func ExtractUserInfo(ctx context.Context) (context.Context, error) {
-	db := ctx.Value(KeyDB).(*gorm.DB)
-	apikey := ctx.Value(KeyToken).(string)
+	db := ctx.Value(keyDB).(*gorm.DB)
+	apikey := ctx.Value(keyToken).(string)
 
 	uid, err := parseAPIKey(apikey)
 	if err != nil {
@@ -34,20 +34,21 @@ func ExtractUserInfo(ctx context.Context) (context.Context, error) {
 	}
 
 	user := &models.User{UID: uid}
-	if tx := db.First(user); tx.Error != nil {
+	if tx := db.WithContext(ctx).Where("uid = ?", uid).First(user); tx.Error != nil {
 		return nil, status.Error(codes.Unauthenticated, "user not found")
 	}
-	ctx = context.WithValue(ctx, KeyUser, user)
+	ctx = context.WithValue(ctx, keyUser, user)
 
+	// TODO 현재는 default workspace로 고정이 되어있음. 향후 current workspace를 변경하는 기능이 필요함
 	userWorkspace := &models.UserWorkspace{}
-	if tx := db.Preload("Workspace").Where(&models.UserWorkspace{
+	if tx := db.WithContext(ctx).Preload("Workspace").Where(&models.UserWorkspace{
 		UserID: user.ID,
 		Role:   models.RoleDefault,
 	}).First(userWorkspace); tx.Error != nil {
 		return nil, status.Errorf(codes.Internal, "user workspace not found: %v", tx.Error)
 	}
 
-	ctx = context.WithValue(ctx, KeyUserWorkspace, userWorkspace.Workspace)
+	ctx = context.WithValue(ctx, keyUserWorkspace, userWorkspace.Workspace)
 
 	return ctx, nil
 }
@@ -75,8 +76,8 @@ func (s *v1alpha1ServiceImpl) authInterceptor() grpc.UnaryServerInterceptor {
 				return nil, err
 			}
 
-			ctx = context.WithValue(ctx, KeyToken, token)
-			ctx = context.WithValue(ctx, KeyDB, s.db) // TODO 맘에 안드네, struct의 멤버이면 ctx 없이 가도 되는데
+			ctx = context.WithValue(ctx, keyToken, token)
+			ctx = context.WithValue(ctx, keyDB, s.db) // TODO 맘에 안드네, struct의 멤버이면 ctx 없이 가도 되는데
 			ctx, err = ExtractUserInfo(ctx)
 			if err != nil {
 				return nil, err
@@ -136,11 +137,11 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 
 	// create user if not exists
 	user := &models.User{}
-	if tx := s.db.Where("email = ?", email).Take(&user); tx.Error != nil {
+	if tx := s.db.WithContext(ctx).Where("email = ?", email).Take(&user); tx.Error != nil {
 		if tx.Error.Error() == "record not found" { // FIXME
 			log.Infof("create new user: email=%s, name=%s", email, name)
 
-			if err := s.db.Transaction(func(txn *gorm.DB) error {
+			if err := s.db.WithContext(ctx).Transaction(func(txn *gorm.DB) error {
 				uw := &models.UserWorkspace{
 					Role: models.RoleDefault,
 					User: &models.User{
@@ -205,6 +206,8 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 			return nil, status.Errorf(codes.Internal, "%+v", tx.Error.Error())
 		}
 	}
+
+	log.Infof("user login: id=%v, uid=%v", user.ID, user.UID)
 
 	// return jwt token
 	tok, err := signAPIKey(user.UID, time.Now().AddDate(1, 0, 0))
