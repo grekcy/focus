@@ -44,8 +44,10 @@ export function PlayCursors() {
           "wait",
           "zoom-in",
           "zoom-out",
-        ].map((c) => (
-          <div style={{ ...cursorStyle, cursor: c }}>{c}</div>
+        ].map((c, i) => (
+          <div key={i} style={{ ...cursorStyle, cursor: c }}>
+            {c}
+          </div>
         ))}
       </div>
     </>

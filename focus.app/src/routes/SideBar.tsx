@@ -176,15 +176,15 @@ export const SideBar = forwardRef(
           <List>
             {pages.map((page, i) => {
               if (page.title === "-") {
-                return <Divider key={`${page.title}${i}`} />;
+                return <Divider key={i} />;
               }
 
               const icon = createElement(page.icon!);
               return (
                 <ListItem
+                key={i}
                   disablePadding
                   sx={{ display: "block" }}
-                  key={page.title}
                 >
                   <Tooltip title={page.tooltip!}>
                     <ListItemButton

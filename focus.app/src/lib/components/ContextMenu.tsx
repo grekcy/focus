@@ -79,12 +79,12 @@ export const ContextMenu = forwardRef(
         onClose={handleClose}
       >
         <MenuList dense={dense}>
-          {items.map((item) =>
+          {items.map((item, i) =>
             item.label === "-" ? (
-              <Divider />
+              <Divider key={i} />
             ) : (
               <MenuItem
-                key={item.label}
+                key={i}
                 disabled={item.onEnabled ? !item.onEnabled() : false}
                 onClick={(e) => handleMenuItemClick(e, item.onExecute)}
               >

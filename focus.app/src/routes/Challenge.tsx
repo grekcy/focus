@@ -66,14 +66,14 @@ function ChallengeList() {
       <TableContainer>
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow key="header">
               <TableCell></TableCell>
               <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {challenges.map((ch) => (
-              <TableRow>
+              <TableRow key={ch.card!.cardNo}>
                 <TableCell>
                   <Link to={ch.card!.cardNo.toString()}>
                     <Typography variant="h6">{ch.card!.objective}</Typography>

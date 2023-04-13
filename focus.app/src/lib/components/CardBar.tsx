@@ -202,7 +202,7 @@ export const CardBar = forwardRef(
               sx={{ width: 1 }}
             >
               {challenges.map((ch) => (
-                <MenuItem value={ch.card!.cardNo}>
+                <MenuItem key={ch.card!.cardNo} value={ch.card!.cardNo}>
                   {ch.card!.objective}
                 </MenuItem>
               ))}

@@ -7,7 +7,7 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { ReactNode, useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PlayAutocomplete } from "./PlayAutocomplete";
 import { PlayCardBar } from "./PlayCardBar";
@@ -150,8 +150,8 @@ export function PlayIndex() {
       <Grid container>
         <Grid item xs={2}>
           <List component="nav" disablePadding sx={{ width: 1, maxWidth: 150 }}>
-            {plays.map((section) => (
-              <>
+            {plays.map((section, i) => (
+              <Fragment key={i}>
                 <ListItem disablePadding>
                   <ListItemButton
                     key={section.id}
@@ -179,7 +179,7 @@ export function PlayIndex() {
                     ))}
                   </List>
                 </Collapse>
-              </>
+              </Fragment>
             ))}
           </List>
         </Grid>
