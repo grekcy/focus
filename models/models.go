@@ -79,9 +79,9 @@ type Card struct {
 	DueDate          *time.Time `gorm:"index"`
 	CompletedAt      *time.Time `gorm:"index"`
 	CardType         string     `gorm:"type:varchar(50);not null;default:'card';check:card_type in ('card','challenge')"`
-	Status           string
-	Objective        string `gorm:"type:varchar(500);not null;default:''"`
-	Content          string `gorm:"type:text;not null;default:''"`
+	Status           string     `gorm:"type:varchar(20)"`
+	Objective        string     `gorm:"type:varchar(500);not null;default:''"`
+	Content          string     `gorm:"type:text;not null;default:''"`
 	//
 	// alter table cards add labels bigint[];
 	// create index idx_cards_labels ON cards using gin(labels)

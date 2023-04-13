@@ -95,7 +95,7 @@ func (s *v1alpha1ServiceImpl) addCard(ctx context.Context, objective string, add
 			}
 		}
 
-		if tx := txn.Save(newCard.Card); tx.Error != nil {
+		if tx := txn.Create(newCard.Card); tx.Error != nil {
 			return status.Errorf(codes.Internal, "fail to add card")
 		}
 
@@ -625,10 +625,16 @@ func (s *v1alpha1ServiceImpl) getParentChallenge(ctx context.Context, cardNo uin
 
 func (s *v1alpha1ServiceImpl) getCardProgressSummary(ctx context.Context, cardNo uint) (uint64, uint64) {
 	var totalCards int64
-	s.db.WithContext(ctx).Model(&models.Card{}).Where("parent_card_no = ?", cardNo).Count(&totalCards)
+	s.db.WithContext(ctx).Model(&models.Card{}).
+		Where("workspace_id = ?", s.currentWorkspace(ctx).ID).
+		Where("parent_card_no = ?", cardNo).
+		Count(&totalCards)
 
 	var completedCards int64
-	s.db.WithContext(ctx).Model(&models.Card{}).Where("parent_card_no = ? AND completed_at IS NOT NULL", cardNo).Count(&completedCards)
+	s.db.WithContext(ctx).Model(&models.Card{}).
+		Where("workspace_id = ?", s.currentWorkspace(ctx).ID).
+		Where("parent_card_no = ? AND completed_at IS NOT NULL", cardNo).
+		Count(&completedCards)
 
 	return uint64(totalCards), uint64(completedCards)
 }

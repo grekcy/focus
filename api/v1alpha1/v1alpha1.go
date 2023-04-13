@@ -28,13 +28,13 @@ func New(db *gorm.DB) proto.FocusServer {
 	}
 }
 
-type Key string
+type contextKey string
 
 const (
-	KeyDB            Key = "focus.db"
-	KeyToken         Key = "focus.token" // token in authorization header
-	KeyUser          Key = "focus.user"
-	KeyUserWorkspace Key = "focus.user.workspace"
+	keyDB            contextKey = "focus.db"
+	keyToken         contextKey = "focus.token" // token in authorization header
+	keyUser          contextKey = "focus.user"
+	keyUserWorkspace contextKey = "focus.user.workspace"
 )
 
 func (s *v1alpha1ServiceImpl) UnrayInterceptor() []grpc.UnaryServerInterceptor {
@@ -51,18 +51,18 @@ func (s *v1alpha1ServiceImpl) VersionEx(ctx context.Context, _ *emptypb.Empty) (
 	return &wrapperspb.StringValue{Value: "v1alpha1.ex"}, nil
 }
 
-// currentUser return current currentUser
+// currentUser return current user
 func (s *v1alpha1ServiceImpl) currentUser(ctx context.Context) *models.User {
-	user, ok := ctx.Value(KeyUser).(*models.User)
+	user, ok := ctx.Value(keyUser).(*models.User)
 	if !ok {
 		log.Fatalf("user was not set: user=%+v", user)
 	}
 	return user
 }
 
-// currentWorkspace returns current user's default workspace
+// currentWorkspace returns current workspace
 func (s *v1alpha1ServiceImpl) currentWorkspace(ctx context.Context) *models.Workspace {
-	ws, ok := ctx.Value(KeyUserWorkspace).(*models.Workspace)
+	ws, ok := ctx.Value(keyUserWorkspace).(*models.Workspace)
 	if !ok {
 		log.Fatalf("workspace was not set: workspace=%+v", ws)
 	}

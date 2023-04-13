@@ -86,7 +86,7 @@ func TestLoginUserNotExists(t *testing.T) {
 	require.Equal(t, email, user.Email)
 	require.Equal(t, uid, user.UID)
 
-	userWorkspace, err := client.service.userDefaultWorkspace(user.ID)
+	userWorkspace, err := client.service.userDefaultWorkspace(ctx, user.ID)
 	require.NoError(t, err, "default workspace not found")
 	require.Equal(t, user.Email, userWorkspace.Name)
 

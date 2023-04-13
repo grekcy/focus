@@ -63,6 +63,7 @@ func userModelToProto(in *models.User) *proto.User {
 	}
 }
 
+// TODO authorization이 필요하겠음
 func (s *v1alpha1ServiceImpl) GetUser(ctx context.Context, req *wrapperspb.UInt64Value) (*proto.User, error) {
 	user, err := s.getUser(ctx, uint(req.Value))
 	if err != nil {

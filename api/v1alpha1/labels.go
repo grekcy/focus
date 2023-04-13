@@ -3,7 +3,6 @@ package v1alpha1
 import (
 	"context"
 
-	"github.com/pkg/errors"
 	"github.com/whitekid/goxp/fx"
 	"github.com/whitekid/goxp/log"
 	"github.com/whitekid/goxp/validate"
@@ -34,8 +33,8 @@ func (s *v1alpha1ServiceImpl) CreateLabel(ctx context.Context, req *proto.Label)
 		Description: req.Description,
 		Color:       req.Color,
 	}
-	s.db.Transaction(func(tx *gorm.DB) error {
-		if tx := tx.Save(newLabel); tx.Error != nil {
+	s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		if tx := tx.Create(newLabel); tx.Error != nil {
 			return status.Errorf(codes.Internal, "fail to create label")
 		}
 		return nil
@@ -46,7 +45,10 @@ func (s *v1alpha1ServiceImpl) CreateLabel(ctx context.Context, req *proto.Label)
 
 func (s *v1alpha1ServiceImpl) listLabels(ctx context.Context, where *models.Label) ([]*models.Label, error) {
 	labels := []*models.Label{}
-	if tx := s.db.WithContext(ctx).Where(where).Order("label").Find(&labels); tx.Error != nil {
+	if tx := s.db.WithContext(ctx).
+		Where(where).
+		Order("label").
+		Find(&labels); tx.Error != nil {
 		return nil, status.Errorf(codes.Internal, "fail to list tags: %+v", tx.Error)
 	}
 
@@ -104,13 +106,12 @@ func (s *v1alpha1ServiceImpl) UpdateLabel(ctx context.Context, req *proto.Label)
 		return nil, err
 	}
 
+	label.WorkspaceID = s.currentWorkspace(ctx).ID
 	label.Label = req.Label
 	label.Description = req.Description
 	label.Color = req.Color
 
-	if err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		return tx.Save(label).Error
-	}); err != nil {
+	if tx := s.db.WithContext(ctx).Save(label); tx.Error != nil {
 		return nil, err
 	}
 
@@ -123,19 +124,13 @@ func (s *v1alpha1ServiceImpl) DeleteLabel(ctx context.Context, req *wrapperspb.U
 		return nil, err
 	}
 
-	if err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		tx = tx.Delete(&label)
-		if tx.Error != nil {
-			return errors.Wrapf(err, "fail to delete label: %+v", tx.Error)
-		}
+	tx := s.db.WithContext(ctx).Delete(&label)
+	if tx.Error != nil {
+		return nil, status.Errorf(codes.Internal, "fail to delete label: %+v", tx.Error)
+	}
 
-		if tx.RowsAffected != 1 {
-			log.Warnf("delete exactly id=%v, but deleted %d", req.Value, tx.RowsAffected)
-		}
-
-		return nil
-	}); err != nil {
-		return helper.Empty(), status.Errorf(codes.Internal, "delete failed: %v", err.Error())
+	if tx.RowsAffected != 1 {
+		log.Warnf("delete exactly id=%v, but deleted %d", req.Value, tx.RowsAffected)
 	}
 
 	return helper.Empty(), nil
