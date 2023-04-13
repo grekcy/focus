@@ -1,7 +1,7 @@
 import { Button, List, ListItem } from "@mui/material";
 import update from "immutability-helper";
 import { useEffect, useState } from "react";
-import { useFocusApp, useFocusClient } from "../FocusProvider";
+import { useFocusApp, useFocusClient } from "../lib/components/FocusProvider";
 import { LabelSelector } from "../lib/components/LabelSelector";
 import { Label } from "../lib/proto/focus_v1alpha1_pb";
 

@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { useFocusApp } from "../FocusProvider";
+import { useFocusApp } from "../lib/components/FocusProvider";
 
 export function PlayFocus() {
   const app = useFocusApp();

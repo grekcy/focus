@@ -7,15 +7,16 @@ import {
 } from "@mui/material";
 import update from "immutability-helper";
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { useFocusApp, useFocusClient } from "../FocusProvider";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Event } from "../lib/api";
 import { CardBar, ICardBar } from "../lib/components/CardBar";
 import { CardListView, ICardListView } from "../lib/components/CardList";
+import { useFocusApp, useFocusClient } from "../lib/components/FocusProvider";
 import { LabelSelector } from "../lib/components/LabelSelector";
 import { Card, Label } from "../lib/proto/focus_v1alpha1_pb";
 
 export function InboxPage() {
+  const navigate = useNavigate();
   const app = useFocusApp();
   const api = useFocusClient();
 

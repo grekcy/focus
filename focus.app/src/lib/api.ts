@@ -1,6 +1,7 @@
 import { Empty } from "google-protobuf/google/protobuf/empty_pb";
 import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
 import { UInt64Value } from "google-protobuf/google/protobuf/wrappers_pb";
+import { IAuthProvider } from "./components/AuthProvider";
 import { FocusClient } from "./proto/Focus_v1alpha1ServiceClientPb";
 import {
   AddCardReq,
@@ -26,9 +27,8 @@ export class FocusAPI {
   token: string = ""; // apikey
   listeners: { [event: string]: EventListener[] };
 
-  constructor(endpoint: string, token: string) {
-    this.token = token!;
-    const authInterceptor = new AuthInterceptor(() => this.token);
+  constructor(endpoint: string, auth: IAuthProvider) {
+    const authInterceptor = new AuthInterceptor(auth.getToken);
     const options = {
       unaryInterceptors: [authInterceptor],
       streamInterceptors: [authInterceptor],
@@ -68,21 +68,6 @@ export class FocusAPI {
 
   versionEx = () => {
     return this.s.versionEx(new Empty(), null).then((r) => r.toObject());
-  };
-
-  //
-  // authentication
-  //
-  isLogined = () => {
-    return this.token !== "";
-  };
-
-  logout = () => {
-    this.token = "";
-  };
-
-  setLogin = (token: string) => {
-    this.token = token;
   };
 
   //
@@ -342,9 +327,9 @@ export class FocusAPI {
 }
 
 class AuthInterceptor {
-  getToken: () => string;
+  getToken: () => string | null;
 
-  constructor(tokenGetter: () => string) {
+  constructor(tokenGetter: () => string | null) {
     this.getToken = tokenGetter;
   }
 

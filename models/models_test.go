@@ -62,7 +62,7 @@ func TestCardLabels(t *testing.T) {
 		Objective:   "test for label",
 		Labels:      []int64{1, 6, 4},
 	}
-	require.NoError(t, _db.Save(card).Error)
+	require.NoError(t, _db.Create(card).Error)
 	defer func() {
 		require.NoError(t, _db.Delete(card).Error)
 	}()

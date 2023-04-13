@@ -1,16 +1,14 @@
 import { Alert, Container, Typography } from "@mui/material";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { useState } from "react";
-import { Cookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
-import { useFocusApp, useFocusClient } from "../FocusProvider";
+import { useAuth } from "../lib/components/AuthProvider";
+import { useFocus } from "../lib/components/FocusProvider";
 
 export function LoginPage() {
   const navigate = useNavigate();
-  const app = useFocusApp();
-  const api = useFocusClient();
-
-  const cookies = new Cookies();
+  const [app, api] = useFocus();
+  const auth = useAuth();
 
   const [error, setError] = useState("");
 
@@ -26,13 +24,7 @@ export function LoginPage() {
             onSuccess={(resp) => {
               api
                 .loginWithGoogle(resp.credential!, resp.clientId!)
-                .then((r) => {
-                  cookies.set("focus-token", r.value, {
-                    path: "/",
-                    maxAge: 86300 * 100,
-                  });
-                  api.setLogin(r.value);
-                })
+                .then((r) => auth.setToken(r.value))
                 .then(() => navigate("/inbox"))
                 .catch((e) => app.toast(e.message, "error"));
             }}

@@ -12,16 +12,16 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardListView } from "../lib/components/CardList";
 import { DatePickButton } from "../lib/components/DatePickButton";
+import { useFocusApp, useFocusClient } from "../lib/components/FocusProvider";
 import { Card, Challenge } from "../lib/proto/focus_v1alpha1_pb";
 import { newChallenge } from "../lib/proto/helper";
 
 export function ChallengeIndex() {
-  const { challengeId: challengeIdParam } = useParams();
+  const { id } = useParams();
 
-  const challengeId = parseInt(challengeIdParam!);
+  const challengeId = parseInt(id!);
 
   return (
     <>

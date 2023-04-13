@@ -28,13 +28,13 @@ import {
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { Link } from "react-router-dom";
 import { Key } from "ts-key-enum";
-import { useFocusApp, useFocusClient } from "../../FocusProvider";
 import { Event } from "../api";
 import { datetime } from "../datetime";
 import { Card, Label } from "../proto/focus_v1alpha1_pb";
 import { newCard } from "../proto/helper";
 import { actDivider, useAction } from "./Action";
 import { ContextMenu, IContextMenu, popupContextMenu } from "./ContextMenu";
+import { useFocusApp, useFocusClient } from "./FocusProvider";
 import { EmptyIcon } from "./Icons";
 import { IInlineEdit, InlineEdit } from "./InlineEdit";
 import { LabelChip } from "./LabelChip";
@@ -683,6 +683,7 @@ export const CardListView = forwardRef(
 
     const [actDueToToday] = useAction({
       label: "Due to Today",
+      hotkey: "⌘+Ctrl+O",
       onEnabled: () => selected !== -1,
       onExecute: () => updateDueDate(datetime.dueTime().toDate()),
     });

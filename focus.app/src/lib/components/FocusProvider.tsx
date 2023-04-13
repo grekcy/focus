@@ -8,9 +8,9 @@ import {
   useImperativeHandle,
   useRef,
 } from "react";
-import { Cookies } from "react-cookie";
-import { FocusAPI } from "./lib/api";
-import { IToast, Toast } from "./lib/components/Toast";
+import { FocusAPI } from "../api";
+import { AuthProvider, useAuth } from "./AuthProvider";
+import { IToast, Toast } from "./Toast";
 
 export type AlertColor = muiAlertColor;
 
@@ -27,7 +27,7 @@ interface FocusProviderProp {
   onToggleSideBar?: () => void;
 }
 
-export interface IFocusProvider {}
+interface IFocusProvider {}
 
 export const FocusProvider = forwardRef(
   (
@@ -49,7 +49,9 @@ export const FocusProvider = forwardRef(
 
     return (
       <FocusContext.Provider value={app}>
-        {children}
+        <AuthProvider>
+          <FocusClientProvider>{children}</FocusClientProvider>
+        </AuthProvider>
         <Toast ref={toastRef} />
       </FocusContext.Provider>
     );
@@ -57,12 +59,17 @@ export const FocusProvider = forwardRef(
 );
 
 export function useFocusApp() {
-  const ctx = useContext(FocusContext);
-  if (!ctx) {
+  const focusApp = useContext(FocusContext);
+  if (!focusApp) {
     throw new Error("Can not find FocusProvider");
   }
 
-  return ctx;
+  return focusApp;
+}
+
+// shortcut for useFocusApp(), useFocusClient(), useAuth()
+export function useFocus(): [IFocusApp, FocusAPI] {
+  return [useFocusApp(), useFocusClient()];
 }
 
 const FocusClientContext = createContext<FocusAPI | null>(null);
@@ -71,17 +78,11 @@ interface FocusClientProviderProps {
   children: ReactNode;
 }
 
-export interface IFocusClientProvider {}
+interface IFocusClientProvider {}
 
-// TODO get token from cookie
-const cookies = new Cookies();
-
-export const FocusClientProvider = forwardRef(
+const FocusClientProvider = forwardRef(
   ({ children }: FocusClientProviderProps, ref: Ref<IFocusClientProvider>) => {
-    const api = new FocusAPI(
-      process.env.REACT_APP_API_ENDPOINT!,
-      cookies.get("focus-token")
-    );
+    const api = new FocusAPI(process.env.REACT_APP_API_ENDPOINT!, useAuth());
 
     useImperativeHandle(ref, () => ({
       client() {

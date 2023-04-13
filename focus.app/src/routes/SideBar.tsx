@@ -30,7 +30,7 @@ import {
   useState,
 } from "react";
 import { Link } from "react-router-dom";
-import { useFocusApp } from "./FocusProvider";
+import { useFocusApp } from "../lib/components/FocusProvider";
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -149,76 +149,78 @@ if (process.env.REACT_APP_ENV === "development") {
   );
 }
 
-export const SideBar = forwardRef(({ open }: SideBarProps, ref: Ref<ISideBar>) => {
-  useImperativeHandle(ref, () => ({
-    toggle() {
-      setCurrentOpen((p) => !p);
-    },
-  }));
+export const SideBar = forwardRef(
+  ({ open }: SideBarProps, ref: Ref<ISideBar>) => {
+    useImperativeHandle(ref, () => ({
+      toggle() {
+        setCurrentOpen((p) => !p);
+      },
+    }));
 
-  const [currentOpen, setCurrentOpen] = useState(open);
-  useEffect(() => {
-    setCurrentOpen(open);
-  }, [open]);
+    const [currentOpen, setCurrentOpen] = useState(open);
+    useEffect(() => {
+      setCurrentOpen(open);
+    }, [open]);
 
-  const app = useFocusApp();
+    const app = useFocusApp();
 
-  return (
-    <Box>
-      <Drawer variant="permanent" open={currentOpen} onClose={toggleDrawer}>
-        <DrawerHeader>
-          <IconButton key="x" onClick={() => app.toggleSidebar()}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <List>
-          {pages.map((page, i) => {
-            if (page.title === "-") {
-              return <Divider key={`${page.title}${i}`} />;
-            }
+    return (
+      <Box>
+        <Drawer variant="permanent" open={currentOpen} onClose={toggleDrawer}>
+          <DrawerHeader>
+            <IconButton key="x" onClick={() => app.toggleSidebar()}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </DrawerHeader>
+          <Divider />
+          <List>
+            {pages.map((page, i) => {
+              if (page.title === "-") {
+                return <Divider key={`${page.title}${i}`} />;
+              }
 
-            const icon = createElement(page.icon!);
-            return (
-              <ListItem
-                disablePadding
-                sx={{ display: "block" }}
-                key={page.title}
-              >
-                <Tooltip title={page.tooltip!}>
-                  <ListItemButton
-                    dense
-                    component={Link}
-                    to={page.href!}
-                    sx={{
-                      justifyContent: currentOpen ? "initial" : "center",
-                      px: 2.5,
-                    }}
-                  >
-                    <ListItemIcon
+              const icon = createElement(page.icon!);
+              return (
+                <ListItem
+                  disablePadding
+                  sx={{ display: "block" }}
+                  key={page.title}
+                >
+                  <Tooltip title={page.tooltip!}>
+                    <ListItemButton
+                      dense
+                      component={Link}
+                      to={page.href!}
                       sx={{
-                        minWidth: 0,
-                        mr: currentOpen ? 3 : "auto",
-                        justifyContent: "center",
+                        justifyContent: currentOpen ? "initial" : "center",
+                        px: 2.5,
                       }}
                     >
-                      {icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={page.title}
-                      sx={{ opacity: currentOpen ? 1 : 0 }}
-                    />
-                  </ListItemButton>
-                </Tooltip>
-              </ListItem>
-            );
-          })}
-        </List>
-      </Drawer>
-    </Box>
-  );
+                      <ListItemIcon
+                        sx={{
+                          minWidth: 0,
+                          mr: currentOpen ? 3 : "auto",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {icon}
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={page.title}
+                        sx={{ opacity: currentOpen ? 1 : 0 }}
+                      />
+                    </ListItemButton>
+                  </Tooltip>
+                </ListItem>
+              );
+            })}
+          </List>
+        </Drawer>
+      </Box>
+    );
 
-  function toggleDrawer(event: SyntheticEvent<{}, Event>): void {
-    setCurrentOpen((p) => !p);
+    function toggleDrawer(event: SyntheticEvent<{}, Event>): void {
+      setCurrentOpen((p) => !p);
+    }
   }
-});
+);

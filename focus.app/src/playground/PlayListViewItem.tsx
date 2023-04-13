@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { useFocusApp, useFocusClient } from "../FocusProvider";
 import { CardItem } from "../lib/components/CardList";
+import { useFocusApp, useFocusClient } from "../lib/components/FocusProvider";
 import { Card } from "../lib/proto/focus_v1alpha1_pb";
 
 export function PlayCardListViewItem() {

@@ -44,7 +44,7 @@ func TestLabelCreate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := client.service.db.Save(tt.args.label).Error
+			err := client.service.db.Create(tt.args.label).Error
 
 			require.Truef(t, (err != nil) == tt.wantErr, `createLabel() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
 			if tt.wantErr {
