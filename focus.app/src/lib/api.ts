@@ -178,7 +178,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setParentCardNo(parent);
 
-    return this.patchCard(card.toObject(), CardField.PARENT_CARD);
+    return this.patchCard(card.toObject(), CardField.PARENT_CARD_NO);
   };
 
   updateCardLabel = (cardNo: number, labels: number[]) => {
@@ -213,6 +213,19 @@ export class FocusAPI {
     return this.patchCard(card.toObject(), CardField.CARD_TYPE);
   };
 
+  moveCardToInbox = (cardNo: number) => {
+    const card = new Card();
+    card.setCardNo(cardNo);
+    card.setCardType("card");
+    card.clearParentCardNo();
+
+    return this.patchCard(
+      card.toObject(),
+      CardField.CARD_TYPE,
+      CardField.PARENT_CARD_NO
+    );
+  };
+
   patchCard = (card: Card.AsObject, ...fields: CardField[]) => {
     const req = new PatchCardReq();
     const c = new Card();
@@ -232,7 +245,7 @@ export class FocusAPI {
         case CardField.CONTENT:
           c.setContent(card.content);
           break;
-        case CardField.PARENT_CARD:
+        case CardField.PARENT_CARD_NO:
           card.parentCardNo
             ? c.setParentCardNo(card.parentCardNo)
             : c.clearParentCardNo();
