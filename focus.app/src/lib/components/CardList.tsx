@@ -766,6 +766,7 @@ export const CardListView = forwardRef(
               .filter((i) => labelsMap[i])
               .map((i) => (
                 <LabelChip
+                  key={i}
                   id={i}
                   label={labelsMap[i]?.label}
                   color={labelsMap[i].color}
@@ -774,7 +775,7 @@ export const CardListView = forwardRef(
               ));
             if (endAdornment) {
               endAdornment = [
-                <Stack direction="row" spacing="1px">
+                <Stack key={i} direction="row" spacing="1px">
                   {endAdornment}
                 </Stack>,
               ];
@@ -783,7 +784,7 @@ export const CardListView = forwardRef(
             return (
               <CardItem
                 ref={(ref) => (refs.current[i] = ref!)}
-                key={item.cardNo}
+                key={i}
                 index={i}
                 card={item}
                 selected={selected === i}
@@ -954,7 +955,6 @@ export const CardItem = forwardRef(
 
     return (
       <Box
-        key={key}
         component="div"
         ref={containerRef}
         visibility={visible ? "inherit" : "hidden"}

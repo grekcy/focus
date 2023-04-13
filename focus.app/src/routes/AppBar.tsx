@@ -163,41 +163,39 @@ export function AppBar({ open }: AppBarProps) {
             open={!!anchorElUser}
             onClose={() => setAnchorElUser(null)}
           >
-            {auth.isAuthenticated() && (
-              <>
-                <MenuItem
-                  component={Link}
-                  to="/account"
-                  onClick={() => setAnchorElUser(null)}
-                >
-                  <ListItemIcon>
-                    <AccountBoxIcon />
-                  </ListItemIcon>
-                  <ListItemText>{currentUser.name} - Profile</ListItemText>
-                </MenuItem>
-                <Divider />
-                <MenuItem onClick={() => handleLogout()}>
-                  <ListItemIcon>
-                    <LogoutIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Logout" />
-                </MenuItem>
-              </>
-            )}
-            {!auth.isAuthenticated() && (
-              <>
-                <MenuItem
-                  component={Link}
-                  to="/auth/login"
-                  onClick={() => setAnchorElUser(null)}
-                >
-                  <ListItemIcon>
-                    <LoginIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Login" />
-                </MenuItem>
-              </>
-            )}
+            {auth.isAuthenticated() && [
+              <MenuItem
+                key="account"
+                component={Link}
+                to="/account"
+                onClick={() => setAnchorElUser(null)}
+              >
+                <ListItemIcon>
+                  <AccountBoxIcon />
+                </ListItemIcon>
+                <ListItemText>{currentUser.name} - Profile</ListItemText>
+              </MenuItem>,
+              <Divider key="divider" />,
+              <MenuItem key="logout" onClick={() => handleLogout()}>
+                <ListItemIcon>
+                  <LogoutIcon />
+                </ListItemIcon>
+                <ListItemText primary="Logout" />
+              </MenuItem>,
+            ]}
+            {!auth.isAuthenticated() && [
+              <MenuItem
+                key="login"
+                component={Link}
+                to="/auth/login"
+                onClick={() => setAnchorElUser(null)}
+              >
+                <ListItemIcon>
+                  <LoginIcon />
+                </ListItemIcon>
+                <ListItemText primary="Login" />
+              </MenuItem>,
+            ]}
           </Menu>
         </Box>
       </Toolbar>

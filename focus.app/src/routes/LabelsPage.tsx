@@ -17,7 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import update from "immutability-helper";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { useFocusApp, useFocusClient } from "../lib/components/FocusProvider";
 import { LabelChip, LabelColors } from "../lib/components/LabelChip";
 import { Label } from "../lib/proto/focus_v1alpha1_pb";
@@ -160,7 +160,7 @@ export function LabelsPage() {
       <TableContainer>
         <Table>
           <TableHead>
-            <TableRow>
+            <TableRow key="head">
               <TableCell>Workspace</TableCell>
               <TableCell>Label</TableCell>
               <TableCell>Description</TableCell>
@@ -169,8 +169,8 @@ export function LabelsPage() {
           </TableHead>
           <TableBody>
             {labels.map((label, i) => (
-              <>
-                <TableRow key={label.id}>
+              <Fragment key={i}>
+                <TableRow>
                   <TableCell>{label.workspaceId}</TableCell>
                   <TableCell>
                     <LabelChip label={label.label} color={label.color} />
@@ -255,7 +255,7 @@ export function LabelsPage() {
                     </Button>
                   </TableCell>
                 </TableRow>
-              </>
+              </Fragment>
             ))}
           </TableBody>
         </Table>
@@ -272,6 +272,7 @@ export function LabelsPage() {
         <Box sx={{ display: "flex", flexWrap: "wrap", p: 1, width: "167px" }}>
           {LabelColors.map((c) => (
             <Box
+              key={c}
               onClick={() => {
                 if (choosingColorItem !== -1) {
                   const x = labels[choosingColorItem];

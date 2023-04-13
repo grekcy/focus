@@ -2,7 +2,7 @@ import { CssBaseline } from "@mui/material";
 import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import MenuBar from "./App";
+import App from "./App";
 import "./index.css";
 import theme from "./theme";
 
@@ -13,7 +13,7 @@ root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <MenuBar />
+      <App />
     </ThemeProvider>
   </React.StrictMode>
 );

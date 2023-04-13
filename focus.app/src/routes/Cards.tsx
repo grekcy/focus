@@ -14,6 +14,7 @@ import {
   LinearProgress,
   LinearProgressProps,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
   TableRow,
@@ -149,83 +150,87 @@ export function CardPage() {
           <AccordionDetails>
             <TableContainer>
               <Table>
-                <TableRow>
-                  <TableCell variant="head">Responsibility</TableCell>
-                  <TableCell>
-                    <Button
-                      onClick={() =>
-                        app.toast(
-                          "set responsibility: not implemented",
-                          "warning"
-                        )
-                      }
-                    >
-                      {responsibility.name}
-                    </Button>
-                  </TableCell>
-                  <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
-                    Reported by
-                  </TableCell>
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    <Button
-                      onClick={() =>
-                        app.toast(
-                          "view user information: not implemented",
-                          "warning"
-                        )
-                      }
-                    >
-                      {creator.name}
-                    </Button>
-                  </TableCell>
-                  <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
-                    Created at
-                  </TableCell>
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {new Date(card!.createdAt!.seconds * 1000).toLocaleString()}
-                  </TableCell>
-                  <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
-                    Completed at
-                  </TableCell>
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {card!.completedAt ? (
-                      new Date(
-                        card!.completedAt.seconds * 1000
-                      ).toLocaleString()
-                    ) : (
+                <TableBody>
+                  <TableRow>
+                    <TableCell variant="head">Responsibility</TableCell>
+                    <TableCell>
                       <Button
                         onClick={() =>
-                          app.toast("completed: not implemented", "warning")
+                          app.toast(
+                            "set responsibility: not implemented",
+                            "warning"
+                          )
                         }
                       >
-                        not completed
+                        {responsibility.name}
                       </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell variant="head">Status</TableCell>
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    {card!.status ? card!.status : "None"}
-                  </TableCell>
-                  <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
-                    Due to
-                  </TableCell>
-                  <TableCell sx={{ whiteSpace: "nowrap" }}>
-                    <DatePickButton
-                      value={
-                        card!.dueDate
-                          ? new Date(card!.dueDate.seconds * 1000)
-                          : null
-                      }
-                      onChange={onDueDateChange}
-                    />
-                  </TableCell>
-                  <TableCell variant="head">Labels</TableCell>
-                  <TableCell colSpan={3}>
-                    <LabelSelector labels={[]} />
-                  </TableCell>
-                </TableRow>
+                    </TableCell>
+                    <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
+                      Reported by
+                    </TableCell>
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      <Button
+                        onClick={() =>
+                          app.toast(
+                            "view user information: not implemented",
+                            "warning"
+                          )
+                        }
+                      >
+                        {creator.name}
+                      </Button>
+                    </TableCell>
+                    <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
+                      Created at
+                    </TableCell>
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      {new Date(
+                        card!.createdAt!.seconds * 1000
+                      ).toLocaleString()}
+                    </TableCell>
+                    <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
+                      Completed at
+                    </TableCell>
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      {card!.completedAt ? (
+                        new Date(
+                          card!.completedAt.seconds * 1000
+                        ).toLocaleString()
+                      ) : (
+                        <Button
+                          onClick={() =>
+                            app.toast("completed: not implemented", "warning")
+                          }
+                        >
+                          not completed
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell variant="head">Status</TableCell>
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      {card!.status ? card!.status : "None"}
+                    </TableCell>
+                    <TableCell variant="head" sx={{ whiteSpace: "nowrap" }}>
+                      Due to
+                    </TableCell>
+                    <TableCell sx={{ whiteSpace: "nowrap" }}>
+                      <DatePickButton
+                        value={
+                          card!.dueDate
+                            ? new Date(card!.dueDate.seconds * 1000)
+                            : null
+                        }
+                        onChange={onDueDateChange}
+                      />
+                    </TableCell>
+                    <TableCell variant="head">Labels</TableCell>
+                    <TableCell colSpan={3}>
+                      <LabelSelector labels={[]} />
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
               </Table>
             </TableContainer>
           </AccordionDetails>

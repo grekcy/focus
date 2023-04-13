@@ -81,12 +81,13 @@ export function TodayPage() {
   return (
     <>
       <Box display="flex">
-        <Typography variant="h5" flexGrow={1}>
+        <Typography component="div" variant="h5" flexGrow={1}>
           Today
-          <Typography display="inline" sx={{ pl: "1rem" }}>
+          <Typography component="div" display="inline" sx={{ pl: "1rem" }}>
             focus today. please consider&nbsp;
-            {urgentLabels.map((label) => (
+            {urgentLabels.map((label, i) => (
               <LabelChip
+                key={i}
                 label={label.label}
                 color={label.color}
                 size="small"
