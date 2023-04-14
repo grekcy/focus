@@ -1,6 +1,8 @@
 package helper
 
-func PP[T uint64 | uint, R uint64 | uint](v *T) *R {
+import "github.com/whitekid/goxp/fx"
+
+func PP[T fx.RealNumber, R fx.RealNumber](v *T) *R {
 	if v == nil {
 		return nil
 	}

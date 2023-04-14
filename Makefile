@@ -37,9 +37,12 @@ proto/v1alpha1/focus_v1alpha1.pb.go: proto/focus_v1alpha1.proto
       --go_opt=paths=source_relative \
       --go-grpc_out=./proto/v1alpha1 \
       --go-grpc_opt=paths=source_relative \
-      --js_out=import_style=commonjs,binary:./focus.app/src/lib/proto \
+      --js_out=import_style=commonjs:./focus.app/src/lib/proto \
       --grpc-web_out=import_style=typescript,mode=grpcweb:./focus.app/src/lib/proto \
 	  proto/focus_v1alpha1.proto
+
+	cd ./proto/v1alpha1 && mockery --name FocusClient
+
 
 proto/v1alpha2/focus_v1alpha2.pb.go: proto/focus_v1alpha2.proto
 	protoc -I=./proto \
@@ -47,6 +50,9 @@ proto/v1alpha2/focus_v1alpha2.pb.go: proto/focus_v1alpha2.proto
       --go_opt=paths=source_relative \
       --go-grpc_out=./proto/v1alpha2 \
       --go-grpc_opt=paths=source_relative \
-      --js_out=import_style=commonjs,binary:./focus.app/src/lib/proto \
+      --js_out=import_style=commonjs:./focus.app/src/lib/proto \
       --grpc-web_out=import_style=typescript,mode=grpcweb:./focus.app/src/lib/proto \
 	  proto/focus_v1alpha2.proto
+
+	cd ./proto/v1alpha2 && mockery --name FocusClient
+
