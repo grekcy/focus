@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package api.sample.v1alpha1;
+option go_package = "github.com/grekcy/focus/proto/sample/v1alpha1";
+
+import "google/protobuf/wrappers.proto";
+import "google/api/annotations.proto";
+
+service Sample {
+  rpc echo(google.protobuf.StringValue) returns (google.protobuf.StringValue) {
+  };
+}
