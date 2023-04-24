@@ -127,12 +127,12 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 
 	email, ok := token.Claims.(jwt.MapClaims)["email"].(string)
 	if !ok || email == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "empty email")
+		return nil, status.Errorf(codes.InvalidArgument, "email required")
 	}
 
 	name, ok := token.Claims.(jwt.MapClaims)["name"].(string)
 	if !ok || name == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "empty name")
+		return nil, status.Errorf(codes.InvalidArgument, "name required")
 	}
 
 	// create user if not exists

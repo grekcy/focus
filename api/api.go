@@ -7,12 +7,12 @@ import (
 
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"github.com/whitekid/goxp/log"
+	"github.com/whitekid/grpcx"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	_ "google.golang.org/grpc/encoding/gzip"
 	"google.golang.org/grpc/keepalive"
 
-	"focus/api/types"
 	"focus/api/v1alpha1"
 	"focus/api/v1alpha2"
 	"focus/config"
@@ -77,7 +77,7 @@ func Serve(ctx context.Context, ln net.Listener) error {
 	v1alpha2Svc := v1alpha2.New(db)
 
 	for _, intf := range []any{v1alpha1Svc, v1alpha2Svc} {
-		if v, ok := intf.(types.Interceptor); ok {
+		if v, ok := intf.(grpcx.Interceptor); ok {
 			unaryInterceptors = append(unaryInterceptors, v.UnrayInterceptor()...)
 			streamInterceptors = append(streamInterceptors, v.StreamInterceptor()...)
 		}

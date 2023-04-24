@@ -3,9 +3,10 @@ module focus
 go 1.20
 
 require (
-	github.com/golang-jwt/jwt/v5 v5.0.0-rc.2
+	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
-	github.com/lib/pq v1.10.7
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.15.2
+	github.com/lib/pq v1.10.8
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
@@ -13,8 +14,11 @@ require (
 	github.com/whitekid/cobrax v0.0.0-20230316054516-c4338cdfe72c
 	github.com/whitekid/gormx v0.0.0-20230222021154-a2fac842229c
 	github.com/whitekid/goxp v0.0.0-20230317034230-382ba50fc378
+	github.com/whitekid/grpcx v0.0.0-20230421095149-48593e9f36b1
+	github.com/whitekid/x509x v0.0.0-20230421042319-809abf939f9b
 	go.uber.org/zap v1.24.0
-	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
+	golang.org/x/exp v0.0.0-20230420155640-133eef4313cb
+	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
 	gorm.io/gorm v1.25.0
@@ -27,7 +31,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.11.2 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
@@ -51,6 +55,7 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/whitekid/iter v0.0.0-20230222021346-f1627b52f797 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
@@ -60,7 +65,6 @@ require (
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
-	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/driver/mysql v1.4.6 // indirect

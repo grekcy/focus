@@ -4,12 +4,12 @@ import (
 	"context"
 	"log"
 
+	"github.com/whitekid/grpcx"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gorm.io/gorm"
 
-	"focus/api/types"
 	"focus/models"
 	proto "focus/proto/v1alpha1"
 )
@@ -20,7 +20,7 @@ type v1alpha1ServiceImpl struct {
 	db *gorm.DB
 }
 
-var _ types.Interceptor = (*v1alpha1ServiceImpl)(nil)
+var _ grpcx.Interceptor = (*v1alpha1ServiceImpl)(nil)
 
 func New(db *gorm.DB) proto.FocusServer {
 	return &v1alpha1ServiceImpl{

@@ -37,9 +37,15 @@ proto/v1alpha1/focus_v1alpha1.pb.go: proto/focus_v1alpha1.proto
       --go_opt=paths=source_relative \
       --go-grpc_out=./proto/v1alpha1 \
       --go-grpc_opt=paths=source_relative \
-      --js_out=import_style=commonjs,binary:./focus.app/src/lib/proto \
+	  --grpc-gateway_out ./proto/v1alpha1 \
+	  --grpc-gateway_opt paths=source_relative \
+	  --grpc-gateway_opt generate_unbound_methods=true \
+      --js_out=import_style=commonjs:./focus.app/src/lib/proto \
       --grpc-web_out=import_style=typescript,mode=grpcweb:./focus.app/src/lib/proto \
 	  proto/focus_v1alpha1.proto
+
+	cd ./proto/v1alpha1 && mockery --name FocusClient
+
 
 proto/v1alpha2/focus_v1alpha2.pb.go: proto/focus_v1alpha2.proto
 	protoc -I=./proto \
@@ -47,6 +53,27 @@ proto/v1alpha2/focus_v1alpha2.pb.go: proto/focus_v1alpha2.proto
       --go_opt=paths=source_relative \
       --go-grpc_out=./proto/v1alpha2 \
       --go-grpc_opt=paths=source_relative \
-      --js_out=import_style=commonjs,binary:./focus.app/src/lib/proto \
+	  --grpc-gateway_out ./proto/v1alpha2 \
+	  --grpc-gateway_opt paths=source_relative \
+	  --grpc-gateway_opt generate_unbound_methods=true \
+      --js_out=import_style=commonjs:./focus.app/src/lib/proto \
       --grpc-web_out=import_style=typescript,mode=grpcweb:./focus.app/src/lib/proto \
 	  proto/focus_v1alpha2.proto
+
+	cd ./proto/v1alpha2 && mockery --name FocusClient
+
+proto/sample/v1alpha1/sample_v1alpha1.pb.go: proto/sample_v1alpha1.proto
+	protoc -I=./proto \
+      --go_out=./proto/sample/v1alpha1 \
+      --go_opt=paths=source_relative \
+      --go-grpc_out=./proto/sample/v1alpha1 \
+      --go-grpc_opt=paths=source_relative \
+	  --grpc-gateway_out ./proto/sample/v1alpha1 \
+	  --grpc-gateway_opt paths=source_relative \
+	  --grpc-gateway_opt generate_unbound_methods=true \
+      --js_out=import_style=commonjs:./focus.app/src/lib/proto \
+      --grpc-web_out=import_style=typescript,mode=grpcweb:./focus.app/src/lib/proto \
+	  proto/sample_v1alpha1.proto
+
+	cd ./proto/sample/v1alpha1 && mockery --name SampleClient
+

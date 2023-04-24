@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/whitekid/grpcx"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -51,7 +52,7 @@ func newTestClientWithEmail(ctx context.Context, t *testing.T, email string) *Te
 		ln.Close()
 	}()
 
-	tokenAuth := &TokenAuth{token: token}
+	tokenAuth := grpcx.NewTokenAuth(token)
 	conn, err := grpc.DialContext(ctx, ln.Addr().String(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithPerRPCCredentials(tokenAuth),
@@ -76,11 +77,11 @@ func newUnauthenticatedTestClient(ctx context.Context, t *testing.T) *TestClient
 // TestClient client for test
 type TestClient struct {
 	proto.FocusClient
-	tokenAuth *TokenAuth
+	tokenAuth *grpcx.TokenAuth
 	service   *v1alpha1ServiceImpl
 }
 
-func (t *TestClient) SetToken(token string) { t.tokenAuth.token = token }
+func (t *TestClient) SetToken(token string) { t.tokenAuth.SetToken(token) }
 
 func TestVersion(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -105,21 +106,4 @@ func TestVersion(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, "v1alpha1.ex", got.Value)
 	}
-}
-
-type TokenAuth struct {
-	token string
-}
-
-func (t *TokenAuth) GetRequestMetadata(ctx context.Context, in ...string) (map[string]string, error) {
-	metadata := map[string]string{}
-	if t.token != "" {
-		metadata["Authorization"] = "Bearer " + t.token
-	}
-
-	return metadata, nil
-}
-
-func (t *TokenAuth) RequireTransportSecurity() bool {
-	return false
 }
