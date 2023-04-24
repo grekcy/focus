@@ -10,3 +10,32 @@ service Sample {
   rpc echo(google.protobuf.StringValue) returns (google.protobuf.StringValue) {
   };
 }
+
+message TestTypes {
+  enum EnumTest {
+    V0 = 0;
+    V1 = 1;
+    V2 = 2;
+  }
+  EnumTest enum_value = 1;
+  repeated string releated_value = 2;
+  map<string, string> map_value = 3;
+  bool bool_value = 4;
+  string string_value = 5;
+  bytes bytes_value = 6;
+
+  int32 int32_value = 7;
+  sint32 sint32_value = 8;
+  uint32 uint32_value = 9;
+  fixed32 fixed32_value = 10;
+  sfixed32 sfixed32_value = 11;
+
+  int64 int64_value = 12;
+  sint64 sint64_value = 13;
+  uint64 uint64_value = 14;
+  fixed64 fixed64_value = 15;
+  sfixed64 sfixed64_value = 16;
+
+  float float_value = 17;
+  double double_value = 18;
+}

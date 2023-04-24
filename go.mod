@@ -14,9 +14,10 @@ require (
 	github.com/whitekid/cobrax v0.0.0-20230316054516-c4338cdfe72c
 	github.com/whitekid/gormx v0.0.0-20230222021154-a2fac842229c
 	github.com/whitekid/goxp v0.0.0-20230317034230-382ba50fc378
-	github.com/whitekid/grpcx v0.0.0-20230419032326-0bf692482dfa
+	github.com/whitekid/grpcx v0.0.0-20230421095149-48593e9f36b1
+	github.com/whitekid/x509x v0.0.0-20230421042319-809abf939f9b
 	go.uber.org/zap v1.24.0
-	golang.org/x/exp v0.0.0-20230418202329-0354be287a23
+	golang.org/x/exp v0.0.0-20230420155640-133eef4313cb
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/grpc v1.54.0
 	google.golang.org/protobuf v1.30.0
