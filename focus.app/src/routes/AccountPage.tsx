@@ -1,8 +1,8 @@
-import { Typography } from "@mui/material";
-import { useEffect, useState } from "react";
-import { useFocusApp, useFocusClient } from "../lib/components/FocusProvider";
-import { User } from "../lib/proto/focus_v1alpha1_pb";
-import { newGuestUser } from "../lib/proto/helper";
+import { Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { useFocusApp, useFocusClient } from '../lib/components/FocusProvider';
+import { User } from '../lib/proto/focus_v1alpha1_pb';
+import { newGuestUser } from '../lib/proto/helper';
 
 export function AccountPage() {
   const [user, setUser] = useState<User.AsObject>(newGuestUser());
@@ -14,7 +14,7 @@ export function AccountPage() {
     api
       .getProfile()
       .then((r) => setUser(r))
-      .catch((e) => app.toast(e.message, "error"));
+      .catch((e) => app.toast(e.message, 'error'));
   }, []);
 
   return (

@@ -1,12 +1,12 @@
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import CalendarViewWeekIcon from "@mui/icons-material/CalendarViewWeek";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import FlagIcon from "@mui/icons-material/Flag";
-import InboxIcon from "@mui/icons-material/Inbox";
-import InsightsIcon from "@mui/icons-material/Insights";
-import LabelIcon from "@mui/icons-material/Label";
-import MicrowaveIcon from "@mui/icons-material/Microwave";
-import ViewColumnIcon from "@mui/icons-material/ViewColumn";
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import CalendarViewWeekIcon from '@mui/icons-material/CalendarViewWeek';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import FlagIcon from '@mui/icons-material/Flag';
+import InboxIcon from '@mui/icons-material/Inbox';
+import InsightsIcon from '@mui/icons-material/Insights';
+import LabelIcon from '@mui/icons-material/Label';
+import MicrowaveIcon from '@mui/icons-material/Microwave';
+import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import {
   Box,
   Divider,
@@ -18,46 +18,38 @@ import {
   ListItemText,
   Drawer as MuiDrawer,
   Tooltip,
-} from "@mui/material";
-import { CSSObject, Theme, styled } from "@mui/material/styles";
-import {
-  Ref,
-  SyntheticEvent,
-  createElement,
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useState,
-} from "react";
-import { Link } from "react-router-dom";
-import { useFocusApp } from "../lib/components/FocusProvider";
+} from '@mui/material';
+import { CSSObject, Theme, styled } from '@mui/material/styles';
+import { Ref, SyntheticEvent, createElement, forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useFocusApp } from '../lib/components/FocusProvider';
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
-  transition: theme.transitions.create("width", {
+  transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
   }),
-  overflowX: "hidden",
+  overflowX: 'hidden',
 });
 
-export const DrawerHeader = styled("div")(({ theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-end",
+export const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
   padding: theme.spacing(0, 1),
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
 }));
 
 const closedMixin = (theme: Theme): CSSObject => ({
-  transition: theme.transitions.create("width", {
+  transition: theme.transitions.create('width', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  overflowX: "hidden",
+  overflowX: 'hidden',
   width: `calc(${theme.spacing(7)} + 1px)`,
-  [theme.breakpoints.up("sm")]: {
+  [theme.breakpoints.up('sm')]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
 });
@@ -65,19 +57,19 @@ const closedMixin = (theme: Theme): CSSObject => ({
 const drawerWidth = 170;
 
 const Drawer = styled(MuiDrawer, {
-  shouldForwardProp: (prop) => prop !== "open",
+  shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
   width: drawerWidth,
   flexShrink: 0,
-  whiteSpace: "nowrap",
-  boxSizing: "border-box",
+  whiteSpace: 'nowrap',
+  boxSizing: 'border-box',
   ...(open && {
     ...openedMixin(theme),
-    "& .MuiDrawer-paper": openedMixin(theme),
+    '& .MuiDrawer-paper': openedMixin(theme),
   }),
   ...(!open && {
     ...closedMixin(theme),
-    "& .MuiDrawer-paper": closedMixin(theme),
+    '& .MuiDrawer-paper': closedMixin(theme),
   }),
 }));
 
@@ -91,136 +83,127 @@ export interface ISideBar {
 
 const pages = [
   {
-    href: "/inbox",
-    title: "Inbox",
+    href: '/inbox',
+    title: 'Inbox',
     icon: InboxIcon,
-    tooltip: "inbox",
+    tooltip: 'inbox',
   },
   {
-    href: "/today",
-    title: "Today",
+    href: '/today',
+    title: 'Today',
     icon: CalendarTodayIcon,
-    tooltip: "focus today",
+    tooltip: 'focus today',
   },
   {
-    href: "/forecast",
-    title: "Forecast",
+    href: '/forecast',
+    title: 'Forecast',
     icon: CalendarViewWeekIcon,
-    tooltip: "forecast",
+    tooltip: 'forecast',
   },
-  { title: "-" },
+  { title: '-' },
   {
-    href: "/challenges/",
-    title: "Challenges",
+    href: '/challenges/',
+    title: 'Challenges',
     icon: ViewColumnIcon,
-    tooltip: "Challenge",
+    tooltip: 'Challenge',
   },
-  { title: "-" },
+  { title: '-' },
   {
-    href: "/planning",
-    title: "Planning",
+    href: '/planning',
+    title: 'Planning',
     icon: FlagIcon,
-    tooltip: "planning",
+    tooltip: 'planning',
   },
   {
-    href: "/performance",
-    title: "Performance",
+    href: '/performance',
+    title: 'Performance',
     icon: InsightsIcon,
-    tooltip: "performance",
+    tooltip: 'performance',
   },
-  { title: "-" },
+  { title: '-' },
   {
-    href: "/labels",
-    title: "Labels",
+    href: '/labels',
+    title: 'Labels',
     icon: LabelIcon,
-    tooltip: "Labels",
+    tooltip: 'Labels',
   },
 ];
 
-if (process.env.REACT_APP_ENV === "development") {
+if (process.env.REACT_APP_ENV === 'development') {
   pages.push(
-    { title: "-" },
+    { title: '-' },
     {
-      href: "/playground/",
-      title: "Playground",
+      href: '/playground/',
+      title: 'Playground',
       icon: MicrowaveIcon,
-      tooltip: "Playground",
+      tooltip: 'Playground',
     }
   );
 }
 
-export const SideBar = forwardRef(
-  ({ open }: SideBarProps, ref: Ref<ISideBar>) => {
-    useImperativeHandle(ref, () => ({
-      toggle() {
-        setCurrentOpen((p) => !p);
-      },
-    }));
+export const SideBar = forwardRef(({ open }: SideBarProps, ref: Ref<ISideBar>) => {
+  useImperativeHandle(ref, () => ({
+    toggle() {
+      setCurrentOpen((p) => !p);
+    },
+  }));
 
-    const [currentOpen, setCurrentOpen] = useState(open);
-    useEffect(() => {
-      setCurrentOpen(open);
-    }, [open]);
+  const [currentOpen, setCurrentOpen] = useState(open);
+  useEffect(() => {
+    setCurrentOpen(open);
+  }, [open]);
 
-    const app = useFocusApp();
+  const app = useFocusApp();
 
-    return (
-      <Box>
-        <Drawer variant="permanent" open={currentOpen} onClose={toggleDrawer}>
-          <DrawerHeader>
-            <IconButton key="x" onClick={() => app.toggleSidebar()}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </DrawerHeader>
-          <Divider />
-          <List>
-            {pages.map((page, i) => {
-              if (page.title === "-") {
-                return <Divider key={i} />;
-              }
+  return (
+    <Box>
+      <Drawer variant="permanent" open={currentOpen} onClose={toggleDrawer}>
+        <DrawerHeader>
+          <IconButton key="x" onClick={() => app.toggleSidebar()}>
+            <ChevronLeftIcon />
+          </IconButton>
+        </DrawerHeader>
+        <Divider />
+        <List>
+          {pages.map((page, i) => {
+            if (page.title === '-') {
+              return <Divider key={i} />;
+            }
 
-              const icon = createElement(page.icon!);
-              return (
-                <ListItem
-                key={i}
-                  disablePadding
-                  sx={{ display: "block" }}
-                >
-                  <Tooltip title={page.tooltip!}>
-                    <ListItemButton
-                      dense
-                      component={Link}
-                      to={page.href!}
+            const icon = createElement(page.icon!);
+            return (
+              <ListItem key={i} disablePadding sx={{ display: 'block' }}>
+                <Tooltip title={page.tooltip!}>
+                  <ListItemButton
+                    dense
+                    component={Link}
+                    to={page.href!}
+                    sx={{
+                      justifyContent: currentOpen ? 'initial' : 'center',
+                      px: 2.5,
+                    }}
+                  >
+                    <ListItemIcon
                       sx={{
-                        justifyContent: currentOpen ? "initial" : "center",
-                        px: 2.5,
+                        minWidth: 0,
+                        mr: currentOpen ? 3 : 'auto',
+                        justifyContent: 'center',
                       }}
                     >
-                      <ListItemIcon
-                        sx={{
-                          minWidth: 0,
-                          mr: currentOpen ? 3 : "auto",
-                          justifyContent: "center",
-                        }}
-                      >
-                        {icon}
-                      </ListItemIcon>
-                      <ListItemText
-                        primary={page.title}
-                        sx={{ opacity: currentOpen ? 1 : 0 }}
-                      />
-                    </ListItemButton>
-                  </Tooltip>
-                </ListItem>
-              );
-            })}
-          </List>
-        </Drawer>
-      </Box>
-    );
+                      {icon}
+                    </ListItemIcon>
+                    <ListItemText primary={page.title} sx={{ opacity: currentOpen ? 1 : 0 }} />
+                  </ListItemButton>
+                </Tooltip>
+              </ListItem>
+            );
+          })}
+        </List>
+      </Drawer>
+    </Box>
+  );
 
-    function toggleDrawer(event: SyntheticEvent<{}, Event>): void {
-      setCurrentOpen((p) => !p);
-    }
+  function toggleDrawer(event: SyntheticEvent<{}, Event>): void {
+    setCurrentOpen((p) => !p);
   }
-);
+});

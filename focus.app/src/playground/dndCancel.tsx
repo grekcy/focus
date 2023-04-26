@@ -1,11 +1,11 @@
-import update from "immutability-helper";
-import type { CSSProperties, FC } from "react";
-import { memo, useCallback, useState } from "react";
-import { DndProvider, useDrag, useDrop } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import update from 'immutability-helper';
+import type { CSSProperties, FC } from 'react';
+import { memo, useCallback, useState } from 'react';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const ItemTypes = {
-  CARD: "card",
+  CARD: 'card',
 };
 
 interface CardProps {
@@ -20,12 +20,7 @@ interface Item {
   originalIndex: number;
 }
 
-const Card: FC<CardProps> = memo(function Card({
-  id,
-  text,
-  moveCard,
-  findCard,
-}) {
+const Card: FC<CardProps> = memo(function Card({ id, text, moveCard, findCard }) {
   const originalIndex = findCard(id).index;
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -60,11 +55,11 @@ const Card: FC<CardProps> = memo(function Card({
 
   const opacity = isDragging ? 0 : 1;
   const style: CSSProperties = {
-    border: "1px dashed gray",
-    padding: "0.5rem 1rem",
-    marginBottom: ".5rem",
-    backgroundColor: "white",
-    cursor: "move",
+    border: '1px dashed gray',
+    padding: '0.5rem 1rem',
+    marginBottom: '.5rem',
+    backgroundColor: 'white',
+    cursor: 'move',
   };
 
   return (
@@ -81,31 +76,31 @@ interface ContainerState {
 const ITEMS = [
   {
     id: 1,
-    text: "Write a cool JS library",
+    text: 'Write a cool JS library',
   },
   {
     id: 2,
-    text: "Make it generic enough",
+    text: 'Make it generic enough',
   },
   {
     id: 3,
-    text: "Write README",
+    text: 'Write README',
   },
   {
     id: 4,
-    text: "Create some examples",
+    text: 'Create some examples',
   },
   {
     id: 5,
-    text: "Spam in Twitter and IRC to promote it",
+    text: 'Spam in Twitter and IRC to promote it',
   },
   {
     id: 6,
-    text: "???",
+    text: '???',
   },
   {
     id: 7,
-    text: "PROFIT",
+    text: 'PROFIT',
   },
 ];
 
@@ -143,19 +138,13 @@ const Container: FC = memo(function Container() {
 
   const [, drop] = useDrop(() => ({ accept: ItemTypes.CARD }));
   const style = {
-    width: "400",
+    width: '400',
   };
 
   return (
     <div ref={drop} style={style}>
       {cards.map((card) => (
-        <Card
-          key={card.id}
-          id={`${card.id}`}
-          text={card.text}
-          moveCard={moveCard}
-          findCard={findCard}
-        />
+        <Card key={card.id} id={`${card.id}`} text={card.text} moveCard={moveCard} findCard={findCard} />
       ))}
     </div>
   );
@@ -170,4 +159,3 @@ export function DragAndDropCancel() {
     </>
   );
 }
-

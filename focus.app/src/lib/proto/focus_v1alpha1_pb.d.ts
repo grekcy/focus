@@ -324,10 +324,10 @@ export namespace RankCardReq {
 }
 
 export class PatchCardReq extends jspb.Message {
-  getFieldsList(): Array<CardField>;
-  setFieldsList(value: Array<CardField>): PatchCardReq;
+  getFieldsList(): Array<PatchCardReq.Field>;
+  setFieldsList(value: Array<PatchCardReq.Field>): PatchCardReq;
   clearFieldsList(): PatchCardReq;
-  addFields(value: CardField, index?: number): PatchCardReq;
+  addFields(value: PatchCardReq.Field, index?: number): PatchCardReq;
 
   getCard(): Card | undefined;
   setCard(value?: Card): PatchCardReq;
@@ -344,8 +344,19 @@ export class PatchCardReq extends jspb.Message {
 
 export namespace PatchCardReq {
   export type AsObject = {
-    fieldsList: Array<CardField>,
+    fieldsList: Array<PatchCardReq.Field>,
     card?: Card.AsObject,
+  }
+
+  export enum Field { 
+    OBJECTIVE = 0,
+    COMPLETED_AT = 1,
+    CONTENT = 2,
+    PARENT_CARD_NO = 3,
+    LABEL = 4,
+    DEFER_UNTIL = 5,
+    DUE_DATE = 6,
+    CARD_TYPE = 7,
   }
 }
 
@@ -517,13 +528,3 @@ export namespace ListChallengesResp {
   }
 }
 
-export enum CardField { 
-  OBJECTIVE = 0,
-  COMPLETED_AT = 1,
-  CONTENT = 2,
-  PARENT_CARD_NO = 3,
-  LABEL = 4,
-  DEFER_UNTIL = 5,
-  DUE_DATE = 6,
-  CARD_TYPE = 7,
-}

@@ -1,9 +1,9 @@
-import { Button, List, ListItem } from "@mui/material";
-import update from "immutability-helper";
-import { useEffect, useState } from "react";
-import { useFocusApp, useFocusClient } from "../lib/components/FocusProvider";
-import { LabelSelector } from "../lib/components/LabelSelector";
-import { Label } from "../lib/proto/focus_v1alpha1_pb";
+import { Button, List, ListItem } from '@mui/material';
+import update from 'immutability-helper';
+import { useEffect, useState } from 'react';
+import { useFocusApp, useFocusClient } from '../lib/components/FocusProvider';
+import { LabelSelector } from '../lib/components/LabelSelector';
+import { Label } from '../lib/proto/focus_v1alpha1_pb';
 
 export function PlayLabelSelector() {
   const app = useFocusApp();
@@ -14,7 +14,7 @@ export function PlayLabelSelector() {
     api
       .listLabels()
       .then((r) => setLabels(r))
-      .catch((e) => app.toast(e.message, "error"));
+      .catch((e) => app.toast(e.message, 'error'));
   }, []);
 
   const [selected, setSelected] = useState<number[]>([]);
@@ -37,11 +37,7 @@ export function PlayLabelSelector() {
 
   return (
     <>
-      <LabelSelector
-        labels={labels}
-        selected={selected}
-        onSelectionChange={handleChange}
-      ></LabelSelector>
+      <LabelSelector labels={labels} selected={selected} onSelectionChange={handleChange}></LabelSelector>
       selected: {selected}
       <List>
         {labels.map((label) => {
@@ -49,16 +45,8 @@ export function PlayLabelSelector() {
 
           return (
             <ListItem key={label.id}>
-              {index === -1 && (
-                <Button onClick={() => addLabel(label.id)}>
-                  Add: {label.label}
-                </Button>
-              )}
-              {index !== -1 && (
-                <Button onClick={() => removeLabel(label.id)}>
-                  Remove: {label.label}
-                </Button>
-              )}
+              {index === -1 && <Button onClick={() => addLabel(label.id)}>Add: {label.label}</Button>}
+              {index !== -1 && <Button onClick={() => removeLabel(label.id)}>Remove: {label.label}</Button>}
             </ListItem>
           );
         })}

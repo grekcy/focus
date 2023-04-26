@@ -1,5 +1,5 @@
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 import {
   Box,
   Button,
@@ -15,12 +15,12 @@ import {
   TableRow,
   TextField,
   Typography,
-} from "@mui/material";
-import update from "immutability-helper";
-import { ChangeEvent, Fragment, useEffect, useState } from "react";
-import { useFocusApp, useFocusClient } from "../lib/components/FocusProvider";
-import { LabelChip, LabelColors } from "../lib/components/LabelChip";
-import { Label } from "../lib/proto/focus_v1alpha1_pb";
+} from '@mui/material';
+import update from 'immutability-helper';
+import { ChangeEvent, Fragment, useEffect, useState } from 'react';
+import { useFocusApp, useFocusClient } from '../lib/components/FocusProvider';
+import { LabelChip, LabelColors } from '../lib/components/LabelChip';
+import { Label } from '../lib/proto/focus_v1alpha1_pb';
 
 export function LabelsPage() {
   const app = useFocusApp();
@@ -32,7 +32,7 @@ export function LabelsPage() {
       api
         .listLabels()
         .then((r) => setLabels(r))
-        .catch((e) => app.toast(e.message, "error"));
+        .catch((e) => app.toast(e.message, 'error'));
     })();
   }, []);
 
@@ -44,20 +44,14 @@ export function LabelsPage() {
   const [colorAnchor, setColorAnchor] = useState<Element | null>(null);
   const [deletingItem, setDeletingItem] = useState(-1);
 
-  function handleLabelChange(
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    index: number
-  ) {
+  function handleLabelChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) {
     const x = labels[index];
     x.label = e.currentTarget.value;
 
     setLabels((p) => p.slice());
   }
 
-  function handleDescriptionChange(
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-    index: number
-  ) {
+  function handleDescriptionChange(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, index: number) {
     const x = labels[index];
     x.description = e.currentTarget.value;
 
@@ -73,11 +67,7 @@ export function LabelsPage() {
       if (label.id !== 0) {
         updated = await api.updateLabel(label);
       } else {
-        updated = await api.createLabel(
-          label.label,
-          label.description,
-          label.color
-        );
+        updated = await api.createLabel(label.label, label.description, label.color);
 
         if (updated) {
           setLabels((p) =>
@@ -92,7 +82,7 @@ export function LabelsPage() {
         }
       }
     } catch (e: any) {
-      app.toast(e.message, "error");
+      app.toast(e.message, 'error');
     }
   }
 
@@ -122,7 +112,7 @@ export function LabelsPage() {
         setEditing((p) => update(p, { [index]: { $set: false } }));
         setDeletingItem(index);
       })
-      .catch((e) => app.toast(e.message, "error"));
+      .catch((e) => app.toast(e.message, 'error'));
   }
 
   const [choosingColorItem, setChoosingColorItem] = useState(-1);
@@ -140,7 +130,7 @@ export function LabelsPage() {
 
   function addLabel() {
     const newLabel = new Label().toObject();
-    newLabel.label = "new label";
+    newLabel.label = 'new label';
     setLabels((p) => update(p, { $push: [newLabel] }));
     setEditing((p) => update(p, { [labels.length]: { $set: true } }));
   }
@@ -178,7 +168,7 @@ export function LabelsPage() {
                   <TableCell>{label.description}</TableCell>
                   <TableCell align="right">
                     <IconButton
-                      sx={{ display: !!editing[i] ? "none" : "" }}
+                      sx={{ display: !!editing[i] ? 'none' : '' }}
                       onClick={() => {
                         setPreValue((p) =>
                           update(p, {
@@ -198,26 +188,21 @@ export function LabelsPage() {
                     >
                       <EditIcon />
                     </IconButton>
-                    <IconButton
-                      onClick={() => handleDeleteClick(i)}
-                      sx={{ display: !!editing[i] ? "none" : "" }}
-                    >
+                    <IconButton onClick={() => handleDeleteClick(i)} sx={{ display: !!editing[i] ? 'none' : '' }}>
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>
                 </TableRow>
                 <TableRow
                   sx={{
-                    display: editing[i] ? "" : "none",
+                    display: editing[i] ? '' : 'none',
                   }}
                 >
                   <TableCell>&nbsp; </TableCell>
                   <TableCell colSpan={2}>
                     <Stack direction="row" spacing={1}>
-                      <Box sx={{ width: "xl" }}>
-                        <InputLabel htmlFor={`edit_label_${i}`}>
-                          Label
-                        </InputLabel>
+                      <Box sx={{ width: 'xl' }}>
+                        <InputLabel htmlFor={`edit_label_${i}`}>Label</InputLabel>
                         <TextField
                           id={`edit_label_${i}`}
                           size="small"
@@ -226,9 +211,7 @@ export function LabelsPage() {
                         />
                       </Box>
                       <Box sx={{ width: 1 }}>
-                        <InputLabel htmlFor={`edit_desc_${i}`}>
-                          Description
-                        </InputLabel>
+                        <InputLabel htmlFor={`edit_desc_${i}`}>Description</InputLabel>
                         <TextField
                           id={`edit_desc_${i}`}
                           size="small"
@@ -250,9 +233,7 @@ export function LabelsPage() {
                   </TableCell>
                   <TableCell>
                     <Button onClick={() => handleOkClick(i)}>OK</Button>
-                    <Button onClick={() => handleEditCancelClick(i)}>
-                      Cancel
-                    </Button>
+                    <Button onClick={() => handleEditCancelClick(i)}>Cancel</Button>
                   </TableCell>
                 </TableRow>
               </Fragment>
@@ -264,12 +245,12 @@ export function LabelsPage() {
         open={colorOpen}
         anchorEl={colorAnchor}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
         onClose={closeColorChooser}
       >
-        <Box sx={{ display: "flex", flexWrap: "wrap", p: 1, width: "167px" }}>
+        <Box sx={{ display: 'flex', flexWrap: 'wrap', p: 1, width: '167px' }}>
           {LabelColors.map((c) => (
             <Box
               key={c}
@@ -283,10 +264,10 @@ export function LabelsPage() {
                 closeColorChooser();
               }}
               sx={{
-                border: "0.1px solid #000000",
+                border: '0.1px solid #000000',
                 backgroundColor: c,
-                width: "50px",
-                cursor: "crosshair",
+                width: '50px',
+                cursor: 'crosshair',
               }}
             >
               &nbsp;

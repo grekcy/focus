@@ -1,5 +1,5 @@
-import { Alert, AlertColor, Snackbar, SnackbarOrigin } from "@mui/material";
-import { Ref, forwardRef, useImperativeHandle, useState } from "react";
+import { Alert, AlertColor, Snackbar, SnackbarOrigin } from '@mui/material';
+import { Ref, forwardRef, useImperativeHandle, useState } from 'react';
 
 interface ToastProps {
   defaultseverity?: AlertColor;
@@ -14,16 +14,15 @@ export interface IToast {
 export const Toast = forwardRef(
   (
     {
-      defaultseverity = "info",
-      anchorOrigin = { vertical: "top", horizontal: "center" },
+      defaultseverity = 'info',
+      anchorOrigin = { vertical: 'top', horizontal: 'center' },
       audoHideDuration = 6000,
     }: ToastProps,
     ref: Ref<IToast>
   ) => {
     const [openToast, setOpenToast] = useState(false);
-    const [toastMessage, setToastMessage] = useState("");
-    const [toastSeverity, setToastSeverity] =
-      useState<AlertColor>(defaultseverity);
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastSeverity, setToastSeverity] = useState<AlertColor>(defaultseverity);
 
     useImperativeHandle(ref, () => ({
       toast(message: string, severity?: AlertColor) {
@@ -39,7 +38,7 @@ export const Toast = forwardRef(
         anchorOrigin={anchorOrigin}
         autoHideDuration={audoHideDuration}
         onClose={(e, r) => {
-          if (r === "clickaway") return;
+          if (r === 'clickaway') return;
           setOpenToast(false);
         }}
       >

@@ -1,15 +1,8 @@
-import type { Identifier } from "dnd-core";
-import update from "immutability-helper";
-import { useCallback, useRef, useState } from "react";
-import {
-  DndProvider,
-  DragSourceMonitor,
-  DropTargetMonitor,
-  XYCoord,
-  useDrag,
-  useDrop,
-} from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
+import type { Identifier } from 'dnd-core';
+import update from 'immutability-helper';
+import { useCallback, useRef, useState } from 'react';
+import { DndProvider, DragSourceMonitor, DropTargetMonitor, XYCoord, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 interface CardProps {
   id: any;
@@ -25,16 +18,12 @@ interface DragItem {
 }
 
 const ItemTypes = {
-  CARD: "card",
+  CARD: 'card',
 };
 
 function Card({ id, text, index, moveCard }: CardProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [{ handlerId }, drop] = useDrop<
-    DragItem,
-    void,
-    { handlerId: Identifier | null }
-  >({
+  const [{ handlerId }, drop] = useDrop<DragItem, void, { handlerId: Identifier | null }>({
     accept: ItemTypes.CARD,
     collect(monitor: DropTargetMonitor<DragItem, void>) {
       return {
@@ -56,8 +45,7 @@ function Card({ id, text, index, moveCard }: CardProps) {
       const hoverBoundingRect = ref.current?.getBoundingClientRect();
 
       // Get vertical middle
-      const hoverMiddleY =
-        (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
       // Determine mouse position
       const clientOffset = monitor.getClientOffset();
@@ -98,7 +86,7 @@ function Card({ id, text, index, moveCard }: CardProps) {
     collect: (monitor: DragSourceMonitor<{ id: number; index: number }>) => ({
       isDragging: !!monitor.isDragging(),
     }),
-    end: (item, monitor) => console.log("drag end"),
+    end: (item, monitor) => console.log('drag end'),
   });
 
   drag(drop(ref));
@@ -107,11 +95,11 @@ function Card({ id, text, index, moveCard }: CardProps) {
     <div
       ref={ref}
       style={{
-        border: "1px dashed gray",
-        padding: "0.5rem 1rem",
-        marginBottom: ".5rem",
-        backgroundColor: "white",
-        cursor: "move",
+        border: '1px dashed gray',
+        padding: '0.5rem 1rem',
+        marginBottom: '.5rem',
+        backgroundColor: 'white',
+        cursor: 'move',
         opacity: isDragging ? 0 : 1,
       }}
       data-handler-id={handlerId}
@@ -134,31 +122,31 @@ export function DragAndDropSortable() {
   const [cards, setCards] = useState([
     {
       id: 1,
-      text: "Write a cool JS library",
+      text: 'Write a cool JS library',
     },
     {
       id: 2,
-      text: "Make it generic enough",
+      text: 'Make it generic enough',
     },
     {
       id: 3,
-      text: "Write README",
+      text: 'Write README',
     },
     {
       id: 4,
-      text: "Create some examples",
+      text: 'Create some examples',
     },
     {
       id: 5,
-      text: "Spam in Twitter and IRC to promote it (note that this element is taller than the others)",
+      text: 'Spam in Twitter and IRC to promote it (note that this element is taller than the others)',
     },
     {
       id: 6,
-      text: "???",
+      text: '???',
     },
     {
       id: 7,
-      text: "PROFIT",
+      text: 'PROFIT',
     },
   ]);
 
@@ -175,23 +163,12 @@ export function DragAndDropSortable() {
     );
   }, []);
 
-  const renderCard = useCallback(
-    (card: { id: number; text: string }, index: number) => {
-      return (
-        <Card
-          key={card.id}
-          index={index}
-          id={card.id}
-          text={card.text}
-          moveCard={moveCard}
-        />
-      );
-    },
-    []
-  );
+  const renderCard = useCallback((card: { id: number; text: string }, index: number) => {
+    return <Card key={card.id} index={index} id={card.id} text={card.text} moveCard={moveCard} />;
+  }, []);
 
   const style = {
-    width: "400",
+    width: '400',
   };
 
   return (

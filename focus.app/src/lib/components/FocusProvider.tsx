@@ -1,16 +1,8 @@
-import { AlertColor as muiAlertColor } from "@mui/material";
-import {
-  ReactNode,
-  Ref,
-  createContext,
-  forwardRef,
-  useContext,
-  useImperativeHandle,
-  useRef,
-} from "react";
-import { FocusAPI } from "../api";
-import { AuthProvider, useAuth } from "./AuthProvider";
-import { IToast, Toast } from "./Toast";
+import { AlertColor as muiAlertColor } from '@mui/material';
+import { ReactNode, Ref, createContext, forwardRef, useContext, useImperativeHandle, useRef } from 'react';
+import { FocusAPI } from '../api';
+import { AuthProvider, useAuth } from './AuthProvider';
+import { IToast, Toast } from './Toast';
 
 export type AlertColor = muiAlertColor;
 
@@ -30,10 +22,7 @@ interface FocusProviderProp {
 interface IFocusProvider {}
 
 export const FocusProvider = forwardRef(
-  (
-    { children, onToggleSideBar }: FocusProviderProp,
-    ref: Ref<IFocusProvider>
-  ) => {
+  ({ children, onToggleSideBar }: FocusProviderProp, ref: Ref<IFocusProvider>) => {
     const app: IFocusApp = {
       toggleSidebar() {
         onToggleSideBar && onToggleSideBar();
@@ -61,7 +50,7 @@ export const FocusProvider = forwardRef(
 export function useFocusApp() {
   const focusApp = useContext(FocusContext);
   if (!focusApp) {
-    throw new Error("Can not find FocusProvider");
+    throw new Error('Can not find FocusProvider');
   }
 
   return focusApp;
@@ -80,28 +69,22 @@ interface FocusClientProviderProps {
 
 interface IFocusClientProvider {}
 
-const FocusClientProvider = forwardRef(
-  ({ children }: FocusClientProviderProps, ref: Ref<IFocusClientProvider>) => {
-    const api = new FocusAPI(process.env.REACT_APP_API_ENDPOINT!, useAuth());
+const FocusClientProvider = forwardRef(({ children }: FocusClientProviderProps, ref: Ref<IFocusClientProvider>) => {
+  const api = new FocusAPI(process.env.REACT_APP_API_ENDPOINT!, useAuth());
 
-    useImperativeHandle(ref, () => ({
-      client() {
-        return api;
-      },
-    }));
+  useImperativeHandle(ref, () => ({
+    client() {
+      return api;
+    },
+  }));
 
-    return (
-      <FocusClientContext.Provider value={api}>
-        {children}
-      </FocusClientContext.Provider>
-    );
-  }
-);
+  return <FocusClientContext.Provider value={api}>{children}</FocusClientContext.Provider>;
+});
 
 export function useFocusClient(): FocusAPI {
   const ctx = useContext(FocusClientContext);
   if (!ctx) {
-    throw new Error("Cannot find FocusClientProvider");
+    throw new Error('Cannot find FocusClientProvider');
   }
   return ctx;
 }

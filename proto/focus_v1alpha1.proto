@@ -14,8 +14,7 @@ service Focus {
   rpc versionEx(google.protobuf.Empty) returns (google.protobuf.StringValue) {};
 
   // returns jwt api key
-  rpc loginWithGoogleOauth(GoogleLoginReq)
-      returns (google.protobuf.StringValue) {};
+  rpc loginWithGoogleOauth(GoogleLoginReq) returns (google.protobuf.StringValue) {};
 
   // return current user profile
   rpc getProfile(google.protobuf.Empty) returns (User);
@@ -26,8 +25,7 @@ service Focus {
   rpc listCards(ListCardReq) returns (ListCardResp) {}
   rpc getCard(google.protobuf.UInt64Value) returns (Card) {}
   rpc getCards(GetCardReq) returns (GetCardResp) {}
-  rpc getCardProgressSummary(google.protobuf.UInt64Value)
-      returns (CardProgressSummaryResp) {}
+  rpc getCardProgressSummary(google.protobuf.UInt64Value) returns (CardProgressSummaryResp) {}
   rpc patchCard(PatchCardReq) returns (Card) {}
   rpc rerankCard(RankCardReq) returns (google.protobuf.Empty) {}
   rpc deleteCard(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {}
@@ -35,8 +33,7 @@ service Focus {
   rpc createLabel(Label) returns (Label) {}
   rpc listLabels(ListLabelsReq) returns (ListLabelsResp) {}
   rpc updateLabel(Label) returns (Label) {}
-  rpc deleteLabel(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {
-  }
+  rpc deleteLabel(google.protobuf.UInt64Value) returns (google.protobuf.Empty) {}
 
   rpc listChallenges(ListChallengesReq) returns (ListChallengesResp) {}
   rpc getChallenge(google.protobuf.UInt64Value) returns (Challenge) {}
@@ -97,20 +94,20 @@ message RankCardReq {
   uint64 target_card_no = 2;
 }
 
-enum CardField {
-  OBJECTIVE = 0;
-  COMPLETED_AT = 1;
-  CONTENT = 2;
-  PARENT_CARD_NO = 3;
-  LABEL = 4;
-  DEFER_UNTIL = 5;
-  DUE_DATE = 6;
-  CARD_TYPE = 7;
-}
-
 message PatchCardReq {
-  repeated CardField fields = 1;
+  repeated Field fields = 1;
   Card card = 2;
+
+  enum Field {
+    OBJECTIVE = 0;
+    COMPLETED_AT = 1;
+    CONTENT = 2;
+    PARENT_CARD_NO = 3;
+    LABEL = 4;
+    DEFER_UNTIL = 5;
+    DUE_DATE = 6;
+    CARD_TYPE = 7;
+  }
 }
 
 message Label {

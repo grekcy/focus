@@ -1,8 +1,8 @@
-import { Box } from "@mui/material";
-import { Ref, forwardRef, useImperativeHandle, useState } from "react";
-import { Outlet } from "react-router-dom";
-import { AppBar } from "./AppBar";
-import { DrawerHeader, SideBar } from "./SideBar";
+import { Box } from '@mui/material';
+import { Ref, forwardRef, useImperativeHandle, useState } from 'react';
+import { Outlet } from 'react-router-dom';
+import { AppBar } from './AppBar';
+import { DrawerHeader, SideBar } from './SideBar';
 
 export function PublicLayout() {
   return <Outlet />;
@@ -24,7 +24,7 @@ export const Layout = forwardRef(({}: LayoutProps, ref: Ref<ILayout>) => {
   }));
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: 'flex' }}>
       <AppBar open={openSideBar} />
       <SideBar open={openSideBar} />
       <Box component="main" sx={{ flexGrow: 1, p: 3 }}>

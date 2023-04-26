@@ -1,5 +1,5 @@
-import { ReactNode, createContext, useContext } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { ReactNode, createContext, useContext } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 
 const AuthContext = createContext<IAuthProvider | null>(null);
 
@@ -16,10 +16,10 @@ interface AuthProviderProp {
 export class localStorageAuthProvider {
   isAuthenticated = () => !!this.getToken();
   setToken = (token: string | null) => {
-    if (token) localStorage.setItem("token", token);
-    else localStorage.removeItem("token");
+    if (token) localStorage.setItem('token', token);
+    else localStorage.removeItem('token');
   };
-  getToken = () => localStorage.getItem("token");
+  getToken = () => localStorage.getItem('token');
 }
 
 export function AuthProvider({ children }: AuthProviderProp) {
@@ -38,7 +38,7 @@ export function useAuth() {
 
 interface RequireAuthProps {
   children?: ReactNode;
-  require?: "auth" | "admin";
+  require?: 'auth' | 'admin';
 }
 
 export function RequireAuth({ children }: RequireAuthProps) {

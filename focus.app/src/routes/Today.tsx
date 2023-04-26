@@ -1,19 +1,13 @@
-import {
-  Box,
-  Checkbox,
-  FormControlLabel,
-  Stack,
-  Typography,
-} from "@mui/material";
-import update from "immutability-helper";
-import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { CardBar, ICardBar } from "../lib/components/CardBar";
-import { CardListView } from "../lib/components/CardList";
-import { useFocus } from "../lib/components/FocusProvider";
-import { LabelChip } from "../lib/components/LabelChip";
-import { LabelSelector } from "../lib/components/LabelSelector";
-import { Card, Label } from "../lib/proto/focus_v1alpha1_pb";
+import { Box, Checkbox, FormControlLabel, Stack, Typography } from '@mui/material';
+import update from 'immutability-helper';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { CardBar, ICardBar } from '../lib/components/CardBar';
+import { CardListView } from '../lib/components/CardList';
+import { useFocus } from '../lib/components/FocusProvider';
+import { LabelChip } from '../lib/components/LabelChip';
+import { LabelSelector } from '../lib/components/LabelSelector';
+import { Card, Label } from '../lib/proto/focus_v1alpha1_pb';
 
 export function TodayPage() {
   const [app, api] = useFocus();
@@ -22,35 +16,33 @@ export function TodayPage() {
 
   const [selectedLabels, setSelectedLabels] = useState<number[]>(
     searchParams
-      .getAll("label")
+      .getAll('label')
       .map((x) => parseInt(x))
       .filter((x) => !isNaN(x))
   );
 
-  const [withDeferred, setWithDeferred] = useState(
-    searchParams.get("deferred") === "true"
-  );
+  const [withDeferred, setWithDeferred] = useState(searchParams.get('deferred') === 'true');
 
   const [cards, setCards] = useState<Card.AsObject[]>([]);
   useEffect(() => {
     setSearchParams((p) => {
-      if (withDeferred) p.set("deferred", withDeferred.toString());
-      else p.delete("deferred");
+      if (withDeferred) p.set('deferred', withDeferred.toString());
+      else p.delete('deferred');
 
-      p.delete("label");
-      selectedLabels.forEach((x) => p.append("label", x.toString()));
+      p.delete('label');
+      selectedLabels.forEach((x) => p.append('label', x.toString()));
       return p;
     });
 
     api
       .listCards({
-        startCardType: "",
+        startCardType: '',
         labels: selectedLabels,
         excludeCompleted: true,
         includeDeferred: withDeferred,
       })
       .then((r) => setCards(r))
-      .catch((e) => app.toast(e.message, "error"));
+      .catch((e) => app.toast(e.message, 'error'));
   }, [withDeferred, selectedLabels]);
 
   const cardBarRef = useRef<ICardBar>(null);
@@ -63,19 +55,16 @@ export function TodayPage() {
   const [urgentLabels, setUrgentLabels] = useState<Label.AsObject[]>([]);
   useEffect(() => {
     api
-      .listLabels(["urgent", "important"])
+      .listLabels(['urgent', 'important'])
       .then((r) => {
         setLabels(r);
-        setUrgentLabels(
-          r.filter((x) => ["urgent", "important"].indexOf(x.label) > -1)
-        );
+        setUrgentLabels(r.filter((x) => ['urgent', 'important'].indexOf(x.label) > -1));
       })
-      .catch((e) => app.toast(e.message, "error"));
+      .catch((e) => app.toast(e.message, 'error'));
   }, []);
 
   function addSelectedLabel(id: number) {
-    if (selectedLabels.indexOf(id) === -1)
-      setSelectedLabels((p) => update(p, { $push: [id] }));
+    if (selectedLabels.indexOf(id) === -1) setSelectedLabels((p) => update(p, { $push: [id] }));
   }
 
   return (
@@ -83,7 +72,7 @@ export function TodayPage() {
       <Box display="flex">
         <Typography component="div" variant="h5" flexGrow={1}>
           Today
-          <Typography component="div" display="inline" sx={{ pl: "1rem" }}>
+          <Typography component="div" display="inline" sx={{ pl: '1rem' }}>
             focus today. please consider&nbsp;
             {urgentLabels.map((label, i) => (
               <LabelChip
@@ -101,19 +90,14 @@ export function TodayPage() {
           <Stack direction="row">
             <FormControlLabel
               label="show deferred"
-              control={
-                <Checkbox
-                  checked={withDeferred}
-                  onChange={() => setWithDeferred((p) => !p)}
-                />
-              }
+              control={<Checkbox checked={withDeferred} onChange={() => setWithDeferred((p) => !p)} />}
             />
 
             <LabelSelector
               labels={labels}
               selected={selectedLabels}
               onSelectionChange={(labels) => setSelectedLabels(labels)}
-              sx={{ minWidth: { md: "300px" } }}
+              sx={{ minWidth: { md: '300px' } }}
             />
           </Stack>
         </Box>

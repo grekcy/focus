@@ -9,29 +9,21 @@ import {
   TableHead,
   TableRow,
   Typography,
-} from "@mui/material";
-import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { CardListView } from "../lib/components/CardList";
-import { DatePickButton } from "../lib/components/DatePickButton";
-import { useFocusApp, useFocusClient } from "../lib/components/FocusProvider";
-import { Card, Challenge } from "../lib/proto/focus_v1alpha1_pb";
-import { newChallenge } from "../lib/proto/helper";
+} from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { CardListView } from '../lib/components/CardList';
+import { DatePickButton } from '../lib/components/DatePickButton';
+import { useFocusApp, useFocusClient } from '../lib/components/FocusProvider';
+import { Card, Challenge } from '../lib/proto/focus_v1alpha1_pb';
+import { newChallenge } from '../lib/proto/helper';
 
 export function ChallengeIndex() {
   const { id } = useParams();
 
   const challengeId = parseInt(id!);
 
-  return (
-    <>
-      {challengeId ? (
-        <ChallengeView challengeId={challengeId} />
-      ) : (
-        <ChallengeList />
-      )}
-    </>
-  );
+  return <>{challengeId ? <ChallengeView challengeId={challengeId} /> : <ChallengeList />}</>;
 }
 
 // https://mui.com/material-ui/react-masonry/
@@ -44,7 +36,7 @@ function ChallengeList() {
     api
       .listChallenges()
       .then((r) => setChallenges(r))
-      .catch((e) => app.toast(e.message, "error"));
+      .catch((e) => app.toast(e.message, 'error'));
   }, []);
 
   return (
@@ -55,11 +47,7 @@ function ChallengeList() {
         </Typography>
         <Box flexGrow={1}></Box>
         <Box flexGrow={0}>
-          <Button
-            onClick={() => app.toast("new challenge: not implemented", "error")}
-          >
-            New Challenge
-          </Button>
+          <Button onClick={() => app.toast('new challenge: not implemented', 'error')}>New Challenge</Button>
         </Box>
       </Box>
 
@@ -79,19 +67,11 @@ function ChallengeList() {
                     <Typography variant="h6">{ch.card!.objective}</Typography>
                   </Link>
                   <Typography>
-                    Due:{" "}
-                    {ch.card!.dueDate
-                      ? new Date(
-                          ch.card!.dueDate!.seconds * 1000
-                        ).toLocaleDateString()
-                      : "None"}
+                    Due: {ch.card!.dueDate ? new Date(ch.card!.dueDate!.seconds * 1000).toLocaleDateString() : 'None'}
                   </Typography>
                 </TableCell>
                 <TableCell>
-                  <ChallengeProgress
-                    done={ch.completedCards}
-                    total={ch.totalCards}
-                  />
+                  <ChallengeProgress done={ch.completedCards} total={ch.totalCards} />
                 </TableCell>
               </TableRow>
             ))}
@@ -120,7 +100,7 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
           setCompletedCards(r.completedCards);
           setTotalCards(r.totalCards);
         })
-        .catch((e) => app.toast(e.message, "error"));
+        .catch((e) => app.toast(e.message, 'error'));
     } else {
       setChallenge(newChallenge());
     }
@@ -136,7 +116,7 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
     api
       .listCards({ parentCardNo: challengeId })
       .then((r) => setCards(r))
-      .catch((e) => app.toast(e.message, "error"));
+      .catch((e) => app.toast(e.message, 'error'));
   }, [challenge]);
 
   if (!challenge) return <></>;
@@ -149,39 +129,28 @@ function ChallengeView({ challengeId }: ChallengeViewProps) {
         setCompletedCards(r.done);
         setTotalCards(r.total);
       })
-      .catch((e) => app.toast(e.message, "error"));
+      .catch((e) => app.toast(e.message, 'error'));
   }
 
   return (
     <>
       <Box>
         <Typography variant="h5">
-          Challenge <Link to={`/cards/${challengeId}`}>#{challengeId}</Link>:{" "}
-          {challenge.card?.objective}
+          Challenge <Link to={`/cards/${challengeId}`}>#{challengeId}</Link>: {challenge.card?.objective}
         </Typography>
       </Box>
 
-      <Box sx={{ display: "flex", p: "1rem" }}>
-        <Typography sx={{ flexGrow: "0", pr: "1rem" }}>
+      <Box sx={{ display: 'flex', p: '1rem' }}>
+        <Typography sx={{ flexGrow: '0', pr: '1rem' }}>
           Due to:
-          <DatePickButton
-            value={
-              challenge.card!.dueDate
-                ? new Date(challenge.card!.dueDate.seconds * 1000)
-                : null
-            }
-          />
+          <DatePickButton value={challenge.card!.dueDate ? new Date(challenge.card!.dueDate.seconds * 1000) : null} />
         </Typography>
-        <Box sx={{ flexGrow: "1" }}>
+        <Box sx={{ flexGrow: '1' }}>
           <ChallengeProgress done={completedCards} total={totalCards} />
         </Box>
       </Box>
 
-      <CardListView
-        cards={cards}
-        depth={challenge.card!.depth + 1}
-        onChange={handleCardChange}
-      />
+      <CardListView cards={cards} depth={challenge.card!.depth + 1} onChange={handleCardChange} />
     </>
   );
 }
@@ -196,12 +165,7 @@ function ChallengeProgress({ done, total }: ChallengeProgressProps) {
 
   return (
     <>
-      <LinearProgress
-        variant="buffer"
-        color="success"
-        value={completedPercent}
-        valueBuffer={0}
-      />
+      <LinearProgress variant="buffer" color="success" value={completedPercent} valueBuffer={0} />
       <Typography component="span" sx={{ mr: 1 }}>
         {completedPercent}% complete,
       </Typography>

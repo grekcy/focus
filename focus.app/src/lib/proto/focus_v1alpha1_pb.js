@@ -29,7 +29,6 @@ var google_protobuf_wrappers_pb = require('google-protobuf/google/protobuf/wrapp
 goog.object.extend(proto, google_protobuf_wrappers_pb);
 goog.exportSymbol('proto.api.v1alpha1.AddCardReq', null, global);
 goog.exportSymbol('proto.api.v1alpha1.Card', null, global);
-goog.exportSymbol('proto.api.v1alpha1.CardField', null, global);
 goog.exportSymbol('proto.api.v1alpha1.CardProgressSummaryResp', null, global);
 goog.exportSymbol('proto.api.v1alpha1.Challenge', null, global);
 goog.exportSymbol('proto.api.v1alpha1.GetCardReq', null, global);
@@ -43,6 +42,7 @@ goog.exportSymbol('proto.api.v1alpha1.ListChallengesResp', null, global);
 goog.exportSymbol('proto.api.v1alpha1.ListLabelsReq', null, global);
 goog.exportSymbol('proto.api.v1alpha1.ListLabelsResp', null, global);
 goog.exportSymbol('proto.api.v1alpha1.PatchCardReq', null, global);
+goog.exportSymbol('proto.api.v1alpha1.PatchCardReq.Field', null, global);
 goog.exportSymbol('proto.api.v1alpha1.RankCardReq', null, global);
 goog.exportSymbol('proto.api.v1alpha1.User', null, global);
 /**
@@ -2691,7 +2691,7 @@ proto.api.v1alpha1.PatchCardReq.deserializeBinaryFromReader = function(msg, read
     var field = reader.getFieldNumber();
     switch (field) {
     case 1:
-      var values = /** @type {!Array<!proto.api.v1alpha1.CardField>} */ (reader.isDelimited() ? reader.readPackedEnum() : [reader.readEnum()]);
+      var values = /** @type {!Array<!proto.api.v1alpha1.PatchCardReq.Field>} */ (reader.isDelimited() ? reader.readPackedEnum() : [reader.readEnum()]);
       for (var i = 0; i < values.length; i++) {
         msg.addFields(values[i]);
       }
@@ -2749,16 +2749,30 @@ proto.api.v1alpha1.PatchCardReq.serializeBinaryToWriter = function(message, writ
 
 
 /**
- * repeated CardField fields = 1;
- * @return {!Array<!proto.api.v1alpha1.CardField>}
+ * @enum {number}
+ */
+proto.api.v1alpha1.PatchCardReq.Field = {
+  OBJECTIVE: 0,
+  COMPLETED_AT: 1,
+  CONTENT: 2,
+  PARENT_CARD_NO: 3,
+  LABEL: 4,
+  DEFER_UNTIL: 5,
+  DUE_DATE: 6,
+  CARD_TYPE: 7
+};
+
+/**
+ * repeated Field fields = 1;
+ * @return {!Array<!proto.api.v1alpha1.PatchCardReq.Field>}
  */
 proto.api.v1alpha1.PatchCardReq.prototype.getFieldsList = function() {
-  return /** @type {!Array<!proto.api.v1alpha1.CardField>} */ (jspb.Message.getRepeatedField(this, 1));
+  return /** @type {!Array<!proto.api.v1alpha1.PatchCardReq.Field>} */ (jspb.Message.getRepeatedField(this, 1));
 };
 
 
 /**
- * @param {!Array<!proto.api.v1alpha1.CardField>} value
+ * @param {!Array<!proto.api.v1alpha1.PatchCardReq.Field>} value
  * @return {!proto.api.v1alpha1.PatchCardReq} returns this
  */
 proto.api.v1alpha1.PatchCardReq.prototype.setFieldsList = function(value) {
@@ -2767,7 +2781,7 @@ proto.api.v1alpha1.PatchCardReq.prototype.setFieldsList = function(value) {
 
 
 /**
- * @param {!proto.api.v1alpha1.CardField} value
+ * @param {!proto.api.v1alpha1.PatchCardReq.Field} value
  * @param {number=} opt_index
  * @return {!proto.api.v1alpha1.PatchCardReq} returns this
  */
@@ -4100,19 +4114,5 @@ proto.api.v1alpha1.ListChallengesResp.prototype.clearItemsList = function() {
   return this.setItemsList([]);
 };
 
-
-/**
- * @enum {number}
- */
-proto.api.v1alpha1.CardField = {
-  OBJECTIVE: 0,
-  COMPLETED_AT: 1,
-  CONTENT: 2,
-  PARENT_CARD_NO: 3,
-  LABEL: 4,
-  DEFER_UNTIL: 5,
-  DUE_DATE: 6,
-  CARD_TYPE: 7
-};
 
 goog.object.extend(exports, proto.api.v1alpha1);

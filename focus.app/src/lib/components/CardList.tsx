@@ -1,43 +1,28 @@
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import CancelIcon from "@mui/icons-material/Cancel";
-import DeleteIcon from "@mui/icons-material/Delete";
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import TaskAltIcon from "@mui/icons-material/TaskAlt";
-import TripOriginIcon from "@mui/icons-material/TripOrigin";
-import { Box, IconButton, Stack, Tooltip } from "@mui/material";
-import dayjs from "dayjs";
-import type { Identifier, XYCoord } from "dnd-core";
-import update from "immutability-helper";
-import React, {
-  MouseEvent,
-  Ref,
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import {
-  DndProvider,
-  DragSourceMonitor,
-  DropTargetMonitor,
-  useDrag,
-  useDrop,
-} from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { Link } from "react-router-dom";
-import { Key } from "ts-key-enum";
-import { Event } from "../api";
-import { datetime } from "../datetime";
-import { Card, Label } from "../proto/focus_v1alpha1_pb";
-import { newCard } from "../proto/helper";
-import { actDivider, useAction } from "./Action";
-import { ContextMenu, IContextMenu, popupContextMenu } from "./ContextMenu";
-import { useFocusApp, useFocusClient } from "./FocusProvider";
-import { EmptyIcon } from "./Icons";
-import { IInlineEdit, InlineEdit } from "./InlineEdit";
-import { LabelChip } from "./LabelChip";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import TaskAltIcon from '@mui/icons-material/TaskAlt';
+import TripOriginIcon from '@mui/icons-material/TripOrigin';
+import { Box, IconButton, Stack, Tooltip } from '@mui/material';
+import dayjs from 'dayjs';
+import type { Identifier, XYCoord } from 'dnd-core';
+import update from 'immutability-helper';
+import React, { MouseEvent, Ref, forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { DndProvider, DragSourceMonitor, DropTargetMonitor, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { Link } from 'react-router-dom';
+import { Key } from 'ts-key-enum';
+import { Event } from '../api';
+import { datetime } from '../datetime';
+import { Card, Label } from '../proto/focus_v1alpha1_pb';
+import { newCard } from '../proto/helper';
+import { actDivider, useAction } from './Action';
+import { ContextMenu, IContextMenu, popupContextMenu } from './ContextMenu';
+import { useFocusApp, useFocusClient } from './FocusProvider';
+import { EmptyIcon } from './Icons';
+import { IInlineEdit, InlineEdit } from './InlineEdit';
+import { LabelChip } from './LabelChip';
 
 export enum CardAction {
   COMPLETE,
@@ -64,15 +49,7 @@ export interface ICardListView {
 
 export const CardListView = forwardRef(
   (
-    {
-      cards: inCards,
-      depth = 0,
-      showCardNo = true,
-      onDoubleClick,
-      onSelect,
-      onChange,
-      onLabelClick,
-    }: CardListViewProp,
+    { cards: inCards, depth = 0, showCardNo = true, onDoubleClick, onSelect, onChange, onLabelClick }: CardListViewProp,
     ref: Ref<ICardListView>
   ) => {
     const app = useFocusApp();
@@ -86,7 +63,7 @@ export const CardListView = forwardRef(
       try {
         api.listLabels().then((r) => r.forEach((e) => (x[e.id] = e)));
       } catch (e: any) {
-        app.toast(e.message, "error");
+        app.toast(e.message, 'error');
       }
       return x;
     }, []);
@@ -98,24 +75,19 @@ export const CardListView = forwardRef(
     }));
 
     useEffect(() => {
-      const handler = api.addEventListener(
-        Event.CARD_UPDATED,
-        (cardNo: number) => {
-          const index = cards.findIndex((c) => c.cardNo === cardNo);
-          if (index === -1) return;
+      const handler = api.addEventListener(Event.CARD_UPDATED, (cardNo: number) => {
+        const index = cards.findIndex((c) => c.cardNo === cardNo);
+        if (index === -1) return;
 
-          api
-            .getCard(cardNo)
-            .then((r) => {
-              r.depth = r.depth - depth;
-              return r;
-            })
-            .then((r) =>
-              setCards((p) => update(p.slice(), { [index]: { $set: r } }))
-            )
-            .catch((e) => app.toast(e.message, "error"));
-        }
-      );
+        api
+          .getCard(cardNo)
+          .then((r) => {
+            r.depth = r.depth - depth;
+            return r;
+          })
+          .then((r) => setCards((p) => update(p.slice(), { [index]: { $set: r } })))
+          .catch((e) => app.toast(e.message, 'error'));
+      });
 
       return () => api.removeEventListener(handler);
     }, [cards]);
@@ -158,14 +130,12 @@ export const CardListView = forwardRef(
             );
             onChange && onChange(r.cardNo);
           })
-          .catch((e) => app.toast(e.message, "error"));
+          .catch((e) => app.toast(e.message, 'error'));
 
         return;
       }
 
-      api
-        .updateCardObjective(card.cardNo, objective)
-        .catch((e) => app.toast(e.message, "error"));
+      api.updateCardObjective(card.cardNo, objective).catch((e) => app.toast(e.message, 'error'));
     }
 
     function handleEditCancel(index: number) {
@@ -194,9 +164,7 @@ export const CardListView = forwardRef(
     //
     // Drag & Drop
     //
-    const [dragStartCard, setDragStartCard] = useState<Card.AsObject | null>(
-      null
-    );
+    const [dragStartCard, setDragStartCard] = useState<Card.AsObject | null>(null);
     const [dragging, setDragging] = useState(false);
 
     function handleDragOver(dragIndex: number, hoverIndex: number) {
@@ -248,15 +216,10 @@ export const CardListView = forwardRef(
         dragStartCard!.parentCardNo = destCard.parentCardNo;
       }
 
-      api
-        .rerankCard(srcCard.cardNo, destCard.cardNo)
-        .catch((e) => app.toast(e.message, "error"));
+      api.rerankCard(srcCard.cardNo, destCard.cardNo).catch((e) => app.toast(e.message, 'error'));
     }
 
-    function walk(
-      cardNo: number,
-      callback: (depth: number, card: Card.AsObject) => void
-    ) {
+    function walk(cardNo: number, callback: (depth: number, card: Card.AsObject) => void) {
       function walk_(depth: number, cardNo: number) {
         cards
           .filter((c) => c.parentCardNo === cardNo)
@@ -274,8 +237,8 @@ export const CardListView = forwardRef(
     //
 
     useAction({
-      label: "selection up",
-      hotkey: [Key.ArrowUp, "K"],
+      label: 'selection up',
+      hotkey: [Key.ArrowUp, 'K'],
       onExecute: selUp,
       hotkeyOptions: { preventDefault: false },
     });
@@ -289,8 +252,8 @@ export const CardListView = forwardRef(
     }
 
     useAction({
-      label: "selection down",
-      hotkey: [Key.ArrowDown, "J"],
+      label: 'selection down',
+      hotkey: [Key.ArrowDown, 'J'],
       onExecute: selDown,
       hotkeyOptions: { preventDefault: false },
     });
@@ -302,8 +265,8 @@ export const CardListView = forwardRef(
     }
 
     useAction({
-      label: "move right",
-      hotkey: ["⌘+Ctrl+Right", "⌘+Ctrl+]"],
+      label: 'move right',
+      hotkey: ['⌘+Ctrl+Right', '⌘+Ctrl+]'],
       onExecute: moveRight,
     });
     function moveRight() {
@@ -328,21 +291,19 @@ export const CardListView = forwardRef(
           });
           onChange && onChange(r.cardNo);
         })
-        .catch((e) => app.toast(e.message, "error"));
+        .catch((e) => app.toast(e.message, 'error'));
     }
 
     useAction({
-      label: "move left",
-      hotkey: ["⌘+Ctrl+Left", "⌘+ctrl+["],
+      label: 'move left',
+      hotkey: ['⌘+Ctrl+Left', '⌘+ctrl+['],
       onExecute: moveLeft,
     });
     function moveLeft() {
       if (selected === 0) return;
       if (cards[selected].depth === 0) return;
 
-      const parent = cards.findIndex(
-        (c) => c.cardNo === cards[selected].parentCardNo
-      );
+      const parent = cards.findIndex((c) => c.cardNo === cards[selected].parentCardNo);
 
       const child = getChildCards(selected);
 
@@ -360,12 +321,7 @@ export const CardListView = forwardRef(
               child.forEach((c) => (cards[c].depth = cards[c].depth - 1));
 
               const x = cards.slice(0, selected); // 기존 것
-              x.push(
-                ...p.slice(
-                  selected + child.length + 1,
-                  selected + siblings.length - child.length
-                )
-              ); // 위로 이동
+              x.push(...p.slice(selected + child.length + 1, selected + siblings.length - child.length)); // 위로 이동
               x.push(...p.slice(selected, selected + child.length + 1)); // 아래로 이동
               x.push(...p.slice(selected + siblings.length)); // 나머지
 
@@ -374,7 +330,7 @@ export const CardListView = forwardRef(
             });
             onChange && onChange(r.cardNo);
           })
-          .catch((e) => app.toast(e.message, "error"));
+          .catch((e) => app.toast(e.message, 'error'));
         return;
       }
 
@@ -389,12 +345,7 @@ export const CardListView = forwardRef(
 
           setCards((p) => {
             const x = p.slice(0, selected); // 유지될 것d
-            x.push(
-              ...p.slice(
-                selected + child.length + 1,
-                selected + child.length + siblings.length + 1
-              )
-            ); // 위로 올라갈 것: child + siblings
+            x.push(...p.slice(selected + child.length + 1, selected + child.length + siblings.length + 1)); // 위로 올라갈 것: child + siblings
             x.push(...p.slice(selected, selected + child.length + 1)); // 내려갈 것
             x.push(...p.slice(selected + child.length + siblings.length + 1)); // 나머지 유지할 것
 
@@ -403,7 +354,7 @@ export const CardListView = forwardRef(
           setSelected((p) => p + siblings.length);
           onChange && onChange(cards[selected].cardNo);
         })
-        .catch((e) => app.toast(e.message, "error"));
+        .catch((e) => app.toast(e.message, 'error'));
     }
 
     function findFirstSiblingUpward(index: number): number {
@@ -414,7 +365,7 @@ export const CardListView = forwardRef(
       return -1;
     }
 
-    useAction({ label: "move up", hotkey: "⌘+Ctrl+Up", onExecute: moveUp });
+    useAction({ label: 'move up', hotkey: '⌘+Ctrl+Up', onExecute: moveUp });
     function moveUp() {
       const upwardIndex = findFirstSiblingUpward(selected);
       if (upwardIndex === -1) return;
@@ -435,7 +386,7 @@ export const CardListView = forwardRef(
           });
           setSelected((p) => upwardIndex);
         })
-        .catch((e) => app.toast(e.message, "error"));
+        .catch((e) => app.toast(e.message, 'error'));
     }
 
     function findFirstSiblingDownward(index: number): number {
@@ -459,8 +410,8 @@ export const CardListView = forwardRef(
     }
 
     useAction({
-      label: "move down",
-      hotkey: "⌘+Ctrl+Down",
+      label: 'move down',
+      hotkey: '⌘+Ctrl+Down',
       onExecute: moveDown,
     });
     function moveDown() {
@@ -482,22 +433,15 @@ export const CardListView = forwardRef(
           .then((r) => {
             setCards((p) => {
               const x = p.slice(0, selected); // 유지할 것
-              x.push(
-                ...p.slice(
-                  selected + child.length + 1,
-                  selected + child.length + 1 + destChild.length + 1
-                )
-              ); // 위로 올라갈 것
+              x.push(...p.slice(selected + child.length + 1, selected + child.length + 1 + destChild.length + 1)); // 위로 올라갈 것
               x.push(...p.slice(selected, selected + child.length + 1)); // 밑으로 내려갈 것
-              x.push(
-                ...p.slice(selected + child.length + 1 + destChild.length + 1)
-              ); // 나머지
+              x.push(...p.slice(selected + child.length + 1 + destChild.length + 1)); // 나머지
               return x;
             });
 
             setSelected((p) => p + destChild.length + 1);
           })
-          .catch((e) => app.toast(e.message, "error"));
+          .catch((e) => app.toast(e.message, 'error'));
         return;
       }
 
@@ -515,11 +459,11 @@ export const CardListView = forwardRef(
           });
           setSelected((p) => p + 1);
         })
-        .catch((e) => app.toast(e.message, "error"));
+        .catch((e) => app.toast(e.message, 'error'));
     }
 
     useAction({
-      label: "Edit",
+      label: 'Edit',
       hotkey: Key.Enter,
       onExecute: () => {
         if (selected === -1) return;
@@ -528,14 +472,14 @@ export const CardListView = forwardRef(
     });
 
     useAction({
-      label: "insert after",
-      hotkey: "⌘+Enter",
+      label: 'insert after',
+      hotkey: '⌘+Enter',
       onExecute: () => insertAfter(),
     });
     function insertAfter() {
       setCards((p) =>
         update(p, {
-          $splice: [[selected + 1, 0, newCard(-1, "")]],
+          $splice: [[selected + 1, 0, newCard(-1, '')]],
         })
       );
       setSelected((p) => p + 1);
@@ -558,14 +502,14 @@ export const CardListView = forwardRef(
           deleteCard(index);
           break;
         default:
-          app.toast(`unknown action: ${action}`, "error");
+          app.toast(`unknown action: ${action}`, 'error');
       }
     }
 
     function setCompleted(index: number, complete: boolean) {
       const card = cards[index];
       if (!card) {
-        app.toast(`invalid card`, "error");
+        app.toast(`invalid card`, 'error');
         return;
       }
 
@@ -595,20 +539,20 @@ export const CardListView = forwardRef(
           app.toast(`card deleted: ${card.objective}`);
           onChange && onChange(card.cardNo);
         })
-        .catch((e) => app.toast(e.message, "error"))
+        .catch((e) => app.toast(e.message, 'error'))
         .finally(() => setDeletingCard(false));
     }
 
     const [actChallengeThis] = useAction({
-      label: "Challenge this card",
-      hotkey: "⌘+Ctrl+C",
+      label: 'Challenge this card',
+      hotkey: '⌘+Ctrl+C',
       onEnabled: () => selected !== -1,
       onExecute: () => {
         const card = cards[selected];
         api
-          .updateCardType(card.cardNo, "challenge")
-          .then(() => app.toast("please review in challenge view", "success"))
-          .catch((e) => app.toast(e.message, "error"));
+          .updateCardType(card.cardNo, 'challenge')
+          .then(() => app.toast('please review in challenge view', 'success'))
+          .catch((e) => app.toast(e.message, 'error'));
       },
     });
 
@@ -619,41 +563,35 @@ export const CardListView = forwardRef(
         .updateCardDeferUntil(cards[selected].cardNo, deferUntil)
         .then((r) =>
           deferUntil
-            ? app.toast(
-                `card ${
-                  cards[selected].cardNo
-                } defered until ${deferUntil.toLocaleString()}`
-              )
+            ? app.toast(`card ${cards[selected].cardNo} defered until ${deferUntil.toLocaleString()}`)
             : app.toast(`card ${cards[selected].cardNo} clear defered`)
         )
-        .catch((e) => app.toast(e.message, "error"));
+        .catch((e) => app.toast(e.message, 'error'));
     }
 
     const [actDeferUntilTomorrow] = useAction({
-      label: "Defer until Tomorrow",
-      hotkey: "⌘+Ctrl+T",
+      label: 'Defer until Tomorrow',
+      hotkey: '⌘+Ctrl+T',
       onEnabled: () => selected !== -1,
-      onExecute: () =>
-        updateDeferUntil(datetime.workTime().add(1, "day").toDate()),
+      onExecute: () => updateDeferUntil(datetime.workTime().add(1, 'day').toDate()),
     });
 
     const [actDeferUntilNextWeek] = useAction({
-      label: "Defer until next Week",
-      hotkey: "⌘+Ctrl+W",
+      label: 'Defer until next Week',
+      hotkey: '⌘+Ctrl+W',
       onEnabled: () => selected !== -1,
-      onExecute: () =>
-        updateDeferUntil(datetime.workTime().add(7, "day").toDate()),
+      onExecute: () => updateDeferUntil(datetime.workTime().add(7, 'day').toDate()),
     });
 
     const [actDeferUntilNextMonth] = useAction({
-      label: "Defer later...",
-      hotkey: "⌘+Ctrl+R",
+      label: 'Defer later...',
+      hotkey: '⌘+Ctrl+R',
       onEnabled: () => selected !== -1,
       onExecute: () =>
         updateDeferUntil(
           datetime
             .workTime()
-            .add(Math.random() * 30 + 7, "day")
+            .add(Math.random() * 30 + 7, 'day')
             .toDate()
         ),
     });
@@ -665,52 +603,46 @@ export const CardListView = forwardRef(
         .updateCardDueDate(cards[selected].cardNo, dueDate)
         .then((r) =>
           dueDate
-            ? app.toast(
-                `set card ${
-                  cards[selected].cardNo
-                } due date to ${dueDate.toLocaleDateString()}`
-              )
+            ? app.toast(`set card ${cards[selected].cardNo} due date to ${dueDate.toLocaleDateString()}`)
             : app.toast(`card ${cards[selected].cardNo} due date cleared`)
         )
-        .catch((e) => app.toast(e.message, "error"));
+        .catch((e) => app.toast(e.message, 'error'));
     }
 
     const [actClearDefer] = useAction({
-      label: "Clear defer",
-      onEnabled: () =>
-        selected !== -1 && cards[selected] && !!cards[selected].deferUntil,
+      label: 'Clear defer',
+      onEnabled: () => selected !== -1 && cards[selected] && !!cards[selected].deferUntil,
       onExecute: () => updateDeferUntil(null),
     });
 
     const [actDueToToday] = useAction({
-      label: "Due to Today",
-      hotkey: "⌘+Ctrl+O",
+      label: 'Due to Today',
+      hotkey: '⌘+Ctrl+O',
       onEnabled: () => selected !== -1,
       onExecute: () => updateDueDate(datetime.dueTime().toDate()),
     });
 
     const [actDueToNextWeek] = useAction({
-      label: "Due to next Week",
+      label: 'Due to next Week',
       onEnabled: () => selected !== -1,
-      onExecute: () => updateDueDate(datetime.dueTime().add(7, "day").toDate()),
+      onExecute: () => updateDueDate(datetime.dueTime().add(7, 'day').toDate()),
     });
 
     const [actDueToLater] = useAction({
-      label: "Due to later...",
+      label: 'Due to later...',
       onEnabled: () => selected !== -1,
       onExecute: () =>
         updateDueDate(
           datetime
             .dueTime()
-            .add(Math.random() * 30 + 7, "day")
+            .add(Math.random() * 30 + 7, 'day')
             .toDate()
         ),
     });
 
     const [actClearDueDate] = useAction({
-      label: "Clear due date",
-      onEnabled: () =>
-        selected !== -1 && cards[selected] && !!cards[selected].dueDate,
+      label: 'Clear due date',
+      onEnabled: () => selected !== -1 && cards[selected] && !!cards[selected].dueDate,
       onExecute: () => updateDueDate(null),
     });
 
@@ -719,17 +651,12 @@ export const CardListView = forwardRef(
 
       api
         .moveCardToInbox(cards[selected].cardNo)
-        .then((r) =>
-          app.toast(
-            `card ${cards[selected].cardNo} was moved to INBOX`,
-            "success"
-          )
-        )
-        .catch((e) => app.toast(e.message, "error"));
+        .then((r) => app.toast(`card ${cards[selected].cardNo} was moved to INBOX`, 'success'))
+        .catch((e) => app.toast(e.message, 'error'));
     }
 
     const [actMoveCardToInbox] = useAction({
-      label: "Move card to INBOX",
+      label: 'Move card to INBOX',
       onEnabled: () => selected !== -1,
       onExecute: () => moveCardToInbox(),
     });
@@ -756,11 +683,7 @@ export const CardListView = forwardRef(
 
     return (
       <DndProvider backend={HTML5Backend}>
-        <Box
-          component="div"
-          onDoubleClick={() => onDoubleClick && onDoubleClick()}
-          onContextMenu={handleContextMenu}
-        >
+        <Box component="div" onDoubleClick={() => onDoubleClick && onDoubleClick()} onContextMenu={handleContextMenu}>
           {cards.map((item, i) => {
             let endAdornment = item.labelsList
               .filter((i) => labelsMap[i])
@@ -816,7 +739,7 @@ interface DragItem {
 }
 
 export const ItemTypes = {
-  CARD: "card",
+  CARD: 'card',
 };
 
 interface ItemProp {
@@ -873,11 +796,7 @@ export const CardItem = forwardRef(
       }),
     });
 
-    const [{ handlerId }, drop] = useDrop<
-      DragItem,
-      void,
-      { handlerId: Identifier | null }
-    >({
+    const [{ handlerId }, drop] = useDrop<DragItem, void, { handlerId: Identifier | null }>({
       accept: ItemTypes.CARD,
       collect(monitor: DropTargetMonitor<DragItem, void>) {
         return {
@@ -899,15 +818,13 @@ export const CardItem = forwardRef(
         const hoverBoundingRect = containerRef.current?.getBoundingClientRect();
 
         // Get vertical middle
-        const hoverMiddleY =
-          (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+        const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
 
         // Determine mouse position
         const clientOffset = monitor.getClientOffset();
 
         // Get pixels to the top
-        const hoverClientY =
-          (clientOffset as XYCoord).y - hoverBoundingRect.top;
+        const hoverClientY = (clientOffset as XYCoord).y - hoverBoundingRect.top;
 
         // Only perform the move when the mouse has crossed half of the items height
         // When dragging downwards, only move when the cursor is below 50%
@@ -944,11 +861,10 @@ export const CardItem = forwardRef(
       onActionClick && onActionClick(index, action);
     }
 
-    let deferColor = card.deferUntil ? "info.light" : "lightgray";
-    let dueColor = card.dueDate ? "info.light" : "lightgray";
+    let deferColor = card.deferUntil ? 'info.light' : 'lightgray';
+    let dueColor = card.dueDate ? 'info.light' : 'lightgray';
     if (card.dueDate) {
-      if (dayjs(card.dueDate.seconds * 1000).diff(dayjs(), "day") < 2)
-        dueColor = "error.light";
+      if (dayjs(card.dueDate.seconds * 1000).diff(dayjs(), 'day') < 2) dueColor = 'error.light';
     }
 
     const app = useFocusApp();
@@ -957,28 +873,25 @@ export const CardItem = forwardRef(
       <Box
         component="div"
         ref={containerRef}
-        visibility={visible ? "inherit" : "hidden"}
+        visibility={visible ? 'inherit' : 'hidden'}
         sx={{
-          display: "flex",
-          border: "1px solid lightgray",
-          padding: "0.5rem 1rem",
-          cursor: "move",
-          backgroundColor: selected ? "action.selected" : "",
+          display: 'flex',
+          border: '1px solid lightgray',
+          padding: '0.5rem 1rem',
+          cursor: 'move',
+          backgroundColor: selected ? 'action.selected' : '',
           opacity: opacity,
           width: 1,
         }}
         onClick={() => onClick && onClick(index)}
       >
-        <Box sx={{ flexGrow: 0, display: "flex" }}>
+        <Box sx={{ flexGrow: 0, display: 'flex' }}>
           <Box>
-            <DragIndicatorIcon sx={{ color: "GrayText" }} />
+            <DragIndicatorIcon sx={{ color: 'GrayText' }} />
           </Box>
           {card.depth > 0 && <Box sx={{ width: card.depth * 20 }}></Box>}
           <Box>
-            <IconButton
-              size="small"
-              onClick={() => app.toast("collapse: not implemented", "warning")}
-            >
+            <IconButton size="small" onClick={() => app.toast('collapse: not implemented', 'warning')}>
               {hasChild && hasChild(card.cardNo) ? (
                 <ArrowDropDownIcon fontSize="small" />
               ) : (
@@ -989,7 +902,7 @@ export const CardItem = forwardRef(
           {showCardNo && (
             <Box sx={{ pr: 1 }}>
               {card.cardNo !== -1 &&
-                (card.cardType === "challenge" ? (
+                (card.cardType === 'challenge' ? (
                   <Link to={`/challenges/` + card.cardNo}>{card.cardNo}</Link>
                 ) : (
                   <Link to={`/cards/` + card.cardNo}>{card.cardNo}</Link>
@@ -998,7 +911,7 @@ export const CardItem = forwardRef(
           )}
         </Box>
         <Box sx={{ flexGrow: 1 }}>
-          <Box sx={{ flexGrow: 1, display: "flex" }}>
+          <Box sx={{ flexGrow: 1, display: 'flex' }}>
             <Box sx={{ flexGrow: 1 }}>
               <InlineEdit
                 ref={ref}
@@ -1010,62 +923,41 @@ export const CardItem = forwardRef(
             </Box>
           </Box>
           {(card.deferUntil || card.dueDate) && (
-            <Box sx={{ display: "flex" }}>
+            <Box sx={{ display: 'flex' }}>
               <Box sx={{ flexGrow: 1 }}></Box>
               <Box sx={{ flexGrow: 0, color: deferColor }}>
-                {card.deferUntil &&
-                  dayjs(card.deferUntil.seconds * 1000).isAfter(dayjs()) && (
-                    <>
-                      defer until{" "}
-                      {new Date(
-                        card.deferUntil.seconds * 1000
-                      ).toLocaleDateString()}
-                    </>
-                  )}
-              </Box>
-              <Box sx={{ flexGrow: 0, pl: "1rem", color: dueColor }}>
-                {card.dueDate && (
-                  <>
-                    due to{" "}
-                    {new Date(card.dueDate.seconds * 1000).toLocaleDateString()}
-                  </>
+                {card.deferUntil && dayjs(card.deferUntil.seconds * 1000).isAfter(dayjs()) && (
+                  <>defer until {new Date(card.deferUntil.seconds * 1000).toLocaleDateString()}</>
                 )}
+              </Box>
+              <Box sx={{ flexGrow: 0, pl: '1rem', color: dueColor }}>
+                {card.dueDate && <>due to {new Date(card.dueDate.seconds * 1000).toLocaleDateString()}</>}
               </Box>
             </Box>
           )}
         </Box>
-        <Box sx={{ flexGrow: 0, pl: "1rem" }}>
+        <Box sx={{ flexGrow: 0, pl: '1rem' }}>
           <Box>
             {card.completedAt ? (
               <Tooltip title="back to progress">
-                <IconButton
-                  onClick={() =>
-                    handleActionClick(index, CardAction.INPROGRESS)
-                  }
-                >
+                <IconButton onClick={() => handleActionClick(index, CardAction.INPROGRESS)}>
                   <TaskAltIcon />
                 </IconButton>
               </Tooltip>
             ) : (
               <Tooltip title="complete card">
-                <IconButton
-                  onClick={() => handleActionClick(index, CardAction.COMPLETE)}
-                >
+                <IconButton onClick={() => handleActionClick(index, CardAction.COMPLETE)}>
                   <TripOriginIcon />
                 </IconButton>
               </Tooltip>
             )}
             <Tooltip title="delete">
-              <IconButton
-                onClick={() => handleActionClick(index, CardAction.DELETE)}
-              >
+              <IconButton onClick={() => handleActionClick(index, CardAction.DELETE)}>
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
             {false && (
-              <IconButton
-                onClick={() => handleActionClick(index, CardAction.UNDELETE)}
-              >
+              <IconButton onClick={() => handleActionClick(index, CardAction.UNDELETE)}>
                 <CancelIcon />
               </IconButton>
             )}
