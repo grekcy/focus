@@ -1,8 +1,8 @@
-import AccountBoxIcon from "@mui/icons-material/AccountBox";
-import AddIcon from "@mui/icons-material/Add";
-import LoginIcon from "@mui/icons-material/Login";
-import LogoutIcon from "@mui/icons-material/Logout";
-import MenuIcon from "@mui/icons-material/Menu";
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import AddIcon from '@mui/icons-material/Add';
+import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import MenuIcon from '@mui/icons-material/Menu';
 import {
   Avatar,
   Box,
@@ -20,15 +20,15 @@ import {
   SvgIconProps,
   TextField,
   Toolbar,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { MouseEvent, SyntheticEvent, useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAction } from "../lib/components/Action";
-import { useAuth } from "../lib/components/AuthProvider";
-import { useFocus } from "../lib/components/FocusProvider";
-import { User } from "../lib/proto/focus_v1alpha1_pb";
-import { newGuestUser } from "../lib/proto/helper";
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import { MouseEvent, SyntheticEvent, useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAction } from '../lib/components/Action';
+import { useAuth } from '../lib/components/AuthProvider';
+import { useFocus } from '../lib/components/FocusProvider';
+import { User } from '../lib/proto/focus_v1alpha1_pb';
+import { newGuestUser } from '../lib/proto/helper';
 
 const drawerWidth = 170;
 
@@ -37,17 +37,17 @@ interface MAppBarProps extends MuiAppBarProps {
 }
 
 const MAppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
+  shouldForwardProp: (prop) => prop !== 'open',
 })<MAppBarProps>(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(["width", "margin"], {
+  transition: theme.transitions.create(['width', 'margin'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
+    transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
@@ -59,34 +59,34 @@ interface AppBarProps {
 }
 
 export function AppBar({ open }: AppBarProps) {
-  const [qucikAddObjective, setQucikAddObjective] = useState("");
+  const [qucikAddObjective, setQucikAddObjective] = useState('');
   const [adding, setAdding] = useState(false);
 
   const [app, api] = useFocus();
   const auth = useAuth();
 
   function onQuickAddKeyUp(e: SyntheticEvent) {
-    if ((e.nativeEvent as KeyboardEvent).key === "Enter") {
+    if ((e.nativeEvent as KeyboardEvent).key === 'Enter') {
       if (adding) return; // NOTE 한글의 경우 글을 조합하는 도중에 Enter를 누르면 2번 호출됨
       const objective = qucikAddObjective.trim();
-      if (objective === "") return;
+      if (objective === '') return;
 
       setAdding(true);
 
       api
         .addCard(objective)
         .then((r) => {
-          setQucikAddObjective("");
-          app.toast(`added: ${objective} as ${r.cardNo}`, "success");
+          setQucikAddObjective('');
+          app.toast(`added: ${objective} as ${r.cardNo}`, 'success');
         })
-        .catch((e) => app.toast(e.message, "error"))
+        .catch((e) => app.toast(e.message, 'error'))
         .finally(() => setAdding(false));
     }
   }
 
   useAction({
-    label: "Quick add card",
-    hotkey: "⌘+Ctrl+A",
+    label: 'Quick add card',
+    hotkey: '⌘+Ctrl+A',
     onExecute: () => ref.current && ref.current.focus(),
   });
 
@@ -101,7 +101,7 @@ export function AppBar({ open }: AppBarProps) {
       api
         .getProfile()
         .then((r) => setCurrentUser(r))
-        .catch((e) => app.toast(e.message, "error"));
+        .catch((e) => app.toast(e.message, 'error'));
     } else {
       setCurrentUser(newGuestUser());
     }
@@ -111,9 +111,9 @@ export function AppBar({ open }: AppBarProps) {
   function handleLogout() {
     setAnchorElUser(null);
 
-    auth.setToken("");
+    auth.setToken('');
 
-    navigate("/");
+    navigate('/');
   }
 
   const ref = useRef<HTMLDivElement>(null);
@@ -125,17 +125,17 @@ export function AppBar({ open }: AppBarProps) {
           color="inherit"
           onClick={() => app.toggleSidebar()}
           edge="start"
-          sx={{ ...(open ? { display: "none" } : {}) }}
+          sx={{ ...(open ? { display: 'none' } : {}) }}
         >
-          <MenuIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
+          <MenuIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
         </IconButton>
-        <Box sx={{ flexGrow: 0, display: { xs: "flex" } }}>
+        <Box sx={{ flexGrow: 0, display: { xs: 'flex' } }}>
           <ListItemButton component={Link} to="/">
             <HomeIcon />
           </ListItemButton>
         </Box>
-        <Box sx={{ flexGrow: 1, display: { xs: "flex" } }} />
-        <Box sx={{ flexGrow: 0, display: { xs: "flex" } }}>
+        <Box sx={{ flexGrow: 1, display: { xs: 'flex' } }} />
+        <Box sx={{ flexGrow: 0, display: { xs: 'flex' } }}>
           <TextField
             inputRef={ref}
             variant="standard"
@@ -144,10 +144,10 @@ export function AppBar({ open }: AppBarProps) {
             onChange={(e) => setQucikAddObjective(e.target.value)}
             onKeyUp={onQuickAddKeyUp}
             InputProps={{
-              sx: { color: "inherit" },
+              sx: { color: 'inherit' },
               startAdornment: (
                 <InputAdornment position="start">
-                  <AddIcon sx={{ color: "white" }} />
+                  <AddIcon sx={{ color: 'white' }} />
                 </InputAdornment>
               ),
             }}
@@ -158,18 +158,9 @@ export function AppBar({ open }: AppBarProps) {
           <IconButton onClick={handleOpenUserMenu}>
             <Avatar />
           </IconButton>
-          <Menu
-            anchorEl={anchorElUser}
-            open={!!anchorElUser}
-            onClose={() => setAnchorElUser(null)}
-          >
+          <Menu anchorEl={anchorElUser} open={!!anchorElUser} onClose={() => setAnchorElUser(null)}>
             {auth.isAuthenticated() && [
-              <MenuItem
-                key="account"
-                component={Link}
-                to="/account"
-                onClick={() => setAnchorElUser(null)}
-              >
+              <MenuItem key="account" component={Link} to="/account" onClick={() => setAnchorElUser(null)}>
                 <ListItemIcon>
                   <AccountBoxIcon />
                 </ListItemIcon>
@@ -184,12 +175,7 @@ export function AppBar({ open }: AppBarProps) {
               </MenuItem>,
             ]}
             {!auth.isAuthenticated() && [
-              <MenuItem
-                key="login"
-                component={Link}
-                to="/auth/login"
-                onClick={() => setAnchorElUser(null)}
-              >
+              <MenuItem key="login" component={Link} to="/auth/login" onClick={() => setAnchorElUser(null)}>
                 <ListItemIcon>
                   <LoginIcon />
                 </ListItemIcon>

@@ -1,4 +1,4 @@
-import { TextField } from "@mui/material";
+import { TextField } from '@mui/material';
 import {
   ChangeEvent,
   FocusEvent,
@@ -9,7 +9,7 @@ import {
   useImperativeHandle,
   useRef,
   useState,
-} from "react";
+} from 'react';
 
 interface InlineEditProp {
   value?: string;
@@ -26,16 +26,7 @@ export interface IInlineEdit {
 
 // Ref: https://www.emgoto.com/react-inline-edit/
 export const InlineEdit = forwardRef(
-  (
-    {
-      value = "",
-      multiline = false,
-      endAdornment,
-      onSubmit,
-      onCancel,
-    }: InlineEditProp,
-    ref: Ref<IInlineEdit>
-  ) => {
+  ({ value = '', multiline = false, endAdornment, onSubmit, onCancel }: InlineEditProp, ref: Ref<IInlineEdit>) => {
     useImperativeHandle(ref, () => ({
       edit() {
         if (!inputRef.current) return;
@@ -85,13 +76,13 @@ export const InlineEdit = forwardRef(
 
     function handleKeyDown(e: SyntheticEvent<HTMLDivElement, KeyboardEvent>) {
       switch (e.nativeEvent.key) {
-        case "Enter":
+        case 'Enter':
           if (multiline) return;
           setTimeout(() => {
             (e.nativeEvent.target! as HTMLInputElement).blur();
           }, 0);
           break;
-        case "Escape":
+        case 'Escape':
           setEditingValue(prevValue);
           setTimeout(() => {
             (e.nativeEvent.target! as HTMLInputElement).blur();

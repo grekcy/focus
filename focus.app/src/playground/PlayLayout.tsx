@@ -1,14 +1,14 @@
-import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
-import { Container, Divider, Grid, Paper } from "@mui/material";
-import { SxProps, Theme } from "@mui/material/styles";
-import { ReactNode } from "react";
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { Container, Divider, Grid, Paper } from '@mui/material';
+import { SxProps, Theme } from '@mui/material/styles';
+import { ReactNode } from 'react';
 
 export function PlayLayout() {
   return (
     <>
       <Divider textAlign="left">CardListViewItem with FlexGrow</Divider>
-      <Filled sx={{ display: "flex" }}>
-        <Filled sx={{ flexGrow: 0, display: "flex" }}>
+      <Filled sx={{ display: 'flex' }}>
+        <Filled sx={{ flexGrow: 0, display: 'flex' }}>
           <Filled>
             <DragIndicatorIcon fontSize="small" />
           </Filled>
@@ -16,10 +16,10 @@ export function PlayLayout() {
           <Filled>CardNo</Filled>
         </Filled>
         <Filled sx={{ flexGrow: 1 }}>
-          <Filled sx={{ flexGrow: 1, display: "flex" }}>
+          <Filled sx={{ flexGrow: 1, display: 'flex' }}>
             <Filled sx={{ flexGrow: 1 }}>Edit</Filled>
           </Filled>
-          <Filled sx={{ display: "flex" }}>
+          <Filled sx={{ display: 'flex' }}>
             <Filled sx={{ flexGrow: 1 }}>Tag</Filled>
             <Filled sx={{ flexGrow: 0 }}>Deferred...</Filled>
             <Filled sx={{ flexGrow: 0 }}>Due...</Filled>
@@ -57,16 +57,16 @@ interface FilledProp {
   children?: ReactNode;
 }
 
-export function Filled({ color = "primary.light", sx, children }: FilledProp) {
+export function Filled({ color = 'primary.light', sx, children }: FilledProp) {
   return (
     <Paper
       sx={{
-        border: "1px dashed gray",
+        border: '1px dashed gray',
         bgcolor: color,
-        minHeight: "4vh",
+        minHeight: '4vh',
         // height: "4vh",
         padding: 1,
-        textAlign: "center",
+        textAlign: 'center',
         ...sx,
       }}
     >

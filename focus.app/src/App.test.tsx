@@ -1,4 +1,4 @@
-test("renders learn react link", () => {
+test('renders learn react link', () => {
   // render(<MenuBar />);
   // const linkElement = screen.getByText(/learn react/i);
   // expect(linkElement).toBeInTheDocument();

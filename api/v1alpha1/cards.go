@@ -494,13 +494,13 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 	updates := map[string]any{}
 	for _, field := range req.Fields {
 		switch field {
-		case proto.CardField_OBJECTIVE:
+		case proto.PatchCardReq_OBJECTIVE:
 			updates["objective"] = req.Card.Objective
 
-		case proto.CardField_CONTENT:
+		case proto.PatchCardReq_CONTENT:
 			updates["content"] = req.Card.Content
 
-		case proto.CardField_COMPLETED_AT:
+		case proto.PatchCardReq_COMPLETED_AT:
 			if req.Card.CompletedAt == nil {
 				if card.CompletedAt == nil {
 					return nil, status.Errorf(codes.AlreadyExists, "already in progress status")
@@ -513,7 +513,7 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 				updates["completed_at"] = req.Card.CompletedAt.AsTime()
 			}
 
-		case proto.CardField_PARENT_CARD_NO:
+		case proto.PatchCardReq_PARENT_CARD_NO:
 			tx := s.db.WithContext(ctx)
 			if req.Card.ParentCardNo == nil {
 				updates["parent_card_no"] = gorm.Expr("NULL")
@@ -533,24 +533,24 @@ func (s *v1alpha1ServiceImpl) PatchCard(ctx context.Context, req *proto.PatchCar
 			log.Debugf("new rank: %v", rank)
 			updates["rank"] = rank
 
-		case proto.CardField_LABEL:
+		case proto.PatchCardReq_LABEL:
 			updates["labels"] = pq.Int64Array(fx.Map(req.Card.Labels, func(x uint64) int64 { return int64(x) }))
 
-		case proto.CardField_DEFER_UNTIL:
+		case proto.PatchCardReq_DEFER_UNTIL:
 			if req.Card.DeferUntil == nil {
 				updates["defer_until"] = gorm.Expr("NULL")
 			} else {
 				updates["defer_until"] = req.Card.DeferUntil.AsTime()
 			}
 
-		case proto.CardField_DUE_DATE:
+		case proto.PatchCardReq_DUE_DATE:
 			if req.Card.DueDate == nil {
 				updates["due_date"] = gorm.Expr("NULL")
 			} else {
 				updates["due_date"] = req.Card.DueDate.AsTime()
 			}
 
-		case proto.CardField_CARD_TYPE:
+		case proto.PatchCardReq_CARD_TYPE:
 			updates["card_type"] = req.Card.CardType
 			if req.Card.CardType == models.CardTypeChallenge.String() {
 				parentChallengeNo, err := s.getParentChallenge(ctx, uint(req.Card.CardNo))

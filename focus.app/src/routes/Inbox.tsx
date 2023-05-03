@@ -1,19 +1,13 @@
-import {
-  Box,
-  Checkbox,
-  FormControlLabel,
-  Stack,
-  Typography,
-} from "@mui/material";
-import update from "immutability-helper";
-import { useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { Event } from "../lib/api";
-import { CardBar, ICardBar } from "../lib/components/CardBar";
-import { CardListView, ICardListView } from "../lib/components/CardList";
-import { useFocusApp, useFocusClient } from "../lib/components/FocusProvider";
-import { LabelSelector } from "../lib/components/LabelSelector";
-import { Card, Label } from "../lib/proto/focus_v1alpha1_pb";
+import { Box, Checkbox, FormControlLabel, Stack, Typography } from '@mui/material';
+import update from 'immutability-helper';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Event } from '../lib/api';
+import { CardBar, ICardBar } from '../lib/components/CardBar';
+import { CardListView, ICardListView } from '../lib/components/CardList';
+import { useFocusApp, useFocusClient } from '../lib/components/FocusProvider';
+import { LabelSelector } from '../lib/components/LabelSelector';
+import { Card, Label } from '../lib/proto/focus_v1alpha1_pb';
 
 export function InboxPage() {
   const navigate = useNavigate();
@@ -24,15 +18,12 @@ export function InboxPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
-    const handler = api.addEventListener(
-      Event.CARD_CREATED,
-      (cardNo: number) => {
-        api
-          .getCard(cardNo)
-          .then((r) => cardListRef.current && cardListRef.current.addCard(r))
-          .catch((e) => app.toast(e.message, "error"));
-      }
-    );
+    const handler = api.addEventListener(Event.CARD_CREATED, (cardNo: number) => {
+      api
+        .getCard(cardNo)
+        .then((r) => cardListRef.current && cardListRef.current.addCard(r))
+        .catch((e) => app.toast(e.message, 'error'));
+    });
     return () => api.removeEventListener(handler);
   }, []);
 
@@ -41,7 +32,7 @@ export function InboxPage() {
     api
       .listLabels()
       .then((r) => setLabels(r))
-      .catch((e) => app.toast(e.message, "error"));
+      .catch((e) => app.toast(e.message, 'error'));
   }, []);
 
   const cardBarRef = useRef<ICardBar>(null);
@@ -53,35 +44,32 @@ export function InboxPage() {
 
   const [selectedLabels, setSelectedLabels] = useState<number[]>(
     searchParams
-      .getAll("label")
+      .getAll('label')
       .map((x) => parseInt(x))
       .filter((x) => !isNaN(x))
   );
 
-  const [withDeferred, setWithDeferred] = useState(
-    searchParams.get("deferred") === "true"
-  );
+  const [withDeferred, setWithDeferred] = useState(searchParams.get('deferred') === 'true');
 
   const [cards, setCards] = useState<Card.AsObject[]>([]);
   useEffect(() => {
     setSearchParams((p) => {
-      if (withDeferred) p.set("deferred", withDeferred.toString());
-      else p.delete("deferred");
+      if (withDeferred) p.set('deferred', withDeferred.toString());
+      else p.delete('deferred');
 
-      p.delete("label");
-      selectedLabels.forEach((x) => p.append("label", x.toString()));
+      p.delete('label');
+      selectedLabels.forEach((x) => p.append('label', x.toString()));
       return p;
     });
 
     api
       .listCards({ labels: selectedLabels, includeDeferred: withDeferred })
       .then((r) => setCards(r))
-      .catch((e) => app.toast(e.message, "error"));
+      .catch((e) => app.toast(e.message, 'error'));
   }, [selectedLabels, withDeferred]);
 
   function handleLabelClick(id: number) {
-    if (selectedLabels.indexOf(id) === -1)
-      setSelectedLabels((p) => update(p, { $push: [id] }));
+    if (selectedLabels.indexOf(id) === -1) setSelectedLabels((p) => update(p, { $push: [id] }));
   }
 
   const cardListRef = useRef<ICardListView>(null);
@@ -91,7 +79,7 @@ export function InboxPage() {
       <Box display="flex">
         <Typography variant="h5" flexGrow={1}>
           Inbox cards
-          <Typography display="inline" sx={{ pl: "1rem" }}>
+          <Typography display="inline" sx={{ pl: '1rem' }}>
             collect idea, organize and make Inbox to zero.
           </Typography>
         </Typography>
@@ -99,18 +87,13 @@ export function InboxPage() {
           <Stack direction="row">
             <FormControlLabel
               label="show deferred"
-              control={
-                <Checkbox
-                  checked={withDeferred}
-                  onChange={() => setWithDeferred((p) => !p)}
-                />
-              }
+              control={<Checkbox checked={withDeferred} onChange={() => setWithDeferred((p) => !p)} />}
             />
             <LabelSelector
               labels={labels}
               selected={selectedLabels}
               onSelectionChange={(labels) => setSelectedLabels(labels)}
-              sx={{ minWidth: { md: "300px" } }}
+              sx={{ minWidth: { md: '300px' } }}
             />
           </Stack>
         </Box>

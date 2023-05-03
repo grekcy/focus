@@ -1,8 +1,8 @@
-import { Empty } from "google-protobuf/google/protobuf/empty_pb";
-import { Timestamp } from "google-protobuf/google/protobuf/timestamp_pb";
-import { UInt64Value } from "google-protobuf/google/protobuf/wrappers_pb";
-import { IAuthProvider } from "./components/AuthProvider";
-import { FocusClient } from "./proto/Focus_v1alpha1ServiceClientPb";
+import { Empty } from 'google-protobuf/google/protobuf/empty_pb';
+import { Timestamp } from 'google-protobuf/google/protobuf/timestamp_pb';
+import { UInt64Value } from 'google-protobuf/google/protobuf/wrappers_pb';
+import { IAuthProvider } from './components/AuthProvider';
+import { FocusClient } from './proto/Focus_v1alpha1ServiceClientPb';
 import {
   AddCardReq,
   Card,
@@ -15,7 +15,7 @@ import {
   ListLabelsReq,
   PatchCardReq,
   RankCardReq,
-} from "./proto/focus_v1alpha1_pb";
+} from './proto/focus_v1alpha1_pb';
 
 export enum Event {
   CARD_CREATED,
@@ -24,7 +24,7 @@ export enum Event {
 
 export class FocusAPI {
   s: FocusClient;
-  token: string = ""; // apikey
+  token: string = ''; // apikey
   listeners: { [event: string]: EventListener[] };
 
   constructor(endpoint: string, auth: IAuthProvider) {
@@ -107,7 +107,7 @@ export class FocusAPI {
   };
 
   listCards = ({
-    startCardType = "card",
+    startCardType = 'card',
     parentCardNo,
     excludeCompleted = true,
     includeDeferred = false,
@@ -137,9 +137,7 @@ export class FocusAPI {
   getCards = (...cardNo: number[]) => {
     const req = new GetCardReq();
     req.setCardNosList(cardNo);
-    return this.s
-      .getCards(req, null)
-      .then((r) => Object.fromEntries(r.toObject().itemsMap));
+    return this.s.getCards(req, null).then((r) => Object.fromEntries(r.toObject().itemsMap));
   };
 
   getCardProgressSummary = (cardNo: number) => {
@@ -216,14 +214,10 @@ export class FocusAPI {
   moveCardToInbox = (cardNo: number) => {
     const card = new Card();
     card.setCardNo(cardNo);
-    card.setCardType("card");
+    card.setCardType('card');
     card.clearParentCardNo();
 
-    return this.patchCard(
-      card.toObject(),
-      CardField.CARD_TYPE,
-      CardField.PARENT_CARD_NO
-    );
+    return this.patchCard(card.toObject(), CardField.CARD_TYPE, CardField.PARENT_CARD_NO);
   };
 
   patchCard = (card: Card.AsObject, ...fields: CardField[]) => {
@@ -236,36 +230,27 @@ export class FocusAPI {
           c.setObjective(card.objective);
           break;
         case CardField.COMPLETED_AT:
-          if (card.completedAt)
-            c.setCompletedAt(
-              Timestamp.fromDate(new Date(card.completedAt!.seconds * 1000))
-            );
+          if (card.completedAt) c.setCompletedAt(Timestamp.fromDate(new Date(card.completedAt!.seconds * 1000)));
           else c.clearCompletedAt();
           break;
         case CardField.CONTENT:
           c.setContent(card.content);
           break;
         case CardField.PARENT_CARD_NO:
-          card.parentCardNo
-            ? c.setParentCardNo(card.parentCardNo)
-            : c.clearParentCardNo();
+          card.parentCardNo ? c.setParentCardNo(card.parentCardNo) : c.clearParentCardNo();
           break;
         case CardField.LABEL:
           c.setLabelsList(card.labelsList);
           break;
         case CardField.DEFER_UNTIL:
           if (card.deferUntil) {
-            const defer = Timestamp.fromDate(
-              new Date(card.deferUntil.seconds * 1000)
-            );
+            const defer = Timestamp.fromDate(new Date(card.deferUntil.seconds * 1000));
             c.setDeferUntil(defer);
           }
           break;
         case CardField.DUE_DATE:
           if (card.dueDate) {
-            const defer = Timestamp.fromDate(
-              new Date(card.dueDate.seconds * 1000)
-            );
+            const defer = Timestamp.fromDate(new Date(card.dueDate.seconds * 1000));
             c.setDueDate(defer);
           }
           break;
@@ -351,8 +336,8 @@ class AuthInterceptor {
     const token = this.getToken();
 
     if (token) {
-      metadata["Access-Control-Allow-Origin"] = "*";
-      metadata.Authorization = "Bearer " + token;
+      metadata['Access-Control-Allow-Origin'] = '*';
+      metadata.Authorization = 'Bearer ' + token;
     }
 
     return invoker(request);

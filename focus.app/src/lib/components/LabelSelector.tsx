@@ -1,24 +1,11 @@
-import { Theme } from "@emotion/react";
-import {
-  Autocomplete,
-  AutocompleteRenderInputParams,
-  Box,
-  TextField,
-} from "@mui/material";
-import { SxProps } from "@mui/material/styles";
-import update from "immutability-helper";
-import {
-  KeyboardEvent,
-  ReactNode,
-  Ref,
-  SyntheticEvent,
-  forwardRef,
-  useEffect,
-  useState,
-} from "react";
-import { Key } from "ts-key-enum";
-import { arrayContentEquals } from "../lib";
-import { LabelChip } from "./LabelChip";
+import { Theme } from '@emotion/react';
+import { Autocomplete, AutocompleteRenderInputParams, Box, TextField } from '@mui/material';
+import { SxProps } from '@mui/material/styles';
+import update from 'immutability-helper';
+import { KeyboardEvent, ReactNode, Ref, SyntheticEvent, forwardRef, useEffect, useState } from 'react';
+import { Key } from 'ts-key-enum';
+import { arrayContentEquals } from '../lib';
+import { LabelChip } from './LabelChip';
 
 export interface LabelOption {
   id: number;
@@ -36,27 +23,17 @@ interface LabelSelectorProps {
 interface ILabelSelector {}
 
 export const LabelSelector = forwardRef(
-  (
-    {
-      labels,
-      selected: inSelected = [],
-      sx,
-      onSelectionChange,
-    }: LabelSelectorProps,
-    ref: Ref<HTMLDivElement>
-  ) => {
+  ({ labels, selected: inSelected = [], sx, onSelectionChange }: LabelSelectorProps, ref: Ref<HTMLDivElement>) => {
     const [options, setOptions] = useState<LabelOption[]>(labels);
     const [selected, setSelected] = useState<number[]>(inSelected);
-    const [value, setValue] = useState("");
+    const [value, setValue] = useState('');
 
     useEffect(() => {
       if (!arrayContentEquals(selected, inSelected)) setSelected(inSelected);
     }, [inSelected]);
 
     useEffect(() => {
-      setOptions(
-        labels.filter((o) => selected.findIndex((s) => s === o.id) === -1)
-      );
+      setOptions(labels.filter((o) => selected.findIndex((s) => s === o.id) === -1));
     }, [labels, selected]);
 
     function deleteLabel(id: number) {
@@ -66,16 +43,13 @@ export const LabelSelector = forwardRef(
       onSelectionChange && onSelectionChange(updated);
     }
 
-    function handleChange(
-      e: SyntheticEvent<Element, Event>,
-      newValue: LabelOption | null
-    ) {
+    function handleChange(e: SyntheticEvent<Element, Event>, newValue: LabelOption | null) {
       if (!newValue) return;
 
       const updated = update(selected, { $push: [newValue.id] });
       setSelected(updated);
 
-      setValue("");
+      setValue('');
 
       onSelectionChange && onSelectionChange(updated);
     }
@@ -88,21 +62,14 @@ export const LabelSelector = forwardRef(
         clearOnBlur
         clearOnEscape
         openOnFocus
-        renderInput={function (
-          params: AutocompleteRenderInputParams
-        ): ReactNode {
-          params.size = "small";
+        renderInput={function (params: AutocompleteRenderInputParams): ReactNode {
+          params.size = 'small';
           params.inputProps.value = value;
           params.InputProps.startAdornment = selected.map((id) => {
             const label = labels.find((e) => e.id === id);
             if (!label) return <></>;
             return (
-              <LabelChip
-                key={label.id}
-                label={label.label}
-                color={label.color}
-                onDelete={() => deleteLabel(id)}
-              />
+              <LabelChip key={label.id} label={label.label} color={label.color} onDelete={() => deleteLabel(id)} />
             );
           });
 
@@ -110,23 +77,15 @@ export const LabelSelector = forwardRef(
         }}
         renderOption={(props, option) => (
           <Box component="li" {...props}>
-            <LabelChip
-              key={option.id}
-              id={option.id}
-              label={option.label}
-              color={option.color}
-            />
+            <LabelChip key={option.id} id={option.id} label={option.label} color={option.color} />
           </Box>
         )}
         options={options}
-        isOptionEqualToValue={(option: LabelOption, value: LabelOption) =>
-          option.id === value.id
-        }
+        isOptionEqualToValue={(option: LabelOption, value: LabelOption) => option.id === value.id}
         onChange={handleChange}
         onInputChange={(e: any, value: string) => setValue(value)}
         onKeyDown={(e: KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === Key.Backspace && value === "" && selected.length > 0)
-            deleteLabel(selected.length - 1);
+          if (e.key === Key.Backspace && value === '' && selected.length > 0) deleteLabel(selected.length - 1);
         }}
       />
     );
