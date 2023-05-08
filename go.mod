@@ -14,12 +14,12 @@ require (
 	github.com/whitekid/cobrax v0.0.0-20230428033153-0d1d63c946ac
 	github.com/whitekid/gormx v0.0.0-20230428033005-1bc2bea75282
 	github.com/whitekid/goxp v0.0.0-20230502051126-ed7839b1e6d7
-	github.com/whitekid/grpcx v0.0.0-20230421095149-48593e9f36b1
-	github.com/whitekid/x509x v0.0.0-20230421042319-809abf939f9b
+	github.com/whitekid/grpcx v0.0.0-20230508003353-45c3a499fa24
+	github.com/whitekid/x509x v0.0.0-20230508003132-45f9cf0126cc
 	go.uber.org/zap v1.24.0
 	golang.org/x/exp v0.0.0-20230425010034-47ecfdc1ba53
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
-	google.golang.org/grpc v1.54.0
+	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
 	gorm.io/gorm v1.25.0
 )
