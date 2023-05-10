@@ -6,7 +6,6 @@ import { FocusClient } from './proto/Focus_v1alpha1ServiceClientPb';
 import {
   AddCardReq,
   Card,
-  CardField,
   GetCardReq,
   GoogleLoginReq,
   Label,
@@ -152,7 +151,7 @@ export class FocusAPI {
     if (complete) card.setCompletedAt(Timestamp.fromDate(new Date()));
     else card.clearCreatedAt();
 
-    return this.patchCard(card.toObject(), CardField.COMPLETED_AT);
+    return this.patchCard(card.toObject(), PatchCardReq.Field.COMPLETED_AT);
   };
 
   updateCardObjective = (cardNo: number, objective: string) => {
@@ -160,7 +159,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setObjective(objective);
 
-    return this.patchCard(card.toObject(), CardField.OBJECTIVE);
+    return this.patchCard(card.toObject(), PatchCardReq.Field.OBJECTIVE);
   };
 
   updateCardContent = (cardNo: number, content: string) => {
@@ -168,7 +167,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setContent(content);
 
-    return this.patchCard(card.toObject(), CardField.CONTENT);
+    return this.patchCard(card.toObject(), PatchCardReq.Field.CONTENT);
   };
 
   setParentCard = (cardNo: number, parent: number) => {
@@ -176,7 +175,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setParentCardNo(parent);
 
-    return this.patchCard(card.toObject(), CardField.PARENT_CARD_NO);
+    return this.patchCard(card.toObject(), PatchCardReq.Field.PARENT_CARD_NO);
   };
 
   updateCardLabel = (cardNo: number, labels: number[]) => {
@@ -184,7 +183,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setLabelsList(labels);
 
-    return this.patchCard(card.toObject(), CardField.LABEL);
+    return this.patchCard(card.toObject(), PatchCardReq.Field.LABEL);
   };
 
   updateCardDeferUntil = (cardNo: number, deferUntil: Date | null) => {
@@ -192,7 +191,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     if (deferUntil) card.setDeferUntil(Timestamp.fromDate(deferUntil));
 
-    return this.patchCard(card.toObject(), CardField.DEFER_UNTIL);
+    return this.patchCard(card.toObject(), PatchCardReq.Field.DEFER_UNTIL);
   };
 
   updateCardDueDate = (cardNo: number, dueDate: Date | null) => {
@@ -200,7 +199,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     if (dueDate) card.setDueDate(Timestamp.fromDate(dueDate));
 
-    return this.patchCard(card.toObject(), CardField.DUE_DATE);
+    return this.patchCard(card.toObject(), PatchCardReq.Field.DUE_DATE);
   };
 
   updateCardType = (cardNo: number, cardType: string) => {
@@ -208,7 +207,7 @@ export class FocusAPI {
     card.setCardNo(cardNo);
     card.setCardType(cardType);
 
-    return this.patchCard(card.toObject(), CardField.CARD_TYPE);
+    return this.patchCard(card.toObject(), PatchCardReq.Field.CARD_TYPE);
   };
 
   moveCardToInbox = (cardNo: number) => {
@@ -217,44 +216,44 @@ export class FocusAPI {
     card.setCardType('card');
     card.clearParentCardNo();
 
-    return this.patchCard(card.toObject(), CardField.CARD_TYPE, CardField.PARENT_CARD_NO);
+    return this.patchCard(card.toObject(), PatchCardReq.Field.CARD_TYPE, PatchCardReq.Field.PARENT_CARD_NO);
   };
 
-  patchCard = (card: Card.AsObject, ...fields: CardField[]) => {
+  patchCard = (card: Card.AsObject, ...fields: PatchCardReq.Field[]) => {
     const req = new PatchCardReq();
     const c = new Card();
     c.setCardNo(card.cardNo);
     fields.forEach((field) => {
       switch (field) {
-        case CardField.OBJECTIVE:
+        case PatchCardReq.Field.OBJECTIVE:
           c.setObjective(card.objective);
           break;
-        case CardField.COMPLETED_AT:
+        case PatchCardReq.Field.COMPLETED_AT:
           if (card.completedAt) c.setCompletedAt(Timestamp.fromDate(new Date(card.completedAt!.seconds * 1000)));
           else c.clearCompletedAt();
           break;
-        case CardField.CONTENT:
+        case PatchCardReq.Field.CONTENT:
           c.setContent(card.content);
           break;
-        case CardField.PARENT_CARD_NO:
+        case PatchCardReq.Field.PARENT_CARD_NO:
           card.parentCardNo ? c.setParentCardNo(card.parentCardNo) : c.clearParentCardNo();
           break;
-        case CardField.LABEL:
+        case PatchCardReq.Field.LABEL:
           c.setLabelsList(card.labelsList);
           break;
-        case CardField.DEFER_UNTIL:
+        case PatchCardReq.Field.DEFER_UNTIL:
           if (card.deferUntil) {
             const defer = Timestamp.fromDate(new Date(card.deferUntil.seconds * 1000));
             c.setDeferUntil(defer);
           }
           break;
-        case CardField.DUE_DATE:
+        case PatchCardReq.Field.DUE_DATE:
           if (card.dueDate) {
             const defer = Timestamp.fromDate(new Date(card.dueDate.seconds * 1000));
             c.setDueDate(defer);
           }
           break;
-        case CardField.CARD_TYPE:
+        case PatchCardReq.Field.CARD_TYPE:
           c.setCardType(card.cardType);
           break;
         default:
