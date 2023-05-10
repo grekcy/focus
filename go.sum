@@ -295,10 +295,10 @@ github.com/stretchr/testify v1.8.2 h1:+h33VjcLVPDHtOdpUCuF+7gSuG3yGIftsP1YvFihtJ
 github.com/stretchr/testify v1.8.2/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/subosito/gotenv v1.4.2 h1:X1TuBLAMDFbaTAChgCBLu3DU3UPyELpnF2jjJ2cz/S8=
 github.com/subosito/gotenv v1.4.2/go.mod h1:ayKnFf/c6rvx/2iiLrJUk1e6plDbT3edrFNGqEflhK0=
-github.com/whitekid/cobrax v0.0.0-20230428033153-0d1d63c946ac h1:3TupH6b5UvRbQi5NcSlEGSE4ftSYrnrEuWrd4zwO/Jc=
-github.com/whitekid/cobrax v0.0.0-20230428033153-0d1d63c946ac/go.mod h1:6Sr7HXT5Im2AhzxXxcp4UbtH7dIrx344MYWJDSzEBGw=
-github.com/whitekid/gormx v0.0.0-20230428033005-1bc2bea75282 h1:E9UAezX6qsCjl/K6W/SeWmtVobxrBQdue5Z29cUAIYg=
-github.com/whitekid/gormx v0.0.0-20230428033005-1bc2bea75282/go.mod h1:yYYdcT/xgnw/Y8I56ao9OuGamlZMJHmeULf68FQucyQ=
+github.com/whitekid/cobrax v0.0.0-20230508004707-3816a2ef4a8d h1:v/PW4m/srAJcD8TFckyz97T4lyzWf3z900GePAGmGc8=
+github.com/whitekid/cobrax v0.0.0-20230508004707-3816a2ef4a8d/go.mod h1:VyAslbFnnNqXaqVVhr9LWtUjn2IqRciHUrcBU8i4H7k=
+github.com/whitekid/gormx v0.0.0-20230508005911-5c8e54b05de8 h1:ENVlm3br2a+nsVmPk+v/MyNwXJQJcF0saBx3VJ9PA5I=
+github.com/whitekid/gormx v0.0.0-20230508005911-5c8e54b05de8/go.mod h1:tPf09ffvSqZZwbfK3nUZOs6Gx48qQYMhlMo4ihFm3Ec=
 github.com/whitekid/goxp v0.0.0-20230502051126-ed7839b1e6d7 h1:vOvgFyFytAUGEqKaywz5FOGfcMDLG1HR0JJ0pJqQB0Y=
 github.com/whitekid/goxp v0.0.0-20230502051126-ed7839b1e6d7/go.mod h1:Jp6+G/5c/s7uPK+DkCB5facaJ4E95unmkXqKEXcdXmY=
 github.com/whitekid/grpcx v0.0.0-20230508003353-45c3a499fa24 h1:m8E0I0OgKp8Wy1Z1zm/OEoYNDtqDtqP50a3OS8Xwskg=
@@ -689,8 +689,8 @@ gorm.io/driver/postgres v1.5.0/go.mod h1:FUZXzO+5Uqg5zzwzv4KK49R8lvGIyscBOqYrtI1
 gorm.io/driver/sqlite v1.5.0 h1:zKYbzRCpBrT1bNijRnxLDJWPjVfImGEn0lSnUY5gZ+c=
 gorm.io/driver/sqlite v1.5.0/go.mod h1:kDMDfntV9u/vuMmz8APHtHF0b4nyBB7sfCieC6G8k8I=
 gorm.io/gorm v1.24.7-0.20230306060331-85eaf9eeda11/go.mod h1:L4uxeKpfBml98NYqVqwAdmV1a2nBtAec/cf3fpucW/k=
-gorm.io/gorm v1.25.0 h1:+KtYtb2roDz14EQe4bla8CbQlmb9dN3VejSai3lprfU=
-gorm.io/gorm v1.25.0/go.mod h1:L4uxeKpfBml98NYqVqwAdmV1a2nBtAec/cf3fpucW/k=
+gorm.io/gorm v1.25.1 h1:nsSALe5Pr+cM3V1qwwQ7rOkw+6UeLrX5O4v3llhHa64=
+gorm.io/gorm v1.25.1/go.mod h1:L4uxeKpfBml98NYqVqwAdmV1a2nBtAec/cf3fpucW/k=
 honnef.co/go/tools v0.0.0-20190102054323-c2f93a96b099/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 honnef.co/go/tools v0.0.0-20190106161140-3f1c8253044a/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=
 honnef.co/go/tools v0.0.0-20190418001031-e561f6794a2a/go.mod h1:rf3lG4BRIbNafJWhAfAdb/ePZxsR/4RtNHQocxwk9r4=

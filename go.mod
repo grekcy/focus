@@ -11,8 +11,8 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
 	github.com/stretchr/testify v1.8.2
-	github.com/whitekid/cobrax v0.0.0-20230428033153-0d1d63c946ac
-	github.com/whitekid/gormx v0.0.0-20230428033005-1bc2bea75282
+	github.com/whitekid/cobrax v0.0.0-20230508004707-3816a2ef4a8d
+	github.com/whitekid/gormx v0.0.0-20230508005911-5c8e54b05de8
 	github.com/whitekid/goxp v0.0.0-20230502051126-ed7839b1e6d7
 	github.com/whitekid/grpcx v0.0.0-20230508003353-45c3a499fa24
 	github.com/whitekid/x509x v0.0.0-20230508003132-45f9cf0126cc
@@ -21,7 +21,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
-	gorm.io/gorm v1.25.0
+	gorm.io/gorm v1.25.1
 )
 
 require (
