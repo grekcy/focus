@@ -67,7 +67,7 @@ func TestListCards(t *testing.T) {
 	client.PatchCard(ctx, &proto.PatchCardReq{Card: &proto.Card{
 		CardNo:     deferredCard.CardNo,
 		DeferUntil: timestamppb.New(time.Now().AddDate(0, 0, 1)),
-	}, Fields: []proto.CardField{proto.CardField_DEFER_UNTIL}})
+	}, Fields: []proto.PatchCardReq_Field{proto.PatchCardReq_DEFER_UNTIL}})
 
 	defer func() {
 		client.DeleteCard(ctx, wrapperspb.UInt64(deferredCard.CardNo))
@@ -207,7 +207,7 @@ func TestCompleteCard(t *testing.T) {
 	// set completed
 	{
 		_, err := client.PatchCard(ctx, &proto.PatchCardReq{
-			Fields: []proto.CardField{proto.CardField_COMPLETED_AT},
+			Fields: []proto.PatchCardReq_Field{proto.PatchCardReq_COMPLETED_AT},
 			Card: &proto.Card{
 				CardNo:      card.CardNo,
 				CompletedAt: timestamppb.Now(),
@@ -224,7 +224,7 @@ func TestCompleteCard(t *testing.T) {
 	// set again will be failed
 	{
 		_, err := client.PatchCard(ctx, &proto.PatchCardReq{
-			Fields: []proto.CardField{proto.CardField_COMPLETED_AT},
+			Fields: []proto.PatchCardReq_Field{proto.PatchCardReq_COMPLETED_AT},
 			Card: &proto.Card{
 				CardNo:      card.CardNo,
 				CompletedAt: timestamppb.Now(),
@@ -236,7 +236,7 @@ func TestCompleteCard(t *testing.T) {
 	// turn to in-progress
 	{
 		_, err := client.PatchCard(ctx, &proto.PatchCardReq{
-			Fields: []proto.CardField{proto.CardField_COMPLETED_AT},
+			Fields: []proto.PatchCardReq_Field{proto.PatchCardReq_COMPLETED_AT},
 			Card: &proto.Card{
 				CardNo:      card.CardNo,
 				CompletedAt: nil,
