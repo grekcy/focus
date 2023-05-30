@@ -693,7 +693,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/Version", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/version"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/Version", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/Version"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -718,7 +718,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/VersionEx", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/versionEx"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/VersionEx", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/VersionEx"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -743,7 +743,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/LoginWithGoogleOauth", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/loginWithGoogleOauth"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/LoginWithGoogleOauth", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/LoginWithGoogleOauth"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -768,7 +768,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetProfile", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getProfile"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetProfile", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetProfile"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -793,7 +793,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetUser", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getUser"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetUser", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetUser"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -818,7 +818,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/AddCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/addCard"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/AddCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/AddCard"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -843,7 +843,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/ListCards", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/listCards"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/ListCards", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/ListCards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -868,7 +868,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getCard"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetCard"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -893,7 +893,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCards", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getCards"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCards", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetCards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -918,7 +918,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCardProgressSummary", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getCardProgressSummary"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCardProgressSummary", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetCardProgressSummary"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -943,7 +943,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/PatchCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/patchCard"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/PatchCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/PatchCard"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -968,7 +968,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/RerankCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/rerankCard"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/RerankCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/RerankCard"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -993,7 +993,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/DeleteCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/deleteCard"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/DeleteCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/DeleteCard"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1018,7 +1018,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/CreateLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/createLabel"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/CreateLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/CreateLabel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1043,7 +1043,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/ListLabels", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/listLabels"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/ListLabels", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/ListLabels"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1068,7 +1068,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/UpdateLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/updateLabel"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/UpdateLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/UpdateLabel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1093,7 +1093,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/DeleteLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/deleteLabel"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/DeleteLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/DeleteLabel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1118,7 +1118,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/ListChallenges", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/listChallenges"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/ListChallenges", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/ListChallenges"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1143,7 +1143,7 @@ func RegisterFocusHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetChallenge", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getChallenge"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/api.v1alpha1.Focus/GetChallenge", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetChallenge"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1207,7 +1207,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/Version", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/version"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/Version", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/Version"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1229,7 +1229,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/VersionEx", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/versionEx"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/VersionEx", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/VersionEx"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1251,7 +1251,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/LoginWithGoogleOauth", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/loginWithGoogleOauth"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/LoginWithGoogleOauth", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/LoginWithGoogleOauth"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1273,7 +1273,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetProfile", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getProfile"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetProfile", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetProfile"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1295,7 +1295,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetUser", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getUser"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetUser", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetUser"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1317,7 +1317,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/AddCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/addCard"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/AddCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/AddCard"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1339,7 +1339,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/ListCards", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/listCards"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/ListCards", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/ListCards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1361,7 +1361,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getCard"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetCard"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1383,7 +1383,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCards", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getCards"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCards", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetCards"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1405,7 +1405,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCardProgressSummary", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getCardProgressSummary"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetCardProgressSummary", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetCardProgressSummary"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1427,7 +1427,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/PatchCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/patchCard"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/PatchCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/PatchCard"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1449,7 +1449,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/RerankCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/rerankCard"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/RerankCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/RerankCard"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1471,7 +1471,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/DeleteCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/deleteCard"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/DeleteCard", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/DeleteCard"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1493,7 +1493,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/CreateLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/createLabel"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/CreateLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/CreateLabel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1515,7 +1515,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/ListLabels", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/listLabels"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/ListLabels", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/ListLabels"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1537,7 +1537,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/UpdateLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/updateLabel"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/UpdateLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/UpdateLabel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1559,7 +1559,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/DeleteLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/deleteLabel"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/DeleteLabel", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/DeleteLabel"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1581,7 +1581,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/ListChallenges", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/listChallenges"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/ListChallenges", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/ListChallenges"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1603,7 +1603,7 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetChallenge", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/getChallenge"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/api.v1alpha1.Focus/GetChallenge", runtime.WithHTTPPathPattern("/api.v1alpha1.Focus/GetChallenge"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1623,43 +1623,43 @@ func RegisterFocusHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Focus_Version_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "version"}, ""))
+	pattern_Focus_Version_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "Version"}, ""))
 
-	pattern_Focus_VersionEx_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "versionEx"}, ""))
+	pattern_Focus_VersionEx_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "VersionEx"}, ""))
 
-	pattern_Focus_LoginWithGoogleOauth_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "loginWithGoogleOauth"}, ""))
+	pattern_Focus_LoginWithGoogleOauth_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "LoginWithGoogleOauth"}, ""))
 
-	pattern_Focus_GetProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "getProfile"}, ""))
+	pattern_Focus_GetProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "GetProfile"}, ""))
 
-	pattern_Focus_GetUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "getUser"}, ""))
+	pattern_Focus_GetUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "GetUser"}, ""))
 
-	pattern_Focus_AddCard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "addCard"}, ""))
+	pattern_Focus_AddCard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "AddCard"}, ""))
 
-	pattern_Focus_ListCards_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "listCards"}, ""))
+	pattern_Focus_ListCards_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "ListCards"}, ""))
 
-	pattern_Focus_GetCard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "getCard"}, ""))
+	pattern_Focus_GetCard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "GetCard"}, ""))
 
-	pattern_Focus_GetCards_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "getCards"}, ""))
+	pattern_Focus_GetCards_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "GetCards"}, ""))
 
-	pattern_Focus_GetCardProgressSummary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "getCardProgressSummary"}, ""))
+	pattern_Focus_GetCardProgressSummary_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "GetCardProgressSummary"}, ""))
 
-	pattern_Focus_PatchCard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "patchCard"}, ""))
+	pattern_Focus_PatchCard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "PatchCard"}, ""))
 
-	pattern_Focus_RerankCard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "rerankCard"}, ""))
+	pattern_Focus_RerankCard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "RerankCard"}, ""))
 
-	pattern_Focus_DeleteCard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "deleteCard"}, ""))
+	pattern_Focus_DeleteCard_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "DeleteCard"}, ""))
 
-	pattern_Focus_CreateLabel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "createLabel"}, ""))
+	pattern_Focus_CreateLabel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "CreateLabel"}, ""))
 
-	pattern_Focus_ListLabels_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "listLabels"}, ""))
+	pattern_Focus_ListLabels_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "ListLabels"}, ""))
 
-	pattern_Focus_UpdateLabel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "updateLabel"}, ""))
+	pattern_Focus_UpdateLabel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "UpdateLabel"}, ""))
 
-	pattern_Focus_DeleteLabel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "deleteLabel"}, ""))
+	pattern_Focus_DeleteLabel_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "DeleteLabel"}, ""))
 
-	pattern_Focus_ListChallenges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "listChallenges"}, ""))
+	pattern_Focus_ListChallenges_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "ListChallenges"}, ""))
 
-	pattern_Focus_GetChallenge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "getChallenge"}, ""))
+	pattern_Focus_GetChallenge_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api.v1alpha1.Focus", "GetChallenge"}, ""))
 )
 
 var (
