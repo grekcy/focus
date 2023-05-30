@@ -1,6 +1,6 @@
 TARGET=bin/focus
 SRC=$(shell find . -type f -name '*.go' -not -path "./vendor/*" -not -path "*_test.go")
-PROTO_GOS = proto/v1alpha1/focus_v1alpha1.pb.go
+PROTO_GOS = proto/v1alpha1/focus_v1alpha1_grpc.pb.go proto/v1alpha2/focus_v1alpha2_grpc.pb.go proto/sample/v1alpha1/sample_v1alpha1_grpc.pb.go
 
 LDFLAGS ?= -ldflags "-s -w"
 BUILD_FLAGS ?= -v ${LDFLAGS}
@@ -31,7 +31,7 @@ tidy:
 	@go mod tidy -v
 
 # FIXME
-proto/v1alpha1/focus_v1alpha1.pb.go: proto/focus_v1alpha1.proto
+proto/v1alpha1/focus_v1alpha1_grpc.pb.go: proto/focus_v1alpha1.proto
 	protoc -I=./proto \
       --go_out=./proto/v1alpha1 \
       --go_opt=paths=source_relative \
@@ -46,8 +46,7 @@ proto/v1alpha1/focus_v1alpha1.pb.go: proto/focus_v1alpha1.proto
 
 	cd ./proto/v1alpha1 && mockery --name FocusClient
 
-
-proto/v1alpha2/focus_v1alpha2.pb.go: proto/focus_v1alpha2.proto
+proto/v1alpha2/focus_v1alpha2_grpc.pb.go: proto/focus_v1alpha2.proto
 	protoc -I=./proto \
       --go_out=./proto/v1alpha2 \
       --go_opt=paths=source_relative \
@@ -62,7 +61,7 @@ proto/v1alpha2/focus_v1alpha2.pb.go: proto/focus_v1alpha2.proto
 
 	cd ./proto/v1alpha2 && mockery --name FocusClient
 
-proto/sample/v1alpha1/sample_v1alpha1.pb.go: proto/sample_v1alpha1.proto
+proto/sample/v1alpha1/sample_v1alpha1_grpc.pb.go: proto/sample_v1alpha1.proto
 	protoc -I=./proto \
       --go_out=./proto/sample/v1alpha1 \
       --go_opt=paths=source_relative \
