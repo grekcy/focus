@@ -7,7 +7,7 @@ Collobration make easy for personal and orginazations.
 ### create PostgreSQL database
 
     CREATE USER focus WITH PASSWORD 'focus-pass';
-    CREATE DATABASE focus_dev OWNER focus;
+    CREATE DATABASE focus_test OWNER focus;
 
 ### start envoy proxy for gRPC api
 

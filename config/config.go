@@ -20,18 +20,20 @@ func init() {
 var defaults = map[string]any{
 	"apiserver.bind_addr":         "127.0.0.1:9090",
 	"database.hostname":           "localhost",
-	"database.name":               "focus_dev",
+	"database.port":               "5432",
+	"database.name":               "focus_test",
 	"database.user":               "focus",
 	"database.passwd":             "passwd-pass",
 	"database.max_idle_conns":     10,
 	"database.max_open_conns":     100,
 	"database.conn_max_life_time": time.Hour,
-	"database.log_sql":            true,
+	"database.log_sql":            false,
 	"auth.signing_key":            "auth-signing-key",
 }
 
 func ApiServerBindAddr() string        { return v.GetString("apiserver.bind_addr") }
 func DBHostname() string               { return v.GetString("database.hostname") }
+func DBPort() string                   { return v.GetString("database.port") }
 func DBName() string                   { return v.GetString("database.name") }
 func DBUser() string                   { return v.GetString("database.user") }
 func DBPassword() string               { return v.GetString("database.passwd") }

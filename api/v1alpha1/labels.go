@@ -6,6 +6,7 @@ import (
 	"github.com/whitekid/goxp/fx"
 	"github.com/whitekid/goxp/log"
 	"github.com/whitekid/goxp/validate"
+	"github.com/whitekid/grpcx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -13,7 +14,6 @@ import (
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gorm.io/gorm"
 
-	"focus/helper"
 	"focus/models"
 	proto "focus/proto/v1alpha1"
 )
@@ -133,5 +133,5 @@ func (s *v1alpha1ServiceImpl) DeleteLabel(ctx context.Context, req *wrapperspb.U
 		log.Warnf("delete exactly id=%v, but deleted %d", req.Value, tx.RowsAffected)
 	}
 
-	return helper.Empty(), nil
+	return grpcx.Empty(), nil
 }

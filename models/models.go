@@ -20,7 +20,7 @@ type User struct {
 
 	UID   string `gorm:"type:varchar(22);not null;uniqueIndex;check:uid<>''"`
 	Email string `gorm:"type:varchar(100);not null;uniqueIndex:,where:deleted_at IS NULL;check:email<>''"`
-	Name  string `gorm:"type:varchar(50);not null;name<>''"`
+	Name  string `gorm:"type:varchar(50);not null;check:name<>''"`
 }
 
 func (u *User) BeforeCreate(tx *gorm.DB) error {

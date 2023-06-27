@@ -11,6 +11,7 @@ import (
 	"github.com/whitekid/goxp/fx"
 	"github.com/whitekid/goxp/log"
 	"github.com/whitekid/goxp/validate"
+	"github.com/whitekid/grpcx"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -194,7 +195,7 @@ func (s *v1alpha1ServiceImpl) RerankCard(ctx context.Context, req *proto.RankCar
 			return nil, err
 		}
 	}
-	return helper.Empty(), nil
+	return grpcx.Empty(), nil
 }
 
 func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UInt64Value) (*emptypb.Empty, error) {
@@ -222,10 +223,10 @@ func (s *v1alpha1ServiceImpl) DeleteCard(ctx context.Context, req *wrapperspb.UI
 
 		return nil
 	}); err != nil {
-		return helper.Empty(), status.Errorf(codes.Internal, "delete failed: %v", err.Error())
+		return grpcx.Empty(), status.Errorf(codes.Internal, "delete failed: %v", err.Error())
 	}
 
-	return helper.Empty(), nil
+	return grpcx.Empty(), nil
 }
 
 func cardModelToProto(in *CardWithDepth) *proto.Card {
@@ -236,9 +237,9 @@ func cardModelToProto(in *CardWithDepth) *proto.Card {
 		Depth:            uint32(in.Depth),
 		CreatedAt:        timestamppb.New(in.CreatedAt),
 		UpdatedAt:        timestamppb.New(in.UpdatedAt),
-		DeferUntil:       helper.NewTimestamppb(in.DeferUntil),
-		DueDate:          helper.NewTimestamppb(in.DueDate),
-		CompletedAt:      helper.NewTimestamppb(in.CompletedAt),
+		DeferUntil:       grpcx.Timestamppb(in.DeferUntil),
+		DueDate:          grpcx.Timestamppb(in.DueDate),
+		CompletedAt:      grpcx.Timestamppb(in.CompletedAt),
 		CreatorId:        uint64(in.CreatorID),
 		ResponsibilityId: helper.PP[uint, uint64](in.ResponsibilityID),
 		CardType:         in.CardType,
@@ -259,9 +260,9 @@ func protoCardToModel(in *proto.Card) *models.Card {
 		ResponsibilityID: helper.PP[uint64, uint](in.ResponsibilityId),
 		CardNo:           uint(in.CardNo),
 		ParentCardNo:     helper.PP[uint64, uint](in.ParentCardNo),
-		DeferUntil:       helper.TimestampToTimeP(in.DeferUntil),
-		DueDate:          helper.TimestampToTimeP(in.DueDate),
-		CompletedAt:      helper.TimestampToTimeP(in.CompletedAt),
+		DeferUntil:       grpcx.TimestampToTimeP(in.DeferUntil),
+		DueDate:          grpcx.TimestampToTimeP(in.DueDate),
+		CompletedAt:      grpcx.TimestampToTimeP(in.CompletedAt),
 		CardType:         in.CardType,
 		Status:           in.Status,
 		Labels:           helper.ToArray(in.Labels),

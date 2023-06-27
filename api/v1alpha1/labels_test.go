@@ -13,7 +13,9 @@ func TestLabelList(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	client := newTestClient(ctx, t)
+	prepareFixture(t, "../..")
+
+	ctx, client := newTestClient(ctx, t)
 	got, err := client.service.listLabels(ctx, nil)
 	require.NoError(t, err)
 
@@ -24,7 +26,9 @@ func TestLabelCreate(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	client := newTestClient(ctx, t)
+	prepareFixture(t, "../..")
+
+	ctx, client := newTestClient(ctx, t)
 
 	type args struct {
 		label *models.Label

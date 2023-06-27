@@ -8,11 +8,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	"github.com/pkg/errors"
+	"github.com/whitekid/gormx"
 	"github.com/whitekid/goxp/log"
 	"github.com/whitekid/goxp/validate"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/wrapperspb"
 	"gorm.io/gorm"
 
@@ -33,19 +32,20 @@ func ExtractUserInfo(ctx context.Context) (context.Context, error) {
 		return nil, err
 	}
 
-	user := &models.User{UID: uid}
-	if tx := db.WithContext(ctx).Where("uid = ?", uid).First(user); tx.Error != nil {
-		return nil, status.Error(codes.Unauthenticated, "user not found")
+	user, err := gormx.Get[models.User](db.WithContext(ctx).Where("uid = ?", uid))
+	if err != nil {
+		return nil, errUserNotFound
 	}
 	ctx = context.WithValue(ctx, keyUser, user)
 
 	// TODO 현재는 default workspace로 고정이 되어있음. 향후 current workspace를 변경하는 기능이 필요함
-	userWorkspace := &models.UserWorkspace{}
-	if tx := db.WithContext(ctx).Preload("Workspace").Where(&models.UserWorkspace{
-		UserID: user.ID,
-		Role:   models.RoleDefault,
-	}).First(userWorkspace); tx.Error != nil {
-		return nil, status.Errorf(codes.Internal, "user workspace not found: %v", tx.Error)
+	userWorkspace, err := gormx.Get[models.UserWorkspace](
+		db.WithContext(ctx).Preload("Workspace").Where(&models.UserWorkspace{
+			UserID: user.ID,
+			Role:   models.RoleDefault,
+		}))
+	if err != nil {
+		return nil, errUserWorkspaceNotFound
 	}
 
 	ctx = context.WithValue(ctx, keyUserWorkspace, userWorkspace.Workspace)
@@ -53,10 +53,14 @@ func ExtractUserInfo(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-var authMap = map[string]string{
-	"version":              "",
-	"loginWithGoogleOauth": "",
-}
+var authMap = map[string]auth{}
+
+type auth int
+
+const (
+	authNone     auth = iota // no authentication
+	authRequired             // authorization required
+)
 
 func (s *v1alpha1ServiceImpl) authInterceptor() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -65,12 +69,12 @@ func (s *v1alpha1ServiceImpl) authInterceptor() grpc.UnaryServerInterceptor {
 
 		auth, ok := authMap[method]
 		if !ok {
-			auth = "required"
+			auth = authRequired
 		}
 
 		switch auth {
-		case "": // no authentication
-		case "required": // user required
+		case authNone: // no authentication
+		case authRequired: // user required
 			token, err := grpc_auth.AuthFromMD(ctx, "bearer")
 			if err != nil {
 				return nil, err
@@ -83,12 +87,14 @@ func (s *v1alpha1ServiceImpl) authInterceptor() grpc.UnaryServerInterceptor {
 				return nil, err
 			}
 		default:
-			return nil, status.Errorf(codes.Internal, "invalid auth method: %v", auth)
+			return nil, errors.Errorf("invalid auth method: %v", auth)
 		}
 
 		return handler(ctx, req)
 	}
 }
+
+func init() { authMap["LoginWithGoogleOauth"] = authNone }
 
 func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *proto.GoogleLoginReq) (*wrapperspb.StringValue, error) {
 	if err := validate.Struct(&struct {
@@ -98,7 +104,7 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 		Credential: req.Credential,
 		ClientID:   req.ClientId,
 	}); err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, err
 	}
 
 	token, err := jwt.ParseWithClaims(req.Credential, jwt.MapClaims{},
@@ -106,17 +112,17 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 			return []byte("some key"), nil
 		})
 	if err != nil && !strings.HasPrefix(err.Error(), "token signature is invalid") {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, err
 	}
 
 	exp, err := token.Claims.GetExpirationTime()
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, err
 	}
 
 	if req.Extra != "__charlie__" {
 		if exp.Before(time.Now()) {
-			return nil, status.Errorf(codes.InvalidArgument, "expired")
+			return nil, errors.New("token expired")
 		}
 
 		// NOTE google oauth token은 valid하지 않음. 키를 모르니까
@@ -127,12 +133,12 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 
 	email, ok := token.Claims.(jwt.MapClaims)["email"].(string)
 	if !ok || email == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "email required")
+		return nil, errors.New("email required")
 	}
 
 	name, ok := token.Claims.(jwt.MapClaims)["name"].(string)
 	if !ok || name == "" {
-		return nil, status.Errorf(codes.InvalidArgument, "name required")
+		return nil, errors.New("name required")
 	}
 
 	// create user if not exists
@@ -155,7 +161,7 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 
 				if tx := txn.Create(uw); tx.Error != nil {
 					log.Errorf("%+v", tx.Error)
-					return status.Errorf(codes.Internal, tx.Error.Error())
+					return tx.Error
 				}
 
 				user = uw.User
@@ -194,7 +200,7 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 				}
 				if tx := txn.Create(defaultLabels); tx.Error != nil {
 					log.Errorf("%+v", tx.Error)
-					return status.Errorf(codes.Internal, tx.Error.Error())
+					return tx.Error
 				}
 
 				return nil
@@ -203,7 +209,7 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 			}
 		} else {
 			log.Errorf("%+v %T", tx.Error.Error(), tx.Error)
-			return nil, status.Errorf(codes.Internal, "%+v", tx.Error.Error())
+			return nil, tx.Error
 		}
 	}
 
@@ -221,7 +227,7 @@ func (s *v1alpha1ServiceImpl) LoginWithGoogleOauth(ctx context.Context, req *pro
 // signAPIKey return signed jwt token
 func signAPIKey(uid string, expireAt time.Time) (string, error) {
 	if uid == "" {
-		return "", status.Error(codes.Internal, "uid required")
+		return "", errors.New("uid required")
 	}
 
 	token, err := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.RegisteredClaims{
@@ -229,7 +235,7 @@ func signAPIKey(uid string, expireAt time.Time) (string, error) {
 		ExpiresAt: jwt.NewNumericDate(expireAt),
 	}).SignedString(config.AuthSigningKey())
 	if err != nil {
-		return "", status.Error(codes.Internal, err.Error())
+		return "", errors.Wrapf(err, "fail to sign token:")
 	}
 
 	return token, nil
@@ -246,28 +252,28 @@ func parseAPIKey(jwtToken string) (string, error) {
 			return config.AuthSigningKey(), nil
 		})
 	if err != nil {
-		return "", status.Errorf(codes.Unauthenticated, err.Error())
+		return "", errors.Wrap(errTokenParseFailed, "")
 	}
 
 	if !token.Valid {
-		return "", status.Errorf(codes.Unauthenticated, "invalid token")
+		return "", errInvalidToken
 	}
 
 	claims, ok := token.Claims.(*jwt.RegisteredClaims)
 	if !ok {
-		return "", status.Errorf(codes.Unauthenticated, "invalid calims")
+		return "", errInvalidClaims
 	}
 
 	if claims.ExpiresAt == nil {
-		return "", status.Errorf(codes.Unauthenticated, "expired missed")
+		return "", errors.New("expired missed")
 	}
 
 	if claims.ExpiresAt.Before(time.Now()) {
-		return "", status.Errorf(codes.Internal, "api key expired")
+		return "", errors.New("api key expired")
 	}
 
 	if claims.Subject == "" {
-		return "", status.Errorf(codes.Internal, "subject missed")
+		return "", errors.New("subject missed")
 	}
 
 	return claims.Subject, nil

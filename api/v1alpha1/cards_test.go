@@ -7,10 +7,11 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"github.com/whitekid/gormx"
 	"github.com/whitekid/goxp/fixtures"
 	"github.com/whitekid/goxp/fx"
+	"github.com/whitekid/grpcx"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"google.golang.org/protobuf/types/known/wrapperspb"
 
 	"focus/helper"
 	"focus/models"
@@ -33,23 +34,28 @@ func TestAddCard(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
-			client := newTestClient(ctx, t)
+			prepareFixture(t, "../..")
+
+			ctx, client := newTestClient(ctx, t)
 
 			got, err := client.AddCard(ctx, &proto.AddCardReq{Objective: tt.args.objective})
-			require.Truef(t, (err != nil) == tt.wantErr, `AddCardReq() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
+			require.Truef(t, (err != nil) == tt.wantErr, `AddCard() failed: error = %+v, wantErr = %v`, err, tt.wantErr)
 			if tt.wantErr {
 				return
 			}
-			defer func() {
-				_, err = client.DeleteCard(ctx, helper.UInt64(got.CardNo))
-				require.NoError(t, err)
-			}()
+			defer client.DeleteCard(ctx, grpcx.UInt64(got.CardNo))
 
 			require.NotEqual(t, uint64(0), got.CardNo)
 			require.Equal(t, tt.args.objective, got.Objective)
 
-			got1, err := client.GetCard(ctx, helper.UInt64(got.CardNo))
+			got1, err := client.GetCard(ctx, grpcx.UInt64(got.CardNo))
 			require.NoError(t, err)
+
+			// github actions에서 nano seconds 정도의 미묘한 차이가 있어서 리셋
+			got.CreatedAt = nil
+			got1.CreatedAt = nil
+			got.UpdatedAt = nil
+			got1.UpdatedAt = nil
 			require.Equal(t, got, got1)
 		})
 	}
@@ -59,19 +65,12 @@ func TestListCards(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	client := newTestClient(ctx, t)
+	db := prepareFixture(t, "../..")
 
-	// set deferred cards
-	deferredCard, err := client.AddCard(ctx, &proto.AddCardReq{Objective: "test defer card"})
+	labelEnhancement, err := gormx.Get[models.Label](db.Where("label = ?", "enhancement"))
 	require.NoError(t, err)
-	client.PatchCard(ctx, &proto.PatchCardReq{Card: &proto.Card{
-		CardNo:     deferredCard.CardNo,
-		DeferUntil: timestamppb.New(time.Now().AddDate(0, 0, 1)),
-	}, Fields: []proto.PatchCardReq_Field{proto.PatchCardReq_DEFER_UNTIL}})
 
-	defer func() {
-		client.DeleteCard(ctx, wrapperspb.UInt64(deferredCard.CardNo))
-	}()
+	ctx, client := newTestClient(ctx, t)
 
 	type args struct {
 		startWhere *models.Card
@@ -87,7 +86,7 @@ func TestListCards(t *testing.T) {
 		{`include deferred`, args{where: nil, opts: ListOpt{excludeDeferred: false}}, false},
 		{`exclude deferred`, args{where: nil, opts: ListOpt{excludeDeferred: true}}, false},
 		{`with label`, args{
-			where: &models.Card{Labels: helper.ToArray(fx.Of(1))},
+			where: &models.Card{Labels: helper.ToArray(fx.Of(labelEnhancement.ID))},
 			opts:  ListOpt{excludeCompleted: true}}, false},
 		{`inbox`, args{&models.Card{CardType: models.CardTypeCard.String()}, &models.Card{}, ListOpt{excludeCompleted: true}}, false},
 		{`challenge list`, args{
@@ -111,8 +110,7 @@ func TestListCards(t *testing.T) {
 
 			if tt.args.opts.excludeDeferred && tt.args.where == nil {
 				require.NotEmpty(t, got)
-				require.NotContains(t,
-					fx.Map(got, func(e *CardWithDepth) uint64 { return uint64(e.CardNo) }), deferredCard.CardNo)
+				require.Empty(t, fx.Filter(got, func(e *CardWithDepth) bool { return e.DeferUntil != nil }))
 				fx.Each(got, func(_ int, c *CardWithDepth) {
 					if c.DeferUntil != nil {
 						require.True(t, c.DeferUntil.Before(time.Now()))
@@ -150,7 +148,8 @@ func TestGetCard(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	client := newTestClient(ctx, t)
+	prepareFixture(t, "../..")
+	ctx, client := newTestClient(ctx, t)
 
 	inProgressCard := &models.Card{}
 	require.NoError(t, client.service.db.WithContext(ctx).Where("defer_until IS NULL AND completed_at IS NULL").Take(inProgressCard).Error)
@@ -198,7 +197,9 @@ func TestCompleteCard(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	client := newTestClient(ctx, t)
+	prepareFixture(t, "../..")
+
+	ctx, client := newTestClient(ctx, t)
 	card, teardown := newCardForTest(ctx, t, client.service, "test card for complete card")
 	defer teardown()
 
@@ -215,7 +216,7 @@ func TestCompleteCard(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		updated, err := client.GetCard(ctx, helper.UInt64(card.CardNo))
+		updated, err := client.GetCard(ctx, grpcx.UInt64(card.CardNo))
 		require.NoError(t, err)
 		require.NotNil(t, updated.CompletedAt)
 		require.Less(t, time.Since(updated.CompletedAt.AsTime()), time.Second)
@@ -244,7 +245,7 @@ func TestCompleteCard(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		updated, err := client.GetCard(ctx, helper.UInt64(card.CardNo))
+		updated, err := client.GetCard(ctx, grpcx.UInt64(card.CardNo))
 		require.NoError(t, err)
 		require.Nil(t, updated.CompletedAt)
 	}
@@ -255,7 +256,7 @@ func newCardForTest(ctx context.Context, t *testing.T, service *v1alpha1ServiceI
 	require.NoError(t, err, "fail to create card")
 
 	return card, func() {
-		_, err = service.DeleteCard(ctx, helper.UInt64(card.CardNo))
+		_, err = service.DeleteCard(ctx, grpcx.UInt64(card.CardNo))
 		require.NoError(t, err)
 	}
 }
@@ -264,7 +265,9 @@ func TestRankDown(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	client := newTestClient(ctx, t)
+	prepareFixture(t, "../..")
+
+	ctx, client := newTestClient(ctx, t)
 	card1, teardown := newCardForTest(ctx, t, client.service, "test objective for rank #1")
 	defer teardown()
 
@@ -286,7 +289,9 @@ func TestGetParentChallenge(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	client := newTestClient(ctx, t)
+	prepareFixture(t, "../..")
+
+	ctx, client := newTestClient(ctx, t)
 
 	type args struct {
 		cardNo uint
@@ -297,8 +302,8 @@ func TestGetParentChallenge(t *testing.T) {
 		wantCard uint
 		wantErr  bool
 	}{
-		{`valid`, args{cardNo: 2141}, 2107, false},
-		{`valid`, args{cardNo: 2107}, 0, false},
+		{`valid`, args{cardNo: 8}, 7, false},
+		{`valid`, args{cardNo: 7}, 0, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -310,5 +315,4 @@ func TestGetParentChallenge(t *testing.T) {
 			require.Equal(t, tt.wantCard, got)
 		})
 	}
-
 }

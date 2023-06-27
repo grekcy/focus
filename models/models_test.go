@@ -1,19 +1,31 @@
 package models
 
 import (
+	"context"
+	"fmt"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"github.com/whitekid/gormx"
+	"github.com/whitekid/goxp"
 	"github.com/whitekid/goxp/fx"
+	"github.com/whitekid/goxp/testx"
 	"gorm.io/gorm"
+
+	"focus/config"
 )
 
 var _db *gorm.DB
 
 func TestMain(m *testing.M) {
-	db, err := gormx.Open("pgsql://focus:focus-pass@localhost/focus_dev")
+	db, err := gormx.Open(fmt.Sprintf("pgsql://%s:%s@%s:%s/%s",
+		config.DBUser(),
+		config.DBPassword(),
+		config.DBHostname(),
+		config.DBPort(),
+		config.DBName(),
+	))
 	if err != nil {
 		panic(err)
 	}
@@ -24,7 +36,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestMigrate(t *testing.T) {
-	require.NoError(t, Migrate(_db))
+	require.NoError(t, Migrate(context.Background(), _db))
 }
 
 func TestUID(t *testing.T) {
@@ -67,10 +79,8 @@ func TestCardLabels(t *testing.T) {
 		require.NoError(t, _db.Delete(card).Error)
 	}()
 
-	cards := []Card{}
-	require.NoError(t, _db.Model(&Card{}).Where("labels IS NOT NULL").Find(&cards).Error)
-	require.NotEmpty(t, cards, "")
-	require.Equal(t, card.Labels, cards[0].Labels)
+	got := testx.NoError1(t, goxp.T2(gormx.Get[Card](_db.Where("card_no = ?", card.CardNo))))
+	require.Equal(t, card.Labels, got.Labels)
 }
 
 // TODO transaction/ rollback 제대로 테스트 필요하겠네

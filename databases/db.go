@@ -1,7 +1,9 @@
 package databases
 
 import (
+	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -15,11 +17,13 @@ import (
 )
 
 func Open() (*gorm.DB, error) {
-	return openURL(fmt.Sprintf("pgsql://%s:%s@%s/%s",
+	return openURL(fmt.Sprintf("pgsql://%s:%s@%s:%s/%s",
 		config.DBUser(),
 		config.DBPassword(),
 		config.DBHostname(),
-		config.DBName()))
+		config.DBPort(),
+		config.DBName(),
+	))
 }
 
 func openURL(dburl string) (*gorm.DB, error) {
@@ -33,6 +37,7 @@ func openURL(dburl string) (*gorm.DB, error) {
 			})
 	}
 
+	log.Debugf("opening database %v", strings.ReplaceAll(dburl, config.DBPassword(), "*****"))
 	db, err := gormx.Open(dburl, &gorm.Config{
 		SkipDefaultTransaction: true,
 		PrepareStmt:            true,
@@ -57,6 +62,6 @@ type gormLogger struct{}
 
 func (l *gormLogger) Printf(s string, args ...any) { log.Debugf(s, args...) }
 
-func Migrate(db *gorm.DB) error {
-	return models.Migrate(db)
+func Migrate(ctx context.Context, db *gorm.DB) error {
+	return models.Migrate(ctx, db)
 }
