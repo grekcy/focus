@@ -21,7 +21,7 @@ func init() {
 				return nil
 			}
 
-			if err := fixtures.Setup(cmd.Context(), db); err != nil {
+			if err := fixtures.Setup(db.WithContext(cmd.Context())); err != nil {
 				return err
 			}
 
