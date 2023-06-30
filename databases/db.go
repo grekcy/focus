@@ -1,7 +1,6 @@
 package databases
 
 import (
-	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -62,6 +61,4 @@ type gormLogger struct{}
 
 func (l *gormLogger) Printf(s string, args ...any) { log.Debugf(s, args...) }
 
-func Migrate(ctx context.Context, db *gorm.DB) error {
-	return models.Migrate(ctx, db)
-}
+func Migrate(db *gorm.DB) error { return models.Migrate(db) }

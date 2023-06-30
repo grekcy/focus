@@ -12,7 +12,7 @@ func init() {
 		Use:   "migrate",
 		Short: "migrate database",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return models.Migrate(cmd.Context(), db)
+			return models.Migrate(db.WithContext(cmd.Context()))
 		},
 	}, nil, nil)
 }

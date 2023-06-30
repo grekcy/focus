@@ -1,7 +1,6 @@
 package models
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"testing"
@@ -36,7 +35,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestMigrate(t *testing.T) {
-	require.NoError(t, Migrate(context.Background(), _db))
+	require.NoError(t, Migrate(_db))
 }
 
 func TestUID(t *testing.T) {

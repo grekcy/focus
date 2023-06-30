@@ -1,7 +1,6 @@
 package fixtures
 
 import (
-	"context"
 	"os"
 	"time"
 
@@ -17,13 +16,13 @@ import (
 
 // Setup setup test databases
 // Setup setup fixture data
-func Setup(ctx context.Context, db *gorm.DB) error {
+func Setup(db *gorm.DB) error {
 	migrator := db.Migrator()
 	if err := migrator.DropTable("users", "cards", "labels", "metadata", "user_workspaces", "workspaces"); err != nil {
 		return err
 	}
 
-	if err := databases.Migrate(ctx, db); err != nil {
+	if err := databases.Migrate(db); err != nil {
 		return err
 	}
 
