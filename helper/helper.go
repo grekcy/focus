@@ -1,6 +1,10 @@
 package helper
 
-import "github.com/whitekid/goxp/fx"
+import (
+	"time"
+
+	"github.com/whitekid/goxp/fx"
+)
 
 func PP[T fx.RealNumber, R fx.RealNumber](v *T) *R {
 	if v == nil {
@@ -11,8 +15,7 @@ func PP[T fx.RealNumber, R fx.RealNumber](v *T) *R {
 	return &vv
 }
 
-func P[T int, R uint](v T) *R {
-	var r R
-	r = R(v)
+func P[T int | time.Duration, R uint | time.Duration](v T) *R {
+	r := R(v)
 	return &r
 }

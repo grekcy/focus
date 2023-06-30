@@ -1,0 +1,50 @@
+users:
+  user1@focus.app:
+    name: test user 1
+
+workspaces:
+  "user1@focus.app default workspace":
+    users:
+      "user1@focus.app":
+        role: default
+    labels:
+      enhancement: success.light
+      design: info.light
+      important: secondary.light
+      urgent: error.main
+      bug: error.light
+      starred: warning.light
+    cards:
+      - cardNo: 1
+        objective: first card
+        creator: user1@focus.app
+      - cardNo: 2
+        objective: completed card
+        creator: user1@focus.app
+        completedAt: -24h
+      - cardNo: 3
+        objective: deferred card
+        creator: user1@focus.app
+        deferUntil: 24h
+      - cardNo: 4
+        objective: enhancement card
+        creator: user1@focus.app
+        labels:
+          - enhancement
+      - cardNo: 5
+        cardType: challenge
+        objective: challenge #1
+        creator: user1@focus.app
+      - cardNo: 6
+        objective: deleted card
+        creator: user1@focus.app
+        deletedAt: -1m
+      - cardNo: 7
+        objective: top level challenge
+        cardType: challenge
+        creator: user1@focus.app
+      - cardNo: 8
+        objective: next level challenge
+        cardType: challenge
+        parentCardNo: 7
+        creator: user1@focus.app

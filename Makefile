@@ -75,4 +75,3 @@ proto/sample/v1alpha1/sample_v1alpha1_grpc.pb.go: proto/sample_v1alpha1.proto
 	  proto/sample_v1alpha1.proto
 
 	cd ./proto/sample/v1alpha1 && mockery --name SampleClient
-
