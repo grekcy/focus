@@ -4,7 +4,6 @@ import (
 	"os"
 	"time"
 
-	"focus/databases"
 	"focus/models"
 	"focus/repository"
 
@@ -17,12 +16,11 @@ import (
 // Setup setup test databases
 // Setup setup fixture data
 func Setup(db *gorm.DB) error {
-	migrator := db.Migrator()
-	if err := migrator.DropTable("users", "cards", "labels", "metadata", "user_workspaces", "workspaces"); err != nil {
+	if err := db.Migrator().DropTable(&models.User{}, &models.Card{}, &models.Label{}, &models.Metadata{}, &models.UserWorkspace{}, &models.Workspace{}); err != nil {
 		return err
 	}
 
-	if err := databases.Migrate(db); err != nil {
+	if err := models.Migrate(db); err != nil {
 		return err
 	}
 

@@ -12,7 +12,6 @@ import (
 	"gorm.io/gorm/logger"
 
 	"focus/config"
-	"focus/models"
 )
 
 func Open() (*gorm.DB, error) {
@@ -60,5 +59,3 @@ func openURL(dburl string) (*gorm.DB, error) {
 type gormLogger struct{}
 
 func (l *gormLogger) Printf(s string, args ...any) { log.Debugf(s, args...) }
-
-func Migrate(db *gorm.DB) error { return models.Migrate(db) }

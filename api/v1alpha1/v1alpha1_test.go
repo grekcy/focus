@@ -33,7 +33,7 @@ func prepareFixture(t *testing.T, fixturePath string) *gorm.DB {
 	sqlDB, err := db.DB()
 	require.NoError(t, err)
 
-	require.NoError(t, databases.Migrate(db))
+	require.NoError(t, models.Migrate(db))
 	require.NoError(t, fixtures.Load(sqlDB, fixturePath))
 
 	return db
